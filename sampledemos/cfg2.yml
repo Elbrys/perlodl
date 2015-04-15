@@ -1,0 +1,12 @@
+# Controller specification
+ctrlIpAddr: "172.22.19.67"
+ctrlPortNum: "8181"     
+ctrlUname: 'admin' 
+ctrlPswd:  'admin'   
+
+# NetconfNode specification
+nodeName: "faux-device"
+nodeIpAddr: "10.2.3.4"
+nodePortNum: 830
+nodeUname: "nom-d'utilisateur"
+nodePswd: "mot-de-passe"
