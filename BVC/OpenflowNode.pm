@@ -13,19 +13,19 @@ sub new {
 
     my $yamlcfg;
     if ($cfgfile) {
-	if ( -e $cfgfile ) {
-	    $yamlcfg = YAML::LoadFile($cfgfile);
-	} else {
-	    unshift @_, $cfgfile;
-	}
+        if ( -e $cfgfile ) {
+            $yamlcfg = YAML::LoadFile($cfgfile);
+        } else {
+            unshift @_, $cfgfile;
+        }
     }
     my $self = {
-	ctrl => '',
-	name => '',
-	@_
+        ctrl => '',
+        name => '',
+        @_
     };
     if ($yamlcfg) {
-	$self->{'name'} = $yamlcfg->{'nodeName'};
+        $self->{'name'} = $yamlcfg->{'nodeName'};
     }
     bless $self;
 }

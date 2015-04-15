@@ -22,7 +22,7 @@ my $result = $bvc->get_all_nodes_in_config();
 if ($result) {
     print "Nodes configured: ", scalar @$result, "\n";
     foreach (@$result) {
-	print "    $_\n";
+        print "    $_\n";
     }
 } else {
     print "XXX 1 Error --\n";
@@ -41,7 +41,7 @@ my $result = $bvc->get_all_nodes_in_config();
 if ($result) {
     print "Nodes configured: ", scalar @$result, "\n";
     foreach (@$result) {
-	print "    $_\n";
+        print "    $_\n";
     }
 } else {
     print "XXX 2 Error --\n";

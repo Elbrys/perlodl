@@ -17,25 +17,25 @@ sub new {
 
     my $yamlcfg;
     if ($cfgfile) {
-	if ( -e $cfgfile ) {
-	    $yamlcfg = YAML::LoadFile($cfgfile);
-	} else {
-	    unshift @_, $cfgfile;
-	}
+        if ( -e $cfgfile ) {
+            $yamlcfg = YAML::LoadFile($cfgfile);
+        } else {
+            unshift @_, $cfgfile;
+        }
     }
     my $self = {
-	ipAddr => '127.0.0.1',
-	portNum => '8181',
-	username => 'admin',
-	password => 'admin',
-	timeout => 5,
-	@_
+        ipAddr => '127.0.0.1',
+        portNum => '8181',
+        username => 'admin',
+        password => 'admin',
+        timeout => 5,
+        @_
     };
     if ($yamlcfg) {
-	$self->{'ipAddr'} = $yamlcfg->{'ctrlIpAddr'};
-	$self->{'portNum'} = $yamlcfg->{'ctrlPortNum'};
-	$self->{'username'} = $yamlcfg->{'ctrlUname'};
-	$self->{'password'} = $yamlcfg->{'ctrlPswd'};
+        $self->{'ipAddr'} = $yamlcfg->{'ctrlIpAddr'};
+        $self->{'portNum'} = $yamlcfg->{'ctrlPortNum'};
+        $self->{'username'} = $yamlcfg->{'ctrlUname'};
+        $self->{'password'} = $yamlcfg->{'ctrlPswd'};
     }
     bless $self;
 }    
@@ -63,7 +63,7 @@ sub http_post {
     my $ua = LWP::UserAgent->new;
     my $req = HTTP::Request->new(POST => $url);
     while (my($header, $value) = each %headers) {
-	$req->header($header => $value);
+        $req->header($header => $value);
     }
     $req->content($data);
     $req->authorization_basic($$self{username}, $$self{password});
@@ -86,7 +86,7 @@ sub http_put {
     my $ua = LWP::UserAgent->new;
     my $req = HTTP::Request->new(PUT => $url);
     while (my($header, $value) = each %headers) {
-	$req->header($header => $value);
+        $req->header($header => $value);
     }
     $req->content($data);
     $req->authorization_basic($$self{username}, $$self{password});
@@ -147,7 +147,7 @@ sub get_all_nodes_in_config {
     my $nodes = from_json($resp->content)->{'nodes'}->{'node'};
     foreach (@$nodes) {
 #	print $_->{'id'}, "\n";
-	push @nodeNames, $_->{'id'};
+        push @nodeNames, $_->{'id'};
     }
     return \@nodeNames;
 #    return $resp->content;
@@ -182,7 +182,7 @@ sub get_schema {
     my $urlpath = "/restconf/operations/opendaylight-inventory:nodes/node/$node/yang-ext:mount/ietf-netconf-monitoring:get-schema";
     my $payload = "{\"input\": {\"identifier\":\"$schemaId\",\"version\":\"$schemaVersion\",\"format\":\"yang\"}}";
     my %headers = {'content-type'=>'applications/yang.data+json',
-		   'accept'=>'text/json, text/html, application/xml, */*'};
+                   'accept'=>'text/json, text/html, application/xml, */*'};
     my $resp = $self->http_post($urlpath, $payload, \%headers);
 #   XXX status check and massage
     return $status, $resp->content;    

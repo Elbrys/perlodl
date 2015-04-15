@@ -13,28 +13,28 @@ sub new {
 
     my $yamlcfg;
     if ($cfgfile) {
-	if ( -e $cfgfile ) {
-	    $yamlcfg = YAML::LoadFile($cfgfile);
-	} else {
-	    unshift @_, $cfgfile;
-	}
+        if ( -e $cfgfile ) {
+            $yamlcfg = YAML::LoadFile($cfgfile);
+        } else {
+            unshift @_, $cfgfile;
+        }
     }
     my $self = {
-	ctrl => '',
-	name => '',
-	ipAddr => '',
-	portNum => '',
-	tcpOnly => '',
-	adminName => 'admin',
-	adminPass => 'admin',
-	@_
+        ctrl => '',
+        name => '',
+        ipAddr => '',
+        portNum => '',
+        tcpOnly => '',
+        adminName => 'admin',
+        adminPass => 'admin',
+        @_
     };
     if ($yamlcfg) {
-	$self->{'name'} = $yamlcfg->{'nodeName'};
-	$self->{'ipAddr'} = $yamlcfg->{'nodeIpAddr'};
-	$self->{'portNum'} = $yamlcfg->{'nodePortNum'};
-	$self->{'adminName'} = $yamlcfg->{'nodeUname'};
-	$self->{'adminPass'} = $yamlcfg->{'nodePswd'};
+        $self->{'name'} = $yamlcfg->{'nodeName'};
+        $self->{'ipAddr'} = $yamlcfg->{'nodeIpAddr'};
+        $self->{'portNum'} = $yamlcfg->{'nodePortNum'};
+        $self->{'adminName'} = $yamlcfg->{'nodeUname'};
+        $self->{'adminPass'} = $yamlcfg->{'nodePswd'};
     }
     bless $self;
 }
