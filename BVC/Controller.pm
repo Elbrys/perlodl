@@ -135,29 +135,46 @@ sub as_json {
 
 sub get_nodes_operational_list {
     my $self = shift;
-
     my @nodeNames = ();
+    my $status = $BVC_UNKNOWN;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
+
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
-        my $nodes = decode_json($resp->content)->{'nodes'}->{'node'};
-        foreach (@$nodes) {
-            push @nodeNames, $_->{'id'};
+        if ($resp->content =~ /\"nodes\"/) {
+            my $nodes = decode_json($resp->content)->{nodes}->{node};
+            if (! $nodes) {
+                $status = $BVC_DATA_NOT_FOUND;
+            }
+            else {
+                foreach (@$nodes) {
+                    push @nodeNames, $_->{'id'};
+                }
+                $status = $BVC_OK;
+            }
+        }
+        else {
+            $status = $BVC_DATA_NOT_FOUND;
         }
     }
-    return \@nodeNames;
+    return ($status, \@nodeNames);
 }
 
 sub get_node_info {
     my $self = shift;
     my $node = shift;
-
+    my $node_info = undef;
+    my $status = $BVC_DATA_NOT_FOUND;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/$node";
+
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
-        return decode_json($resp->content)->{'node'};
+        if ($resp->content =~ /\"node\"/) {
+            $node_info = decode_json($resp->content)->{node};
+            $status = $node_info ? $BVC_OK : $BVC_DATA_NOT_FOUND;
+        }
     }
-    return;
+    return ($status, $node_info);
 }
 
 sub check_node_config_status {
@@ -196,7 +213,7 @@ sub get_all_nodes_in_config {
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"nodes\"/) {
-            my $nodes = decode_json($resp->content)->{'nodes'}->{'node'};
+            my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
                 $status = $BVC_DATA_NOT_FOUND;
             }
