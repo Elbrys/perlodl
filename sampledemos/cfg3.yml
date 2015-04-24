@@ -5,8 +5,8 @@ ctrlUname: 'admin'
 ctrlPswd:  'admin'   
 
 # NetconfNode specification
-nodeName: "fake-device"
-nodeIpAddr: "1.2.3.4"
+nodeName: "lwp-vr-5600"
+nodeIpAddr: "172.22.17.63"
 nodePortNum: 830
-nodeUname: "fake-device-uname"
-nodePswd: "fake-device-pswd"
+nodeUname: "vyatta"
+nodePswd: "vyatta"

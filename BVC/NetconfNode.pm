@@ -5,7 +5,6 @@ package BVC::NetconfNode;
 use strict;
 
 use YAML;
-use Data::Dumper;  # XXX remove
 
 sub new {
     my $caller = shift;
@@ -23,25 +22,34 @@ sub new {
         ctrl => '',
         name => '',
         ipAddr => '',
-        portNum => '',
-        tcpOnly => '',
+        portNum => 830,
+        tcpOnly => 0,
         adminName => 'admin',
-        adminPass => 'admin',
+        adminPassword => 'admin',
         @_
     };
     if ($yamlcfg) {
-        $self->{'name'} = $yamlcfg->{'nodeName'};
-        $self->{'ipAddr'} = $yamlcfg->{'nodeIpAddr'};
-        $self->{'portNum'} = $yamlcfg->{'nodePortNum'};
-        $self->{'adminName'} = $yamlcfg->{'nodeUname'};
-        $self->{'adminPass'} = $yamlcfg->{'nodePswd'};
+        $self->{name} = $yamlcfg->{nodeName};
+        $self->{ipAddr} = $yamlcfg->{nodeIpAddr};
+        $self->{portNum} = $yamlcfg->{nodePortNum};
+        $self->{adminName} = $yamlcfg->{nodeUname};
+        $self->{adminPassword} = $yamlcfg->{nodePswd};
     }
     bless $self;
 }
 
-# XXX remove, replace with json dumping
-sub dump {
-    return Dumper(shift());
+sub TO_JSON {
+    my $b_obj = B::svref_2object( $_[0] );
+    return    $b_obj->isa('B::HV') ? { %{ $_[0] } }
+            : $b_obj->isa('B::AV') ? [ @{ $_[0] } ]
+            : undef
+            ;
+}
+
+sub as_json {
+    my $self = shift;
+    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    return $json->pretty->encode($self);
 }
 
 1;

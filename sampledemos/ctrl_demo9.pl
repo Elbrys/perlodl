@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
+
 use Getopt::Long;
 use BVC::Controller;
 
@@ -13,15 +16,21 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
 my $bvc = new BVC::Controller($configfile);
-print $bvc->dump;
+print "'Controller':\n";
+print $bvc->as_json() . "\n";
 
-print "<<< Show notification event streams registered on the controller.\n";
+print "<<< Show notification event streams registered on the Controller\n";
 my $result = $bvc->get_streams_info();
 
-if ($result) {
+if ($status == $BVC_OK) {
     print "Streams:\n";
-    my $json = new JSON->allow_nonref->canonical;
-    print $json->pretty->encode($json->decode($result));
-} else {
-    print "XXX Error --\n";
+    print JSON->new->canonical->pretty->encode($result);
 }
+else {
+    die "\n!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n\n";
+}
+
+print ("\n");
+print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+print (">>> Demo End\n");
+print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");

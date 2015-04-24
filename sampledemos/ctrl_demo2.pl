@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
+
 use Getopt::Long;
 use BVC::Controller;
 
@@ -13,7 +16,7 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
 my $bvc = new BVC::Controller($configfile);
-print $bvc->dump;
+print $bvc->as_json() . "\n";
 
 my $nodeName      = "controller-config";
 my $yangModelName = "flow-topology-discovery";
@@ -23,8 +26,9 @@ print "<<< Retrieve '$yangModelName' YANG model definition from controller.\n";
 my $result = $bvc->get_schema($nodeName, $yangModelName, $yangModelRev);
 
 if ($result) {
-    my $json = new JSON->allow_nonref->canonical;
-    print $json->pretty->encode($json->decode($result));
+#    print $result;
+#    my $json = new JSON->allow_nonref->canonical;
+#    print $json->pretty->encode($json->decode($result));
 } else {
     print "XXX Error--\n";
 }
