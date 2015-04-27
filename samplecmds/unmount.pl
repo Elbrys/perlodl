@@ -16,7 +16,7 @@ my $ncNode = new BVC::NetconfNode($configfile, ctrl=>$bvc);
 
 my ($status, $http_resp) = $bvc->delete_netconf_node($ncNode);
 if ($status == $BVC_OK) {
-    print "'".$ncNode->{name}."' was successfully removed to the Controller\n\n";
+    print "'".$ncNode->{name}."' was successfully removed from the Controller\n\n";
 }
 else {
     die "!!!Failed: " . $bvc->status_string($status, $http_resp) . "\n\n";

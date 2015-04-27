@@ -1,13 +1,12 @@
 package BVC::NetconfNode;
 
-# XXX EXPORT *
-
 use strict;
+use warnings;
 
 use YAML;
 
 sub new {
-    my $caller = shift;
+    my $class = shift;
     my $cfgfile = shift;
 
     my $yamlcfg;
@@ -35,7 +34,7 @@ sub new {
         $self->{adminName} = $yamlcfg->{nodeUname};
         $self->{adminPassword} = $yamlcfg->{nodePswd};
     }
-    bless $self;
+    bless ($self, $class);
 }
 
 sub TO_JSON {

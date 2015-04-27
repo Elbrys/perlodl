@@ -1,14 +1,12 @@
 package BVC::OpenflowNode;
 
-# XXX EXPORT *
-
 use strict;
+use warnings;
 
 use YAML;
-use Data::Dumper;  # XXX remove
 
 sub new {
-    my $caller = shift;
+    my $class = shift;
     my $cfgfile = shift;
 
     my $yamlcfg;
@@ -27,12 +25,21 @@ sub new {
     if ($yamlcfg) {
         $self->{'name'} = $yamlcfg->{'nodeName'};
     }
-    bless $self;
+    bless ($self, $class);
 }
 
-# XXX remove, replace with json dumping
-sub dump {
-    return Dumper(shift());
+sub TO_JSON {
+    my $b_obj = B::svref_2object( $_[0] );
+    return    $b_obj->isa('B::HV') ? { %{ $_[0] } }
+            : $b_obj->isa('B::AV') ? [ @{ $_[0] } ]
+            : undef
+            ;
+}
+
+sub as_json {
+    my $self = shift;
+    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    return $json->pretty->encode($self);
 }
 
 1;
