@@ -10,31 +10,39 @@ use BVC::Netconf::Vrouter::VR5600;
 my $configfile = "";
 my $status = $BVC_UNKNOWN;
 my $schemas = undef;
+my $http_resp = undef;
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
-print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 my $bvc = new BVC::Controller($configfile);
 my $vRouter = new BVC::Netconf::Vrouter::VR5600($configfile, ctrl=>$bvc);
 
 print "<<< 'Controller': " . $bvc->{ipAddr} . ", '"
-    . $vRouter->{name} . "': " . $vRouter->{ipAddr} . "\n";
+    . $vRouter->{name} . "': " . $vRouter->{ipAddr} . "\n\n";
 
-$status = $bvc->add_netconf_node($vRouter);
-($status == $BVC_OK)
-    && print "<<< '" . $vRouter->{name} . "' added to the Controller\n"
-    || die "Demo terminated: " . $bvc->status_string($status) . "\n";
+($status, $http_resp) = $bvc->add_netconf_node($vRouter);
+if ($status == $BVC_OK) {
+    print "<<< '" . $vRouter->{name} . "' added to the Controller\n\n";
+}
+else {
+    die "Demo terminated: " . $bvc->status_string($status, $http_resp) . "\n";
+}
+sleep(2);
 
 $status = $bvc->check_node_conn_status($vRouter->{name});
-($status == $BVC_NODE_CONNECTED)
-    && print "<<< '" . $vRouter->{name} . "' is connected to the Controller\n"
-    || die "Demo terminated: " . $bvc->status_string($status) . "\n";
+if ($status == $BVC_NODE_CONNECTED) {
+    print "<<< '" . $vRouter->{name} . "' is connected to the Controller\n\n";
+}
+else {
+    die "Demo terminated: " . $bvc->status_string($status) . "\n";
+}
 
 print "<<< Get list of all YANG models supported by the node '"
-    . $vRouter->{name} . "'\n";
+    . $vRouter->{name} . "'\n\n";
 ($status, $schemas) = $vRouter->get_schemas();
 if ($status == $BVC_OK) {
     print "YANG models list:\n";

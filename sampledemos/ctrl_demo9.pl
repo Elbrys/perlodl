@@ -20,7 +20,7 @@ print "'Controller':\n";
 print $bvc->as_json() . "\n";
 
 print "<<< Show notification event streams registered on the Controller\n";
-my $result = $bvc->get_streams_info();
+my ($status, $result) = $bvc->get_streams_info();
 
 if ($status == $BVC_OK) {
     print "Streams:\n";

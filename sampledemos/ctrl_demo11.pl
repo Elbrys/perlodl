@@ -29,15 +29,15 @@ print "<<< Creating new '" . $ncNode->{name} . "' NETCONF node\n";
 print "'" . $ncNode->{name} . "':\n";
 print $ncNode->as_json() . "\n";
 
-# print "<<< Check '" . $ncNode->{name} . "' NETCONF node availability on the network\n";
-# $status = system ("ping -c 1 " . $ncNode->{ipAddr});
-# $status >>= 8;  # wait()
-# if (0 == $status) {
-#     print $ncNode->{ipAddr} . " is up!\n\n";
-# }
-# else {
-#     die $ncNode->{ipAddr} . " is down!\n!!!Demo terminated\n\n";
-# }
+print "<<< Check '" . $ncNode->{name} . "' NETCONF node availability on the network\n";
+$status = system ("ping -c 1 " . $ncNode->{ipAddr});
+$status >>= 8;  # wait()
+if (0 == $status) {
+    print $ncNode->{ipAddr} . " is up!\n\n";
+}
+else {
+    die $ncNode->{ipAddr} . " is down!\n!!!Demo terminated\n\n";
+}
 
 print "<<< Add '", $ncNode->{name}, "' NETCONF node to the Controller\n";
 ($status, $result) = $bvc->add_netconf_node($ncNode);

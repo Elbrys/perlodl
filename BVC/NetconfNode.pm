@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use YAML;
+use JSON -convert_blessed_universally;
 
 sub new {
     my $class = shift;
@@ -35,14 +36,6 @@ sub new {
         $self->{adminPassword} = $yamlcfg->{nodePswd};
     }
     bless ($self, $class);
-}
-
-sub TO_JSON {
-    my $b_obj = B::svref_2object( $_[0] );
-    return    $b_obj->isa('B::HV') ? { %{ $_[0] } }
-            : $b_obj->isa('B::AV') ? [ @{ $_[0] } ]
-            : undef
-            ;
 }
 
 sub as_json {

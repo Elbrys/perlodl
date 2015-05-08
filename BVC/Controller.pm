@@ -9,8 +9,9 @@ use warnings;
 use YAML;
 use LWP;
 use HTTP::Status qw(:constants :is status_message);
-use JSON;
+use JSON -convert_blessed_universally;
 use XML::Parser;
+use Carp::Assert;
 use Readonly;
 
 require Exporter;
@@ -66,7 +67,7 @@ sub status_string {
         && $http_resp
         && $http_resp->code
         && $http_resp->message) {
-            $errmsg += " " . $http_resp->code . " - " . $http_resp->message
+            $errmsg .= " " . $http_resp->code . " - " . $http_resp->message
     }
     return $errmsg;
 }
@@ -117,14 +118,6 @@ sub _http_req {
     $req->authorization_basic($$self{adminName}, $$self{adminPassword});
 
     return $ua->request($req);
-}
-
-sub TO_JSON {
-    my $b_obj = B::svref_2object( $_[0] );
-    return    $b_obj->isa('B::HV') ? { %{ $_[0] } }
-            : $b_obj->isa('B::AV') ? [ @{ $_[0] } ]
-            : undef
-            ;
 }
 
 sub as_json {
@@ -313,10 +306,12 @@ sub get_schema {
 
     my $resp = $self->_http_req('POST', $urlpath, $payload, \%headers);
     if ($resp->code == HTTP_OK) {
-        my $xmlp = new XML::Parser(Style => 'Tree');
-        my @foo = $xmlp->parse($resp->content);
-# XXX *cough*  learn how to parse and extract
-        $schema = $foo[0][1][2][2][2];
+        my $xmltree_ref = new XML::Parser(Style => 'Tree')->parse($resp->content);
+        assert   ($xmltree_ref->[0]          eq 'get-schema');
+        assert   ($xmltree_ref->[1][1]       eq 'output');
+        assert   ($xmltree_ref->[1][2][1]    eq 'data');
+        assert   ($xmltree_ref->[1][2][2][1] == 0);
+        $schema = $xmltree_ref->[1][2][2][2];
         $status = $BVC_OK;
     }
     else {
@@ -500,7 +495,7 @@ sub add_netconf_node {
           <address xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{ipAddr}</address>
           <port xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{portNum}</port>
           <username xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{adminName}</username>
-          <password xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{adminPass}</password>
+          <password xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{adminPassword}</password>
           <tcp-only xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{tcpOnly}</tcp-only>
           <event-executor xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
             <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-event-executor</type>
@@ -546,40 +541,34 @@ sub modify_netconf_node_in_config {
     my $node = shift;
 }
 
-sub get_ext_mount_config_url {
+sub get_ext_mount_config_urlpath {
     my $self = shift;
     my $node = shift;
 
-    return "http://" . $self->{ipAddr} . ":" . $self->{portNum}
-        . "/restconf/config/opendaylight-inventory:nodes/node/"
+    return "/restconf/config/opendaylight-inventory:nodes/node/"
         . $node . "/yang-ext:mount/";
 }
 
-sub get_ext_mount_operational_url {
+sub get_ext_mount_operational_urlpath {
     my $self = shift;
     my $node = shift;
 
-    return "http://" . $self->{ipAddr} . ":" . $self->{portNum}
-        . "/restconf/operational/opendaylight-inventory:nodes/node/"
+    return "/restconf/operational/opendaylight-inventory:nodes/node/"
         . $node . "/yang-ext:mount/";
 }
 
-sub get_node_operational_url {
+sub get_node_operational_urlpath {
     my $self = shift;
     my $node = shift;
 
-    return "http://" . $self->{ipAddr} . ":" . $self->{portNum}
-        . "/restconf/operational/opendaylight-inventory:nodes/node/"
-        . $node;
+    return "/restconf/operational/opendaylight-inventory:nodes/node/" . $node;
 }
 
-sub get_node_config_url {
+sub get_node_config_urlpath {
     my $self = shift;
     my $node = shift;
 
-    return "http://" . $self->{ipAddr} . ":" . $self->{portNum}
-        . "/restconf/config/opendaylight-inventory:nodes/node/"
-        . $node;
+    return "/restconf/config/opendaylight-inventory:nodes/node/" . $node;
 }
 
 sub get_openflow_nodes_operational_list {

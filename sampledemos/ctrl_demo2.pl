@@ -16,19 +16,24 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
 my $bvc = new BVC::Controller($configfile);
+print "'Controller':\n";
 print $bvc->as_json() . "\n";
 
 my $nodeName      = "controller-config";
 my $yangModelName = "flow-topology-discovery";
 my $yangModelRev  = "2013-08-19";
-print "<<< Retrieve '$yangModelName' YANG model definition from controller.\n";
+print "<<< Retrieve '$yangModelName' YANG model definition from the Controller\n";
 
-my $result = $bvc->get_schema($nodeName, $yangModelName, $yangModelRev);
+my ($status, $schema) = $bvc->get_schema($nodeName, $yangModelName, $yangModelRev);
 
-if ($result) {
-#    print $result;
-#    my $json = new JSON->allow_nonref->canonical;
-#    print $json->pretty->encode($json->decode($result));
+if ($status == $BVC_OK) {
+    print "YANG model:\n";
+    print $schema;
 } else {
-    print "XXX Error--\n";
+    die "\n!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n\n";
 }
+
+print ("\n");
+print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+print (">>> Demo End\n");
+print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
