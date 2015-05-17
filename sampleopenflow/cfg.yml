@@ -1,0 +1,9 @@
+# Controller specification
+ctrlIpAddr: "172.22.19.67"
+#ctrlIpAddr: "10.254.2.13"
+ctrlPortNum: "8181"     
+ctrlUname: 'admin' 
+ctrlPswd:  'admin'   
+
+# OpenflowNode specification
+nodeName: "openflow:1"

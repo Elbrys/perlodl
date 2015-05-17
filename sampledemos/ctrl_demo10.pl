@@ -18,13 +18,13 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
-my $bvc = new BVC::Controller($configfile);
+my $bvc = new BVC::Controller(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 
 show_all_nodes_in_config($bvc);
 
-my $ncNode = new BVC::NetconfNode($configfile, ctrl=>$bvc);
+my $ncNode = new BVC::NetconfNode(cfgfile => $configfile, ctrl=>$bvc);
 print "<<< Creating new '" . $ncNode->{name} . "' NETCONF node\n";
 print "'" . $ncNode->{name} . "':\n";
 print $ncNode->as_json() . "\n";

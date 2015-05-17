@@ -15,7 +15,7 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
-my $bvc = new BVC::Controller($configfile);
+my $bvc = new BVC::Controller(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 

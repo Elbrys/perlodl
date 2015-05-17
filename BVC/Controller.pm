@@ -1,32 +1,40 @@
-# Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
-#
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# 1. Redistributions of source code must retain the above copyright notice,
-# this list of conditions and the following disclaimer.
-#
-# 2. Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# 3. Neither the name of the copyright holder nor the names of its
-# contributors may be used to endorse or promote products derived from this
-# software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-# THE POSSIBILITY OF SUCH DAMAGE.
+=head1 BVC::Controller
+
+Configure and query the Brocade Vyatta Controller.
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
 
 package BVC::Controller;
 $BVC::VERSION = '0.01';
@@ -102,35 +110,59 @@ sub status_string {
     return $errmsg;
 }
 
+# Constructor ==========================================================
+# Parameters: cfgfile : name of YAML file for configuring object (opt)
+#             explicit values override config overrides defaults
+#
+#             object hash   | YAML label
+#             ------------- | ----------
+#             ipAddr        | ctrlIpAddr   IP address of controller
+#             portNum       | ctrlPortNum  TCP port of ctrl REST interface
+#             adminName     | ctrlUname    username
+#             adminPassword | ctrlPswd     password
+#             timeout       | timeout      in seconds on HTTP requests
+# Returns   : BVC::Controller object
+# 
 sub new {
     my $caller = shift;
-    my $cfgfile = shift;
+    my %params = @_;
 
     my $yamlcfg;
-    if ($cfgfile) {
-        if ( -e $cfgfile ) {
-            $yamlcfg = YAML::LoadFile($cfgfile);
-        } else {
-            unshift @_, $cfgfile;
-        }
+    if ($params{cfgfile} && ( -e $params{cfgfile})) {
+        $yamlcfg = YAML::LoadFile($params{cfgfile});
     }
     my $self = {
-        ipAddr => '127.0.0.1',
-        portNum => '8181',
-        adminName => 'admin',
+        ipAddr        => '127.0.0.1',
+        portNum       => '8181',
+        adminName     => 'admin',
         adminPassword => 'admin',
-        timeout => 5,
-        @_
+        timeout       => 5
     };
     if ($yamlcfg) {
-        $self->{ipAddr} = $yamlcfg->{ctrlIpAddr};
-        $self->{portNum} = $yamlcfg->{ctrlPortNum};
-        $self->{adminName} = $yamlcfg->{ctrlUname};
-        $self->{adminPassword} = $yamlcfg->{ctrlPswd};
+        $yamlcfg->{ctrlIpAddr}
+            && ($self->{ipAddr} = $yamlcfg->{ctrlIpAddr});
+        $yamlcfg->{ctrlPortNum}
+            && ($self->{portNum} = $yamlcfg->{ctrlPortNum});
+        $yamlcfg->{ctrlUname}
+            && ($self->{adminName} = $yamlcfg->{ctrlUname});
+        $yamlcfg->{ctrlPswd}
+            && ($self->{adminPassword} = $yamlcfg->{ctrlPswd});
+        $yamlcfg->{timeout}
+            && ($self->{timeout} = $yamlcfg->{timeout});
     }
+    map { $params{$_} && ($self->{$_} = $params{$_}) }
+        qw(ipAddr portNum adminName adminPassword timeout);
     bless $self;
 }    
 
+# Method ===============================================================
+# _http_req : semi-private; send HTTP request to BVC Controller
+# Parameters: $method (string, req) HTTP verb
+#           : $urlpath (string, req) path for REST request
+#           : $data (string, opt)
+#           : $headerref (hash ref, opt)
+# Returns   : HTTP::Response
+#
 sub _http_req {
     my $self = shift;
     my ($method, $urlpath, $data, $headerref) = @_;
@@ -138,6 +170,7 @@ sub _http_req {
 
     my $url = "http://$$self{ipAddr}:$$self{portNum}$urlpath";
     my $ua = LWP::UserAgent->new;
+    $ua->timeout($self->{timeout});
     my $req = HTTP::Request->new($method => $url);
     while (my($header, $value) = each %headers) {
         $req->header($header => $value);
@@ -150,12 +183,23 @@ sub _http_req {
     return $ua->request($req);
 }
 
+# Method ===============================================================
+# as_json
+# Parameters: none
+# Returns   : BVC::Controller as formatted JSON string
+#
 sub as_json {
     my $self = shift;
     my $json = new JSON->canonical->allow_blessed->convert_blessed;
     return $json->pretty->encode($self);
 }
 
+# Method ===============================================================
+# get_nodes_operational_list
+# Parameters: none
+# Returns   : status code (integer)
+#           : reference to array of node names
+#
 sub get_nodes_operational_list {
     my $self = shift;
     my @nodeNames = ();
@@ -186,6 +230,12 @@ sub get_nodes_operational_list {
     return ($status, \@nodeNames);
 }
 
+# Method ===============================================================
+# get_node_info 
+# Parameters: node name (string)
+# Returns   : status code (integer)
+#           : node_info XXX
+#
 sub get_node_info {
     my $self = shift;
     my $node = shift;
@@ -206,6 +256,11 @@ sub get_node_info {
     return ($status, $node_info);
 }
 
+# Method ===============================================================
+# check_node_config_status
+# Parameters: 
+# Returns   : 
+#
 sub check_node_config_status {
     my $self = shift;
     my $node = shift;
@@ -216,6 +271,11 @@ sub check_node_config_status {
         ? $BVC_NODE_CONFIGURED : $BVC_NODE_NOT_FOUND;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub check_node_conn_status {
     my $self = shift;
     my $node = shift;
@@ -233,6 +293,11 @@ sub check_node_conn_status {
     return $BVC_UNKNOWN;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_all_nodes_in_config {
     my $self = shift;
     my @nodeNames = ();
@@ -263,6 +328,11 @@ sub get_all_nodes_in_config {
     return ($status, \@nodeNames);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_all_nodes_conn_status {
     my $self = shift;
     my @nodeStatus = ();
@@ -300,6 +370,11 @@ sub get_all_nodes_conn_status {
     return ($status, \@nodeStatus);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_schemas {
     my $self = shift;
     my $node = shift;
@@ -323,6 +398,11 @@ sub get_schemas {
     return ($status, $schemas);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_schema {
     my $self = shift;
     my ($node, $schemaId, $schemaVersion) = @_;
@@ -350,6 +430,11 @@ sub get_schema {
     return ($status, $schema);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_netconf_operations {
     my $self = shift;
     my $node = shift;
@@ -373,6 +458,11 @@ sub get_netconf_operations {
     return ($status, $operations);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_all_modules_operational_state {
     my $self = shift;
     my $modules = undef;
@@ -398,6 +488,11 @@ sub get_all_modules_operational_state {
     return ($status, $modules);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_module_operational_state {
     my $self = shift;
     my ($moduleType, $moduleName) = @_;
@@ -421,6 +516,11 @@ sub get_module_operational_state {
     return ($status, $module);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_sessions_info {
     my $self = shift;
     my $node = shift;
@@ -444,6 +544,11 @@ sub get_sessions_info {
     return ($status, $sessions);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_streams_info {
     my $self = shift;
     my $streams = undef;
@@ -466,6 +571,11 @@ sub get_streams_info {
     return ($status, $streams);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_service_providers_info {
     my $self = shift;
     my $service = undef;
@@ -488,6 +598,11 @@ sub get_service_providers_info {
     return ($status, $service);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_service_provider_info {
     my $self = shift;
     my $name = shift;
@@ -511,6 +626,11 @@ sub get_service_provider_info {
     return ($status, $service);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub add_netconf_node {
     my $self = shift;
     my $node = shift;
@@ -555,6 +675,11 @@ END_XML
     return ($status, $resp);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub delete_netconf_node {
     my $self = shift;
     my $node = shift;
@@ -566,11 +691,23 @@ sub delete_netconf_node {
     return ($status, $resp);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub modify_netconf_node_in_config {
     my $self = shift;
     my $node = shift;
+
+    die "XXX";
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_ext_mount_config_urlpath {
     my $self = shift;
     my $node = shift;
@@ -579,6 +716,11 @@ sub get_ext_mount_config_urlpath {
         . $node . "/yang-ext:mount/";
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_ext_mount_operational_urlpath {
     my $self = shift;
     my $node = shift;
@@ -587,6 +729,11 @@ sub get_ext_mount_operational_urlpath {
         . $node . "/yang-ext:mount/";
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_node_operational_urlpath {
     my $self = shift;
     my $node = shift;
@@ -594,6 +741,11 @@ sub get_node_operational_urlpath {
     return "/restconf/operational/opendaylight-inventory:nodes/node/" . $node;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_node_config_urlpath {
     my $self = shift;
     my $node = shift;
@@ -601,13 +753,37 @@ sub get_node_config_urlpath {
     return "/restconf/config/opendaylight-inventory:nodes/node/" . $node;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_openflow_nodes_operational_list {
     my $self = shift;
+    my $status = $BVC_UNKNOWN;
+    my @nodelist = ();
 
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
     my $resp = $self->_http_req('GET', $urlpath);
-#   XXX status check and massage
-    return $resp->is_success ? $resp->content : '';
+    if ($resp->code == HTTP_OK) {
+        if ($resp->content =~ /\"nodes\"/) {
+            my $nodes = decode_json($resp->content)->{nodes}->{node};
+            if (! $nodes) {
+                $status = $BVC_DATA_NOT_FOUND;
+            }
+            else {
+                $status = $BVC_OK;
+                foreach (@$nodes) {
+                    $_->{id} =~ /^(openflow:[0-9]*)/ && push @nodelist, $1;
+                }
+            }
+        }
+    }
+    else {
+        $status = $BVC_HTTP_ERROR;
+    }
+    return ($status, \@nodelist);
 }
 
+# Module ===============================================================
 1;

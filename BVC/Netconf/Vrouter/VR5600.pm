@@ -1,49 +1,65 @@
-# Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
-#
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# 1. Redistributions of source code must retain the above copyright notice,
-# this list of conditions and the following disclaimer.
-#
-# 2. Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# 3. Neither the name of the copyright holder nor the names of its
-# contributors may be used to endorse or promote products derived from this
-# software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-# THE POSSIBILITY OF SUCH DAMAGE.
+=head1 BVC::Netconf::Vrouter::VR5600
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
 
 package BVC::Netconf::Vrouter::VR5600;
 
 use strict;
 use warnings;
 
-use base ("BVC::NetconfNode");
+use base qw(BVC::NetconfNode);
 use HTTP::Status qw(:constants :is status_message);
 use JSON;
 use BVC::Controller;
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_schemas {
     my $self = shift;
 
     return $self->{ctrl}->get_schemas($self->{name});
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_schema {
     my $self = shift;
     my ($yangId, $yangVersion) = @_;
@@ -51,6 +67,11 @@ sub get_schema {
     return $self->{ctrl}->get_schema($self->{name}, $yangId, $yangVersion);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_cfg {
     my $self = shift;
     my $status = $BVC_UNKNOWN;
@@ -68,6 +89,11 @@ sub get_cfg {
     return ($status, $config);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_firewalls_cfg {
     my $self = shift;
     my $status = $BVC_UNKNOWN;
@@ -86,6 +112,11 @@ sub get_firewalls_cfg {
     return ($status, $config);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_firewall_instance_cfg {
     my $self = shift;
     my $instance = shift;
@@ -106,6 +137,11 @@ sub get_firewall_instance_cfg {
     return ($status, $config);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub create_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
@@ -120,14 +156,29 @@ sub create_firewall_instance {
     return ($resp->is_success) ? $BVC_OK : $BVC_HTTP_ERROR;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub add_firewall_instance_rule {
     die "XXX";
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub update_firewall_instance_rule {
     die "XXX";
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub delete_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
@@ -152,14 +203,29 @@ sub delete_firewall_instance {
     return $status;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub set_dataplane_interface_firewall {
     die "XXX";
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub delete_dataplane_interface_firewall {
     die "XXX";
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_interfaces_list {
     my $self = shift;
     my $status = $BVC_UNKNOWN;
@@ -176,6 +242,11 @@ sub get_interfaces_list {
     return ($status, \@iflist);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_interfaces_cfg {
     my $self = shift;
     my $status = $BVC_UNKNOWN;
@@ -195,6 +266,11 @@ sub get_interfaces_cfg {
     return ($status, $config);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_dataplane_interfaces_list {
     my $self = shift;
     my $status = $BVC_UNKNOWN;
@@ -216,6 +292,11 @@ sub get_dataplane_interfaces_list {
     return ($status, @dpiflist);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_dataplane_interfaces_cfg {
     my $self = shift;
     my $dpifcfg = undef;
@@ -231,6 +312,11 @@ sub get_dataplane_interfaces_cfg {
     return ($status, $dpifcfg);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_dataplane_interface_cfg {
     my $self = shift;
     my $ifname = shift;
@@ -251,6 +337,11 @@ sub get_dataplane_interface_cfg {
     return ($status, $cfg);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_loopback_interfaces_list {
     my $self = shift;
     my @lbiflist = ();
@@ -261,14 +352,18 @@ sub get_loopback_interfaces_list {
     }
     else {
         foreach (@$lbifcfg) {
-            # XXX
-            push @lbiflist, $_;
+            push @lbiflist, $_->{tagnode};
         }
         $status = $BVC_OK;
     }
     return ($status, \@lbiflist);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_loopback_interfaces_cfg {
     my $self = shift;
     my $lbifcfg = undef;
@@ -284,8 +379,22 @@ sub get_loopback_interfaces_cfg {
     return ($status, $lbifcfg);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_loopback_interface_cfg {
-    die "XXX";
+    my $self = shift;
+    my $ifName = shift;
+    my $status = $BVC_UNKNOWN;
+
+    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+        . "vyatta-interfaces:interfaces/vyatta-interfaces-loopback:loopback/"
+        . $ifName;
+    my $resp = $self->{ctrl}->_http_req('GET', $urlpath);
+    $status = ($resp->code == HTTP_OK) ? $BVC_OK : $BVC_HTTP_ERROR;
+    return ($status, $resp);
 }
 
 1;

@@ -1,32 +1,38 @@
-# Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
-#
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# 1. Redistributions of source code must retain the above copyright notice,
-# this list of conditions and the following disclaimer.
-#
-# 2. Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# 3. Neither the name of the copyright holder nor the names of its
-# contributors may be used to endorse or promote products derived from this
-# software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-# THE POSSIBILITY OF SUCH DAMAGE.
+=head1 BVC::Netconf::Vrouter::Firewall
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut
 
 package BVC::Netconf::Vrouter::Firewall;
 
@@ -42,7 +48,7 @@ use JSON -convert_blessed_universally;
 #---------------------------------------------------------------------------
 # 
 #---------------------------------------------------------------------------
-package Rule;
+package FirewallRule;
 
 sub new {
     my $class = shift;
@@ -55,6 +61,11 @@ sub new {
     bless ($self, $class);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub add_action {
     my $self = shift;
     my $action = shift;
@@ -62,6 +73,11 @@ sub add_action {
     $self->{action} = $action;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_name {
     my $self = shift;
 
@@ -71,7 +87,7 @@ sub get_name {
 #---------------------------------------------------------------------------
 # 
 #---------------------------------------------------------------------------
-package Group;
+package FirewallGroup;
 
 sub new {
     my $class = shift;
@@ -84,6 +100,11 @@ sub new {
     bless ($self, $class);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_name {
     my $self = shift;
     return $self->{tagnode};
@@ -104,6 +125,11 @@ sub new {
     bless ($self, $class);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub as_json {
     my $self = shift;
 
@@ -111,14 +137,24 @@ sub as_json {
     return $json->pretty->encode($self);
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub add_group {
     my $self = shift;
     my $name = shift;
 
-    my $group = new Group($name);
+    my $group = new FirewallGroup($name);
     push $self->{name}, $group;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_group {
     my $self = shift;
     my $name = shift;
@@ -132,32 +168,48 @@ sub get_group {
     return undef;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub add_rule {
     my $self       = shift;
     my $group_name = shift;
     my $rule_id    = shift;
 
-    my $rule = new Rule($rule_id, @_);
+    my $rule = new FirewallRule($rule_id, @_);
     my $group = $self->get_group($group_name);
     push $group->{rule}, $rule;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_rule {
     my $self = shift;
 
     # XXX
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_rules {
     my $self = shift;
 
-    my @rules = ();
-    foreach my $rule (@{ $self->{name} }) {
-        push @rules, $rule;
-    }
-    return @rules;
+    return @{ $self->{name} };
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_payload {
     my $self = shift;
 
@@ -170,6 +222,11 @@ sub get_payload {
     return $payload;
 }
 
+# Method ===============================================================
+# 
+# Parameters: 
+# Returns   : 
+#
 sub get_url_extension {
     my $self = shift;
 

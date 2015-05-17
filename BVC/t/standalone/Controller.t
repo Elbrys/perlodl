@@ -34,7 +34,6 @@ use Test::More tests => 20;
 
 # check module load 1
 use_ok( 'BVC::Controller' );
-use BVC::Controller;
 
 # create object with default values 8
 my $bvc = new BVC::Controller;

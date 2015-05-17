@@ -34,7 +34,6 @@ use Test::More tests => 15;
 
 # check module load 1
 use_ok( 'BVC::Netconf::Vrouter::VR5600' );
-use BVC::Netconf::Vrouter::VR5600;
 use BVC::Controller;
 
 # create object with specified values 10
