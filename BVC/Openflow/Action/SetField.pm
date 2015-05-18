@@ -51,7 +51,7 @@ sub new {
 
     my $self = $class->SUPER::new(%params);
     $self->{set_field}->{'vlan-match'} = undef;
-    $self->{set_field}->{'protocol-fields-match'} = undef;
+    $self->{set_field}->{'protocol-match-fields'} = undef;
     bless ($self, $class);
 }
 
@@ -66,9 +66,9 @@ sub vlan_id {
 }
 sub mpls_label {
     my ($self, $mpls_label) = @_;
-    defined $self->{set_field}->{'protocol-fields-match'} or
-        $self->{set_field}->{'protocol-fields-match'} = new ProtocolMatchFields;
-    $self->{set_field}->{'protocol-fields-match'}->mpls_label($mpls_label);
+    defined $self->{set_field}->{'protocol-match-fields'} or
+        $self->{set_field}->{'protocol-match-fields'} = new ProtocolMatchFields;
+    $self->{set_field}->{'protocol-match-fields'}->mpls_label($mpls_label);
 }
 
 

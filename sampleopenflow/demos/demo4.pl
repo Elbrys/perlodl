@@ -5,6 +5,7 @@ use warnings;
 
 use Getopt::Long;
 use BVC::Controller;
+use BVC::Const qw(/ETH_TYPE/);
 use BVC::Openflow::OFSwitch;
 use BVC::Openflow::FlowEntry;
 use BVC::Openflow::Match;
@@ -14,8 +15,7 @@ my $configfile = "";
 my $status = $BVC_UNKNOWN;
 my $flowinfo = undef;
 
-my $sample = "openflow:1";
-my $ethtype = 0x0800;
+my $ethtype = $ETH_TYPE_IPv4;
 my $ipv4_dst = "10.11.12.13/24";
 my $table_id = 0;
 my $flow_id  = 11;
@@ -28,8 +28,10 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 my $bvc = new BVC::Controller(cfgfile => $configfile);
-my $ofswitch = new BVC::Openflow::OFSwitch(ctrl => $bvc, name => $sample);
-print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $sample\n\n";
+my $ofswitch = new BVC::Openflow::OFSwitch(cfgfile => $configfile,
+                                           ctrl => $bvc);
+print "<<< 'Controller': $bvc->{ipAddr}, "
+    . "'OpenFlow' switch: $ofswitch->{name}\n\n";
 
 print  "<<< Set OpenFlow flow on the Controller\n";
 printf "        Match: Ethernet Type (0x%04x)\n", $ethtype;
@@ -68,6 +70,14 @@ print "<<< Flow successfully added to the Controller\n\n";
 print "<<< Flow successfully read from the Controller\n";
 print "Flow info:\n";
 print JSON->new->pretty->encode(JSON::decode_json($flowinfo)) . "\n";
+
+print "<<< Delete flow with id of '$flow_id' from the Controller's cache\n";
+print "        and from table '$table_id' on the '$ofswitch->{name}' node\n\n";
+$status = $ofswitch->delete_flow($flowentry->table_id,
+                                 $flowentry->id);
+($BVC_OK == $status)
+    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+print "<<< Flow successfully removed from the Controller\n";
 
 print ("\n");
 print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");

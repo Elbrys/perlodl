@@ -252,6 +252,23 @@ sub add_modify_flow {
 
 
 # Method ===============================================================
+#             delete_flow
+# Parameters: table_id and flow_id of flow to delete
+# Returns   : success
+#
+sub delete_flow {
+    my ($self, $table_id, $flow_id) = @_;
+    my $status = $BVC_UNKNOWN;
+
+    my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
+        . "/table/$table_id/flow/$flow_id";
+    my $resp = $self->{ctrl}->_http_req('DELETE', $urlpath);
+
+    $status = (HTTP_OK == $resp->code) ? $BVC_OK : $BVC_HTTP_ERROR;
+}
+
+
+# Method ===============================================================
 #             get_configured_flow
 # Parameters: flow table_id, flow_id
 # Returns   : flow (JSON)

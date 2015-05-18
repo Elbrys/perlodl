@@ -450,14 +450,16 @@ sub ipv6_dst {
     $self->{ipv6_destination}
         = (@_ == 2) ? $ipv6_dst : $self->{ipv6_destination};
 }
-sub ipv6_label {
+sub ipv6_flabel {
     my ($self, $ipv6_label) = @_;
-    $self->{ipv6_label} = (@_ == 2) ? $ipv6_label : $self->{ipv6_label};
+    defined $self->{ipv6_label} or $self->{ipv6_label} = new IPv6LabelMatch;
+    $self->{ipv6_label}->flabel($ipv6_label);
 }
 sub ipv6_ext_header {
     my ($self, $ipv6_ext_header) = @_;
-    $self->{ipv6_ext_header}
-        = (@_ == 2) ? $ipv6_ext_header : $self->{ipv6_ext_header};
+    defined $self->{ipv6_ext_header} or
+        $self->{ipv6_ext_header} = new IPv6ExtHdrMatch;
+    $self->{ipv6_ext_header}->exthdr($ipv6_ext_header);
 }
 sub ip_dscp {
     my ($self, $dscp) = @_;
@@ -525,7 +527,7 @@ sub icmpv6_type {
 sub icmpv6_code {
     my ($self, $icmpv6_code) = @_;
     defined $self->{icmpv6_match} or $self->{icmpv6_match} = new IcmpV6Match;
-    $self->{icmpv6_match}->type($icmpv6_code);
+    $self->{icmpv6_match}->code($icmpv6_code);
 }
 sub in_port {
     my ($self, $in_port) = @_;

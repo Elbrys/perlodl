@@ -1,0 +1,95 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use BVC::Controller;
+use BVC::Const qw(:all);
+use BVC::Openflow::OFSwitch;
+use BVC::Openflow::FlowEntry;
+use BVC::Openflow::Match;
+use BVC::Openflow::Action::Output;
+
+my $configfile = "";
+my $status = $BVC_UNKNOWN;
+my $flowinfo = undef;
+
+my $ethtype = $ETH_TYPE_IPv4;
+my $eth_src = "00:00:00:11:23:ad";
+my $eth_dst = "00:ff:29:01:19:61";
+my $vlan_id = 100;
+my $vlan_pcp = $PCP_CA;         # Critical Applications (priority 3)
+
+my $table_id = 0;
+my $flow_id  = 20;
+my $flow_priority = 1011;
+
+GetOptions("config=s" => \$configfile) or die ("Command line args");
+
+print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+print ("<<< Demo Start\n");
+print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
+
+my $bvc = new BVC::Controller(cfgfile => $configfile);
+my $ofswitch = new BVC::Openflow::OFSwitch(cfgfile => $configfile,
+                                           ctrl => $bvc);
+print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
+
+print  "<<< Set OpenFlow flow on the Controller\n";
+printf "        Match:  Ethernet Type                (0x%04x)\n", $ethtype;
+print  "                Ethernet Source Address      ($eth_src)\n";
+print  "                Ethernet Destination Address ($eth_dst)\n";
+print  "                VLAN ID                      ($vlan_id)\n";
+print  "                VLAN PCP                     ($vlan_pcp)\n";
+print  "        Action: Output (to Physical Port Number)\n\n";
+
+my $flowentry = new BVC::Openflow::FlowEntry;
+$flowentry->table_id($table_id);
+$flowentry->id($flow_id);
+$flowentry->priority($flow_priority);
+
+# # --- Instruction: 'Apply-action'
+# #     Action:      'Output' NORMAL
+my $instruction = $flowentry->add_instruction(0);
+my $action = new BVC::Openflow::Action::Output(order => 0, port => 7);
+$instruction->apply_actions($action);
+
+# # --- Match Fields
+
+my $match = new BVC::Openflow::Match();
+$match->eth_type($ethtype);
+$match->eth_src($eth_src);
+$match->eth_dst($eth_dst);
+$match->vlan_id($vlan_id);
+$match->vlan_pcp($vlan_pcp);
+$flowentry->add_match($match);
+
+print "<<< Flow to send:\n";
+print $flowentry->get_payload() . "\n\n";
+
+$status = $ofswitch->add_modify_flow($flowentry);
+($BVC_OK == $status)
+    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+print "<<< Flow successfully added to the Controller\n\n";
+
+($status, $flowinfo) = $ofswitch->get_configured_flow($table_id, $flow_id);
+($BVC_OK == $status)
+    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+print "<<< Flow successfully read from the Controller\n";
+print "Flow info:\n";
+print JSON->new->pretty->encode(JSON::decode_json($flowinfo)) . "\n";
+
+print "<<< Delete flow with id of '$flow_id' from the Controller's cache\n";
+print "        and from table '$table_id' on the '$ofswitch->{name}' node\n\n";
+$status = $ofswitch->delete_flow($flowentry->table_id,
+                                 $flowentry->id);
+($BVC_OK == $status)
+    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+print "<<< Flow successfully removed from the Controller\n";
+
+
+print ("\n");
+print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+print (">>> Demo End\n");
+print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");

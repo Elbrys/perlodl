@@ -133,7 +133,7 @@ sub _strip_undef {
 # Parameters: none
 # Returns   : FlowEntry as formatted for transmission to controller
 #
-sub get_payload {   # XXX entire method
+sub get_payload {
     my $self = shift;
 
     # hack clone
@@ -158,37 +158,44 @@ sub get_payload {   # XXX entire method
 #
 sub table_id {
     my ($self, $table_id) = @_;
-    $self->{table_id} = (@_ == 2) ? $table_id : $self->{table_id};
+    $self->{table_id} = (2 == @_) ? $table_id : $self->{table_id};
 }
 sub flow_name {
     my ($self, $flow_name) = @_;
-    $self->{flow_name} = (@_ == 2) ? $flow_name : $self->{flow_name};
+    $self->{flow_name} = (2 == @_) ? $flow_name : $self->{flow_name};
 }
 sub id {
     my ($self, $id) = @_;
-    $self->{id} = (@_ == 2) ? $id : $self->{id};
+    $self->{id} = (2 == @_) ? $id : $self->{id};
+}
+sub install_hw {
+    my ($self, $install_hw) = @_;
+    $self->{installHw} = (2 == @_) ? $install_hw : $self->{installHw};
 }
 sub priority {
     my ($self, $priority) = @_;
-    $self->{priority} = (@_ == 2) ? $priority : $self->{priority};
+    $self->{priority} = (2 == @_) ? $priority : $self->{priority};
 }
 sub hard_timeout {
     my ($self, $timeout) = @_;
-    $self->{hard_timeout} = (@_ == 2) ? $timeout : $self->{hard_timeout};
+    $self->{hard_timeout} = (2 == @_) ? $timeout : $self->{hard_timeout};
 }
 sub idle_timeout {
     my ($self, $timeout) = @_;
-    $self->{idle_timeout} = (@_ == 2) ? $timeout : $self->{idle_timeout};
+    $self->{idle_timeout} = (2 == @_) ? $timeout : $self->{idle_timeout};
 }
 sub cookie {
     my ($self, $cookie) = @_;
-    $self->{cookie} = (@_ == 2) ? $cookie : $self->{cookie};
+    $self->{cookie} = (2 == @_) ? $cookie : $self->{cookie};
 }
 sub cookie_mask {
     my ($self, $mask) = @_;
-    $self->{cookie_mask} = (@_ == 2) ? $mask : $self->{cookie_mask};
+    $self->{cookie_mask} = (2 == @_) ? $mask : $self->{cookie_mask};
 }
-
+sub strict {
+    my ($self, $strict) = @_;
+    $self->{strict} = (2 == @_) ? $strict : $self->{strict};
+}
 
 sub add_instruction {
     my ($self, $order) = @_;
