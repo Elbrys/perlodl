@@ -15,7 +15,7 @@ use BVC::Openflow::Action::PushVlanHeader;
 use BVC::Openflow::Action::PopVlanHeader;
 
 my $configfile = "";
-my $status = $BVC_UNKNOWN;
+my $status = undef;
 my $flowinfo = undef;
 
 my $qinq_eth_type    = $ETH_TYPE_STAG;
@@ -109,8 +109,7 @@ print "<<< Flow to send:\n";
 print $flowentry->get_payload() . "\n\n";
 
 $status = $ofswitch->add_modify_flow($flowentry);
-($BVC_OK == $status)
-    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Flow successfully added to the Controller\n\n";
 
 # ---------------------------------------------------
@@ -174,8 +173,7 @@ print "<<< Flow to send:\n";
 print $flowentry2->get_payload() . "\n\n";
 
 $status = $ofswitch->add_modify_flow($flowentry2);
-($BVC_OK == $status)
-    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Flow successfully added to the Controller\n\n";
 
 # ---------------------------------------------------
@@ -221,8 +219,7 @@ print "<<< Flow to send:\n";
 print $flowentry3->get_payload() . "\n\n";
 
 $status = $ofswitch->add_modify_flow($flowentry3);
-($BVC_OK == $status)
-    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Flow successfully added to the Controller\n\n";
 
 # ---------------------------------------------------
@@ -268,8 +265,7 @@ print "<<< Flow to send:\n";
 print $flowentry4->get_payload() . "\n\n";
 
 $status = $ofswitch->add_modify_flow($flowentry4);
-($BVC_OK == $status)
-    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Flow successfully added to the Controller\n\n";
 
 # ---------------------------------------------------
@@ -279,8 +275,8 @@ print "<<< Flow successfully added to the Controller\n\n";
 print "<<< Get configured flows from the Controller\n";
 foreach my $flow_num ($first_flow_id .. $flow_id-1) {
     ($status, $flowinfo) = $ofswitch->get_configured_flow($table_id, $flow_num);
-    ($BVC_OK == $status)
-        or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+    $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
     print "<<< Flow '$flow_num' successfully read from the Controller\n";
     print "Flow info:\n";
     print JSON->new->pretty->encode(JSON::decode_json($flowinfo)) . "\n";
@@ -295,8 +291,7 @@ print "    the table '$table_id' on the '$ofswitch->{name}' node\n";
 
 foreach my $flow_num ($first_flow_id .. $flow_id-1) {
     $status = $ofswitch->delete_flow($table_id, $flow_num);
-    ($BVC_OK == $status)
-        or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+    $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
     print "<<< Flow with id of '$flow_num' successfully removed from the Controller\n";
 }
 

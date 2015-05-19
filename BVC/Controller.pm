@@ -36,13 +36,17 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Controller;
-$BVC::VERSION = '0.01';
-
-# XXX perldoc
-
 use strict;
 use warnings;
+
+# Package ==============================================================
+# BVC::Controller
+#    model and interact with Brocade Vyatta Controller Controller
+#
+# ======================================================================
+package BVC::Controller;
+
+use BVC::Status qw(:constants);
 
 use YAML;
 use LWP;
@@ -50,65 +54,6 @@ use HTTP::Status qw(:constants :is status_message);
 use JSON -convert_blessed_universally;
 use XML::Parser;
 use Carp::Assert;
-use Readonly;
-
-require Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT = qw($BVC_OK
-                 $BVC_CONN_ERROR
-                 $BVC_DATA_NOT_FOUND
-                 $BVC_BAD_REQUEST
-                 $BVC_UNAUTHORIZED_ACCESS
-                 $BVC_INTERNAL_ERROR
-                 $BVC_NODE_CONNECTED
-                 $BVC_NODE_DISCONNECTED
-                 $BVC_NODE_NOT_FOUND
-                 $BVC_NODE_CONFIGURED
-                 $BVC_HTTP_ERROR
-                 $BVC_MALFORMED_DATA
-                 $BVC_UNKNOWN
-);
-
-Readonly our $BVC_OK                  =>  0;
-Readonly our $BVC_CONN_ERROR          =>  1;
-Readonly our $BVC_DATA_NOT_FOUND      =>  2;
-Readonly our $BVC_BAD_REQUEST         =>  3;
-Readonly our $BVC_UNAUTHORIZED_ACCESS =>  4;
-Readonly our $BVC_INTERNAL_ERROR      =>  5;
-Readonly our $BVC_NODE_CONNECTED      =>  6;
-Readonly our $BVC_NODE_DISCONNECTED   =>  7;
-Readonly our $BVC_NODE_NOT_FOUND      =>  8;
-Readonly our $BVC_NODE_CONFIGURED     =>  9;
-Readonly our $BVC_HTTP_ERROR          => 10;
-Readonly our $BVC_MALFORMED_DATA      => 11;
-Readonly our $BVC_UNKNOWN             => 12;
-
-sub status_string {
-    my $self = shift;
-    my ($status, $http_resp) = @_;
-
-    my $errmsg = ($status == $BVC_OK)                  ? "Success"
-               : ($status == $BVC_CONN_ERROR)          ? "Server connection error"
-               : ($status == $BVC_DATA_NOT_FOUND)      ? "Requested data not found"
-               : ($status == $BVC_BAD_REQUEST)         ? "Bad or invalid data in request"
-               : ($status == $BVC_UNAUTHORIZED_ACCESS) ? "Server unauthorized access"
-               : ($status == $BVC_INTERNAL_ERROR)      ? "Internal server error"
-               : ($status == $BVC_NODE_CONNECTED)      ? "Node is connected"
-               : ($status == $BVC_NODE_DISCONNECTED)   ? "Node is disconnected"
-               : ($status == $BVC_NODE_NOT_FOUND)      ? "Node not found"
-               : ($status == $BVC_NODE_CONFIGURED)     ? "Node is configured"
-               : ($status == $BVC_HTTP_ERROR)          ? "HTTP error"
-               : ($status == $BVC_MALFORMED_DATA)      ? "Malformed data"
-               : ($status == $BVC_UNKNOWN)             ? "Unknown error"
-               :                                        "Undefined status code " . $status;
-    if (($status == $BVC_HTTP_ERROR)
-        && $http_resp
-        && $http_resp->code
-        && $http_resp->message) {
-            $errmsg .= " " . $http_resp->code . " - " . $http_resp->message
-    }
-    return $errmsg;
-}
 
 # Constructor ==========================================================
 # Parameters: cfgfile : name of YAML file for configuring object (opt)
@@ -203,7 +148,7 @@ sub as_json {
 sub get_nodes_operational_list {
     my $self = shift;
     my @nodeNames = ();
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -211,21 +156,21 @@ sub get_nodes_operational_list {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status = $BVC_DATA_NOT_FOUND;
+                $status->code($BVC_DATA_NOT_FOUND);
             }
             else {
                 foreach (@$nodes) {
                     push @nodeNames, $_->{id};
                 }
-                $status = $BVC_OK;
+                $status->code($BVC_OK);
             }
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, \@nodeNames);
 }
@@ -240,18 +185,18 @@ sub get_node_info {
     my $self = shift;
     my $node = shift;
     my $node_info = undef;
-    my $status = $BVC_DATA_NOT_FOUND;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/$node";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"node\"/) {
             $node_info = decode_json($resp->content)->{node};
-            $status = $node_info ? $BVC_OK : $BVC_DATA_NOT_FOUND;
+            $status->code($node_info ? $BVC_OK : $BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $node_info);
 }
@@ -264,11 +209,13 @@ sub get_node_info {
 sub check_node_config_status {
     my $self = shift;
     my $node = shift;
+    my $status = new BVC::Status;
 
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/$node";
     my $resp = $self->_http_req('GET', $urlpath);
-    return ($resp->code == HTTP_OK)
-        ? $BVC_NODE_CONFIGURED : $BVC_NODE_NOT_FOUND;
+    $status->code(($resp->code == HTTP_OK)
+        ? $BVC_NODE_CONFIGURED : $BVC_NODE_NOT_FOUND);
+    return $status;
 }
 
 # Method ===============================================================
@@ -279,18 +226,18 @@ sub check_node_config_status {
 sub check_node_conn_status {
     my $self = shift;
     my $node = shift;
-
-    my ($status, $nodeStatus) = $self->get_all_nodes_conn_status();
-    if ($status == $BVC_OK) {
+    my $status = new BVC::Status;
+    ($status, my $nodeStatus) = $self->get_all_nodes_conn_status();
+    if ($status->ok) {
+        $status->code($BVC_NODE_NOT_FOUND);
         foreach (@$nodeStatus) {
             if ($_->{id} eq $node) {
-                return $_->{connected} ? $BVC_NODE_CONNECTED
-                                       : $BVC_NODE_DISCONNECTED;
+                $status->code($_->{connected} ? $BVC_NODE_CONNECTED
+                                              : $BVC_NODE_DISCONNECTED);
             }
         }
-        return $BVC_NODE_NOT_FOUND;
     }
-    return $BVC_UNKNOWN;
+    return $status;
 }
 
 # Method ===============================================================
@@ -301,7 +248,7 @@ sub check_node_conn_status {
 sub get_all_nodes_in_config {
     my $self = shift;
     my @nodeNames = ();
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -309,21 +256,21 @@ sub get_all_nodes_in_config {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status = $BVC_DATA_NOT_FOUND;
+                $status->code($BVC_DATA_NOT_FOUND);
             }
             else {
                 foreach (@$nodes) {
                     push @nodeNames, $_->{id};
                 }
-                $status = $BVC_OK;
+                $status->code($BVC_OK);
             }
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, \@nodeNames);
 }
@@ -336,7 +283,7 @@ sub get_all_nodes_in_config {
 sub get_all_nodes_conn_status {
     my $self = shift;
     my @nodeStatus = ();
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -344,28 +291,23 @@ sub get_all_nodes_conn_status {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status = $BVC_DATA_NOT_FOUND;
+                $status->code($BVC_DATA_NOT_FOUND);
             }
             else {
                 foreach (@$nodes) {
                     my $connected = $_->{"netconf-node-inventory:connected"};
-                    if ($connected) {
-                        push @nodeStatus, {'id' => $_->{id},
-                                           'connected' => 1}
-                    } else {
-                        push @nodeStatus, {'id' => $_->{id},
-                                           'connected' => 0}
-                    }
+                    push @nodeStatus, {'id' => $_->{id},
+                                       'connected' => $connected}
                 }
-                $status = $BVC_OK;
+                $status->code($BVC_OK);
             }
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, \@nodeStatus);
 }
@@ -373,27 +315,28 @@ sub get_all_nodes_conn_status {
 # Method ===============================================================
 # 
 # Parameters: 
-# Returns   : 
+# Returns   : array ref of supported schemas
 #
 sub get_schemas {
     my $self = shift;
     my $node = shift;
     my $schemas = undef;
-    my $status = $BVC_UNKNOWN;
-    my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/$node/yang-ext:mount/ietf-netconf-monitoring:netconf-state/schemas";
+    my $status = new BVC::Status;
+    my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/"
+        . "$node/yang-ext:mount/ietf-netconf-monitoring:netconf-state/schemas";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"schemas\"/) {
             $schemas = decode_json($resp->content)->{schemas}->{schema};
-            $status = $schemas ? $BVC_OK : $BVC_DATA_NOT_FOUND;
+            $status->code($schemas ? $BVC_OK : $BVC_DATA_NOT_FOUND);
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $schemas);
 }
@@ -401,16 +344,18 @@ sub get_schemas {
 # Method ===============================================================
 # 
 # Parameters: 
-# Returns   : 
+# Returns   : specified YANG schema as formatted JSON
 #
 sub get_schema {
     my $self = shift;
     my ($node, $schemaId, $schemaVersion) = @_;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $schema = undef;
 
-    my $urlpath = "/restconf/operations/opendaylight-inventory:nodes/node/$node/yang-ext:mount/ietf-netconf-monitoring:get-schema";
-    my $payload = '{"input": {"identifier":"' . $schemaId . '","version":"' . $schemaVersion . '","format":"yang"}}';
+    my $urlpath = "/restconf/operations/opendaylight-inventory:nodes"
+        . "/node/$node/yang-ext:mount/ietf-netconf-monitoring:get-schema";
+    my $payload = qq({"input":{"identifier":"$schemaId","version":)
+        . qq("$schemaVersion","format":"yang"}});
     my %headers = ('content-type'=>'application/yang.data+json',
                    'accept'=>'text/json, text/html, application/xml, */*');
 
@@ -422,10 +367,10 @@ sub get_schema {
         assert   ($xmltree_ref->[1][2][1]    eq 'data');
         assert   ($xmltree_ref->[1][2][2][1] == 0);
         $schema = $xmltree_ref->[1][2][2][2];
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $schema);
 }
@@ -439,21 +384,21 @@ sub get_netconf_operations {
     my $self = shift;
     my $node = shift;
     my $operations = undef;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/operations/opendaylight-inventory:nodes/node/$node/yang-ext:mount/";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"operations\"/) {
             $operations = decode_json($resp->content)->{operations};
-            $status = $BVC_OK;
+            $status->code($BVC_OK);
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $operations);
 }
@@ -466,7 +411,7 @@ sub get_netconf_operations {
 sub get_all_modules_operational_state {
     my $self = shift;
     my $modules = undef;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
     
     my $resp = $self->_http_req('GET', $urlpath);
@@ -476,14 +421,14 @@ sub get_all_modules_operational_state {
             my $json = $resp->content;
             $json =~ s/\\\n//g;
             $modules = decode_json($json)->{modules}->{module};
-            $status = $modules ? $BVC_OK : $BVC_DATA_NOT_FOUND;
+            $status->code($modules ? $BVC_OK : $BVC_DATA_NOT_FOUND);
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $modules);
 }
@@ -497,21 +442,21 @@ sub get_module_operational_state {
     my $self = shift;
     my ($moduleType, $moduleName) = @_;
     my $module = undef;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules/module/$moduleType/$moduleName";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK ) {
         if ($resp->content =~ /\"module\"/) {
             $module = decode_json($resp->content)->{module};
-            $status = $module ? $BVC_OK : $BVC_DATA_NOT_FOUND;
+            $status->code($module ? $BVC_OK : $BVC_DATA_NOT_FOUND);
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $module);
 }
@@ -525,21 +470,21 @@ sub get_sessions_info {
     my $self = shift;
     my $node = shift;
     my $sessions = undef;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/$node/yang-ext:mount/ietf-netconf-monitoring:netconf-state/sessions";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"sessions\"/) {
             $sessions = decode_json($resp->content)->{sessions};
-            $status = $sessions ? $BVC_OK : $BVC_DATA_NOT_FOUND;
+            $status->code($sessions ? $BVC_OK : $BVC_DATA_NOT_FOUND);
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $sessions);
 }
@@ -552,21 +497,21 @@ sub get_sessions_info {
 sub get_streams_info {
     my $self = shift;
     my $streams = undef;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/streams";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"streams\"/) {
             $streams = decode_json($resp->content)->{streams};
-            $status = $streams ? $BVC_OK : $BVC_DATA_NOT_FOUND;
+            $status->code($streams ? $BVC_OK : $BVC_DATA_NOT_FOUND);
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $streams);
 }
@@ -579,21 +524,21 @@ sub get_streams_info {
 sub get_service_providers_info {
     my $self = shift;
     my $service = undef;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:services";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"services\"/) {
             $service = decode_json($resp->content)->{services}->{service};
-            $status = $service ? $BVC_OK : $BVC_DATA_NOT_FOUND;
+            $status->code($service ? $BVC_OK : $BVC_DATA_NOT_FOUND);
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $service);
 }
@@ -607,21 +552,22 @@ sub get_service_provider_info {
     my $self = shift;
     my $name = shift;
     my $service = undef;
-    my $status = $BVC_UNKNOWN;
-    my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:services/service/$name";
+    my $status = new BVC::Status;
+    my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node"
+        . "/controller-config/yang-ext:mount/config:services/service/$name";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"service\"/) {
             $service = decode_json($resp->content)->{service};
-            $status = $BVC_OK;
+            $status->code($BVC_OK);
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $service);
 }
@@ -634,7 +580,7 @@ sub get_service_provider_info {
 sub add_netconf_node {
     my $self = shift;
     my $node = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
     my %headers = ('content-type' => 'application/xml',
                    'accept' => 'application/xml');
@@ -671,7 +617,7 @@ sub add_netconf_node {
 END_XML
 
     my $resp = $self->_http_req('POST', $urlpath, $xmlPayload, \%headers);
-    $status = $resp->is_success ? $BVC_OK : $BVC_HTTP_ERROR;
+    $status->code($resp->is_success ? $BVC_OK : $BVC_HTTP_ERROR);
     return ($status, $resp);
 }
 
@@ -683,11 +629,11 @@ END_XML
 sub delete_netconf_node {
     my $self = shift;
     my $node = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules/module/odl-sal-netconf-connector-cfg:sal-netconf-connector/" . $node->{name};
 
     my $resp = $self->_http_req('DELETE', $urlpath);
-    $status = $resp->is_success ? $BVC_OK : $BVC_HTTP_ERROR;
+    $status->code($resp->is_success ? $BVC_OK : $BVC_HTTP_ERROR);
     return ($status, $resp);
 }
 
@@ -713,7 +659,7 @@ sub get_ext_mount_config_urlpath {
     my $node = shift;
 
     return "/restconf/config/opendaylight-inventory:nodes/node/"
-        . $node . "/yang-ext:mount/";
+        . "$node/yang-ext:mount/";
 }
 
 # Method ===============================================================
@@ -726,7 +672,7 @@ sub get_ext_mount_operational_urlpath {
     my $node = shift;
 
     return "/restconf/operational/opendaylight-inventory:nodes/node/"
-        . $node . "/yang-ext:mount/";
+        . "$node/yang-ext:mount/";
 }
 
 # Method ===============================================================
@@ -738,7 +684,7 @@ sub get_node_operational_urlpath {
     my $self = shift;
     my $node = shift;
 
-    return "/restconf/operational/opendaylight-inventory:nodes/node/" . $node;
+    return "/restconf/operational/opendaylight-inventory:nodes/node/$node";
 }
 
 # Method ===============================================================
@@ -750,7 +696,7 @@ sub get_node_config_urlpath {
     my $self = shift;
     my $node = shift;
 
-    return "/restconf/config/opendaylight-inventory:nodes/node/" . $node;
+    return "/restconf/config/opendaylight-inventory:nodes/node/$node";
 }
 
 # Method ===============================================================
@@ -760,7 +706,7 @@ sub get_node_config_urlpath {
 #
 sub get_openflow_nodes_operational_list {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my @nodelist = ();
 
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
@@ -769,10 +715,10 @@ sub get_openflow_nodes_operational_list {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status = $BVC_DATA_NOT_FOUND;
+                $status->code($BVC_DATA_NOT_FOUND);
             }
             else {
-                $status = $BVC_OK;
+                $status->code($BVC_OK);
                 foreach (@$nodes) {
                     $_->{id} =~ /^(openflow:[0-9]*)/ && push @nodelist, $1;
                 }
@@ -780,7 +726,7 @@ sub get_openflow_nodes_operational_list {
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, \@nodelist);
 }

@@ -11,17 +11,15 @@ my $configfile = "";
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
-my $bvc = new BVC::Controller($configfile);
-my $vRouter = new BVC::Netconf::Vrouter::VR5600($configfile, ctrl=>$bvc);
+my $bvc = new BVC::Controller(cfgfile => $configfile);
+my $vRouter = new BVC::Netconf::Vrouter::VR5600(cfgfile => $configfile,
+                                                ctrl=>$bvc);
 
-print "<<< 'Controller': " . $bvc->{ipAddr} . ", '"
-    . $vRouter->{name} . "': " . $vRouter->{ipAddr} . "\n";
+print "<<< 'Controller': $bvc->{ipAddr}, " .
+    "'$vRouter->{name}': $vRouter->{ipAddr}\n";
 
 my ($status, $config) = $vRouter->get_firewalls_cfg();
-if ($status == $BVC_OK) {
-    print "'" . $vRouter->{name} . "' firewalls config:\n";
-    print JSON->new->canonical->pretty->encode($config);
-}
-else {
-    die "Error: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "Error: ${\$status->msg}\n";
+
+print "'" . $vRouter->{name} . "' firewalls config:\n";
+print JSON->new->canonical->pretty->encode($config);

@@ -41,6 +41,7 @@ use warnings;
 
 use parent qw(BVC::OpenflowNode);
 use BVC::Controller;
+use BVC::Status qw(:constants);
 
 use Regexp::Common;   # balanced paren matching
 use HTTP::Status qw(:constants :is status_message);
@@ -76,7 +77,7 @@ sub as_json {
 #
 sub get_switch_info {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my %node_info = ();
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
@@ -86,10 +87,10 @@ sub get_switch_info {
             $resp->content =~ /\"flow-node-inventory:$_\":\"([^"]*)\"/
                 && ($node_info{$_} = $1);
         } qw(manufacturer serial-number software hardware description);
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, \%node_info);
 }
@@ -102,7 +103,7 @@ sub get_switch_info {
 #
 sub get_features_info {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $feature_info_ref = undef;
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
@@ -112,10 +113,10 @@ sub get_features_info {
         ($resp->content =~ /\"flow-node-inventory:switch-features\":(\{[^\}]+\}),/)
             && (($features = $1) =~ s/flow-node-inventory:flow-feature-capability-//g);
         $feature_info_ref = decode_json($features);
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $feature_info_ref);
 }
@@ -128,7 +129,7 @@ sub get_features_info {
 #
 sub get_ports_list {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my @port_list = ();
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
@@ -136,10 +137,10 @@ sub get_ports_list {
     if (HTTP_OK == $resp->code) {
         my $node_connector_json = ($resp->content =~ /$RE{balanced}{-keep}{-begin => "\"node-connector\":\["}{-end => "]"}/ && $1);
         @port_list = ($node_connector_json =~ /\"flow-node-inventory:port-number\":\"([0-9a-zA-Z]+)\"/g);
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, \@port_list);
 }
@@ -153,7 +154,7 @@ sub get_ports_list {
 sub get_port_brief_info {
     my $self = shift;
     my $portnum = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
 
     die "XXX";
 }
@@ -166,7 +167,7 @@ sub get_port_brief_info {
 #
 sub get_ports_brief_info {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my @ports_info = ();
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
@@ -186,10 +187,10 @@ sub get_ports_brief_info {
                 uc($connector->{'flow-node-inventory:current-feature'});
             push @ports_info, $port_info;
         }
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, \@ports_info);
 }
@@ -203,7 +204,7 @@ sub get_ports_brief_info {
 sub get_port_detail_info {
     my $self = shift;
     my $portnum = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $port_info_ref;
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name}) . "/node-connector/$self->{name}:$portnum";
@@ -212,14 +213,14 @@ sub get_port_detail_info {
         my $node_connector = decode_json($resp->content);
         if (ref($node_connector->{'node-connector'}[0]) eq "HASH") {
             ($port_info_ref = $node_connector->{'node-connector'}[0]);
-            $status = $BVC_OK;
+            $status->code($BVC_OK);
         }
         else {
-            $status = $BVC_DATA_NOT_FOUND;
+            $status->code($BVC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $port_info_ref);
 }
@@ -232,7 +233,7 @@ sub get_port_detail_info {
 #
 sub add_modify_flow {
     my ($self, $flow_entry) = @_;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status($BVC_OK);
 
     if($flow_entry->isa("BVC::Openflow::FlowEntry")) {
         my %headers = ('content-type' => 'application/yang.data+json');
@@ -242,10 +243,10 @@ sub add_modify_flow {
             . "/flow/" . $flow_entry->id();
         my $resp = $self->{ctrl}->_http_req('PUT', $urlpath, $payload, \%headers);
 
-        $status = (HTTP_OK == $resp->code) ? $BVC_OK : $BVC_INTERNAL_ERROR;
+        ($resp->code == HTTP_OK) or $status->http_err($resp);
     }
     else {
-        $status = $BVC_MALFORMED_DATA;
+        $status->code($BVC_MALFORMED_DATA);
     }
     return $status;
 }
@@ -258,13 +259,13 @@ sub add_modify_flow {
 #
 sub delete_flow {
     my ($self, $table_id, $flow_id) = @_;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status($BVC_OK);
 
     my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
         . "/table/$table_id/flow/$flow_id";
     my $resp = $self->{ctrl}->_http_req('DELETE', $urlpath);
-
-    $status = (HTTP_OK == $resp->code) ? $BVC_OK : $BVC_HTTP_ERROR;
+    $resp->code == HTTP_OK or $status->http_err($resp);
+    return $status;
 }
 
 
@@ -275,7 +276,7 @@ sub delete_flow {
 #
 sub get_configured_flow {
     my ($self, $table_id, $flow_id) = @_;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $flow = undef;
 
     my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
@@ -284,10 +285,10 @@ sub get_configured_flow {
 
     if (HTTP_OK == $resp->code) {
         $flow = $resp->content;
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $flow);
 }

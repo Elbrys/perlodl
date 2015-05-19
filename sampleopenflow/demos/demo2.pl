@@ -8,7 +8,7 @@ use BVC::Controller;
 use BVC::Openflow::OFSwitch;
 
 my $configfile = "";
-my $status = $BVC_UNKNOWN;
+my $status = undef;
 my $switch_info = undef;
 my $features = undef;
 my $portlist = undef;
@@ -28,44 +28,33 @@ print $bvc->as_json() . "\n";
 my $ofswitch = new BVC::Openflow::OFSwitch(ctrl => $bvc, name => $sample);
 
     
-print "<<< Get information about OpenFlow node '" . $sample . "'\n";
+print "<<< Get information about OpenFlow node '$sample'\n";
 ($status, $switch_info) = $ofswitch->get_switch_info();
-if ($BVC_OK == $status) {
-    print "Node '" . $sample . "' generic info:\n";
-    print JSON->new->canonical->pretty->encode($switch_info) . "\n";
-}
-else {
-    die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Node '$sample' generic info:\n";
+print JSON->new->canonical->pretty->encode($switch_info) . "\n";
 
 
 ($status, $features) = $ofswitch->get_features_info();
-if ($BVC_OK == $status) {
-    print "Node '" . $sample . "' features:\n";
-    print JSON->new->canonical->pretty->encode($features) . "\n";
-}
-else {
-    die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Node '$sample' features:\n";
+print JSON->new->canonical->pretty->encode($features) . "\n";
+
 
 ($status, $portlist) = $ofswitch->get_ports_list();
-if ($BVC_OK == $status) {
-    print "Node '" . $sample . "' ports list:\n";
-    print JSON->new->canonical->pretty->encode($portlist) . "\n";
-}
-else {
-    die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Node '$sample' ports list:\n";
+print JSON->new->canonical->pretty->encode($portlist) . "\n";
 
 
 ($status, $portinfo) = $ofswitch->get_ports_brief_info();
-if ($BVC_OK == $status) {
-    print "Node '" . $sample . "' ports brief information:\n";
-    print JSON->new->canonical->pretty->encode($portinfo);
-}
-else {
-    die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Node '$sample' ports brief information:\n";
+print JSON->new->canonical->pretty->encode($portinfo);
 
 
 print ("\n");

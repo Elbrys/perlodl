@@ -11,13 +11,10 @@ my $configfile = "";
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
-my $bvc = new BVC::Controller($configfile);
-my $ncNode = new BVC::NetconfNode($configfile, ctrl=>$bvc);
+my $bvc = new BVC::Controller(cfgfile => $configfile);
+my $ncNode = new BVC::NetconfNode(cfgfile => $configfile, ctrl => $bvc);
 
 my ($status, $node_info) = $bvc->get_node_info($ncNode->{name});
-if ($status == $BVC_OK) {
-    print JSON->new->canonical->pretty->encode($node_info);
-}
-else {
-    die "Error: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "Error: ${\$status->msg}\n";
+
+print JSON->new->canonical->pretty->encode($node_info);

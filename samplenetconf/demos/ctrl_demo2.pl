@@ -26,12 +26,11 @@ print "<<< Retrieve '$yangModelName' YANG model definition from the Controller\n
 
 my ($status, $schema) = $bvc->get_schema($nodeName, $yangModelName, $yangModelRev);
 
-if ($status == $BVC_OK) {
-    print "YANG model:\n";
-    print $schema;
-} else {
-    die "\n!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "YANG model:\n";
+print $schema;
+
 
 print ("\n");
 print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");

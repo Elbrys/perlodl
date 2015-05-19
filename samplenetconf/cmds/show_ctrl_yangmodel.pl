@@ -15,19 +15,14 @@ GetOptions("config=s"     => \$configfile,
            "version=s"    => \$yangVersion
     ) or die ("Command line args");
 
-if (!$yangId || !$yangVersion) {
-    die "identifier and version arguments are required.";
-}
+($yangId && $yangVersion)
+    or die "identifier and version arguments are required.";
 
-my $bvc = new BVC::Controller($configfile);
-
-print "<<< 'Controller': " . $bvc->{ipAddr} . "\n";
+my $bvc = new BVC::Controller(cfgfile => $configfile);
+print "<<< 'Controller': $bvc->{ipAddr}\n";
 
 my ($status, $schema) = $bvc->get_schema('controller-config',
                                          $yangId, $yangVersion);
-if ($status == $BVC_OK) {
-    print $schema . "\n";
-}
-else {
-    die "Error: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "Error: ${\$status->msg}\n";
+
+print $schema . "\n";

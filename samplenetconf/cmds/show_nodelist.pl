@@ -11,17 +11,13 @@ my $configfile = "";
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
-my $bvc = new BVC::Controller($configfile);
-
+my $bvc = new BVC::Controller(cfgfile => $configfile);
 
 my ($status, $nodelist_ref) = $bvc->get_nodes_operational_list();
-if ($status == $BVC_OK) {
-    print "Nodes:\n";
-    foreach (@$nodelist_ref) {
-        print "    '$_'\n";
-    }
-    print "\n";
+$status->ok or die "Error: ${\$status->msg}\n";
+
+print "Nodes:\n";
+foreach (@$nodelist_ref) {
+    print "    '$_'\n";
 }
-else {
-    die "Error: " . $bvc->status_string($status) . "\n";
-}
+print "\n";

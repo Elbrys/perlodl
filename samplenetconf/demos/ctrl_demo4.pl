@@ -23,13 +23,10 @@ my $name = "opendaylight-md-sal-binding:binding-data-broker";
 print ("<<< Get '$name' service provider info\n");
 my ($status, $result) = $bvc->get_service_provider_info($name);
 
-if ($status == $BVC_OK) {
-    print "Service provider:\n";
-    print JSON->new->canonical->pretty->encode($result);
-}
-else {
-    die "\n!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Service provider:\n";
+print JSON->new->canonical->pretty->encode($result);
 
 print ("\n");
 print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");

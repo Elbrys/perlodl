@@ -43,6 +43,7 @@ use base qw(BVC::NetconfNode);
 use HTTP::Status qw(:constants :is status_message);
 use JSON;
 use BVC::Controller;
+use BVC::Status qw(:constants);
 
 # Method ===============================================================
 # 
@@ -74,17 +75,17 @@ sub get_schema {
 #
 sub get_cfg {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $config = undef;
 
     my $url = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
     my $resp = $self->{ctrl}->_http_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = decode_json($resp->content);
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $config);
 }
@@ -96,7 +97,7 @@ sub get_cfg {
 #
 sub get_firewalls_cfg {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $config = undef;
 
     my $url = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
@@ -104,10 +105,10 @@ sub get_firewalls_cfg {
     my $resp = $self->{ctrl}->_http_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $config);
 }
@@ -120,7 +121,7 @@ sub get_firewalls_cfg {
 sub get_firewall_instance_cfg {
     my $self = shift;
     my $instance = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $config = undef;
 
     my $url = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
@@ -129,10 +130,10 @@ sub get_firewall_instance_cfg {
     my $resp = $self->{ctrl}->_http_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $config);
 }
@@ -145,15 +146,16 @@ sub get_firewall_instance_cfg {
 sub create_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status($BVC_OK);
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
     my %headers = ('content-type'=>'application/yang.data+json');
     my $payload = $fwInstance->get_payload();
 
     my $resp = $self->{ctrl}->_http_req('POST', $urlpath, $payload, \%headers);
+    $resp->is_success or $status->http_err($resp);
 
-    return ($resp->is_success) ? $BVC_OK : $BVC_HTTP_ERROR;
+    return $status;
 }
 
 # Method ===============================================================
@@ -182,7 +184,7 @@ sub update_firewall_instance_rule {
 sub delete_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
         . $fwInstance->get_url_extension()
@@ -193,11 +195,11 @@ sub delete_firewall_instance {
         my $rule_url = $urlpath . $rule->get_name();
         my $resp = $self->{ctrl}->_http_req('DELETE', $rule_url);
         if ($resp->code != HTTP_OK) {
-            $status = $BVC_HTTP_ERROR;
+            $status->http_err($resp);
             last;
         }
         else {
-            $status = $BVC_OK;
+            $status->code($BVC_OK);
         }
     }
     return $status;
@@ -228,12 +230,12 @@ sub delete_dataplane_interface_firewall {
 #
 sub get_interfaces_list {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $ifcfg = undef;
     my @iflist = ();
 
     ($status, $ifcfg) = $self->get_interfaces_cfg();
-    if ($status == $BVC_OK) {
+    if ($status->ok) {
         if ($ifcfg =~ /interfaces/) {
             my $XXXfoo = decode_json($ifcfg)->{interfaces};
             # XXX
@@ -249,7 +251,7 @@ sub get_interfaces_list {
 #
 sub get_interfaces_cfg {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $config = undef;
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
@@ -258,10 +260,10 @@ sub get_interfaces_cfg {
     my $resp = $self->{ctrl}->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $config);
 }
@@ -273,21 +275,21 @@ sub get_interfaces_cfg {
 #
 sub get_dataplane_interfaces_list {
     my $self = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $dpifcfg = undef;
     my $iflist = undef;
     my @dpiflist;
 
     ($status, $dpifcfg) = $self->get_interfaces_cfg();
     if (! $dpifcfg) {
-        $status = $BVC_DATA_NOT_FOUND;
+        $status->code($BVC_DATA_NOT_FOUND);
     }
     else {
         $iflist = decode_json($dpifcfg)->{interfaces}->{'vyatta-interfaces-dataplane:dataplane'};
         foreach my $interface (@$iflist) {
             push @dpiflist, $interface->{tagnode};
         }
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     return ($status, @dpiflist);
 }
@@ -302,10 +304,10 @@ sub get_dataplane_interfaces_cfg {
     my $dpifcfg = undef;
 
     my ($status, $config) = $self->get_interfaces_cfg();
-    if ($status == $BVC_OK) {
+    if ($status->ok) {
         my $str1 = 'interfaces';
         my $str2 = 'vyatta-interfaces-dataplane:dataplane';
-        if (($config =~ /$str1/) && ($config =~ /$str2/)) {
+        if ($config =~ /$str2/) {
             $dpifcfg = decode_json($config)->{$str1}->{$str2};
         }
     }
@@ -320,7 +322,7 @@ sub get_dataplane_interfaces_cfg {
 sub get_dataplane_interface_cfg {
     my $self = shift;
     my $ifname = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status;
     my $cfg = undef;
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
@@ -329,10 +331,10 @@ sub get_dataplane_interface_cfg {
     my $resp = $self->{ctrl}->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         $cfg = $resp->content;
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     else {
-        $status = $BVC_HTTP_ERROR;
+        $status->http_err($resp);
     }
     return ($status, $cfg);
 }
@@ -348,13 +350,13 @@ sub get_loopback_interfaces_list {
 
     my ($status, $lbifcfg) = $self->get_loopback_interfaces_cfg();
     if (! $lbifcfg) {
-        $status = $BVC_DATA_NOT_FOUND;
+        $status->code($BVC_DATA_NOT_FOUND);
     }
     else {
         foreach (@$lbifcfg) {
             push @lbiflist, $_->{tagnode};
         }
-        $status = $BVC_OK;
+        $status->code($BVC_OK);
     }
     return ($status, \@lbiflist);
 }
@@ -369,7 +371,7 @@ sub get_loopback_interfaces_cfg {
     my $lbifcfg = undef;
 
     my ($status, $config) = $self->get_interfaces_cfg();
-    if ($status == $BVC_OK) {
+    if ($status->ok) {
         my $str1 = 'interfaces';
         my $str2 = 'vyatta-interfaces-loopback:loopback';
         if (($config =~ /$str1/) && ($config =~ /$str2/)) {
@@ -387,14 +389,16 @@ sub get_loopback_interfaces_cfg {
 sub get_loopback_interface_cfg {
     my $self = shift;
     my $ifName = shift;
-    my $status = $BVC_UNKNOWN;
+    my $status = new BVC::Status($BVC_OK);
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
         . "vyatta-interfaces:interfaces/vyatta-interfaces-loopback:loopback/"
         . $ifName;
     my $resp = $self->{ctrl}->_http_req('GET', $urlpath);
-    $status = ($resp->code == HTTP_OK) ? $BVC_OK : $BVC_HTTP_ERROR;
+    $resp->code == HTTP_OK or $status->http_err($resp);
+
     return ($status, $resp);
 }
 
+# Module ===============================================================
 1;

@@ -8,7 +8,7 @@ use BVC::Controller;
 use BVC::Netconf::Vrouter::VR5600;
 
 my $configfile = "";
-my $status = $BVC_UNKNOWN;
+my $status = undef;
 my $config = undef;
 my $http_resp = undef;
 
@@ -22,28 +22,25 @@ my $bvc = new BVC::Controller(cfgfile => $configfile);
 my $vRouter = new BVC::Netconf::Vrouter::VR5600(cfgfile => $configfile,
                                                 ctrl=>$bvc);
 
-print "<<< 'Controller': " . $bvc->{ipAddr} . ", '"
-    . $vRouter->{name} . "': " . $vRouter->{ipAddr} . "\n\n";
+print "<<< 'Controller': $bvc->{ipAddr}, '"
+    . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
 
 ($status, $http_resp) = $bvc->add_netconf_node($vRouter);
-($status == $BVC_OK)
-    && print "<<< '" . $vRouter->{name} . "' added to the Controller\n\n"
-    || die "Demo terminated: " . $bvc->status_string($status, $http_resp) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "<<< '$vRouter->{name}' added to the Controller\n\n";
 
 $status = $bvc->check_node_conn_status($vRouter->{name});
-($status == $BVC_NODE_CONNECTED)
-    && print "<<< '" . $vRouter->{name} . "' is connected to the Controller\n\n"
-    || die "Demo terminated: " . $bvc->status_string($status) . "\n";
+$status->connected or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "<<< '$vRouter->{name}' is connected to the Controller\n\n";
 
 print "<<< Show configuration of the '" . $vRouter->{name} . "'\n";
 ($status, $config) = $vRouter->get_cfg();
-if ($status == $BVC_OK) {
-    print "'" . $vRouter->{name} . "' configuration:\n";
-    print JSON->new->canonical->pretty->encode($config);
-}
-else {
-    die "Demo terminated: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "'$vRouter->{name}' configuration:\n";
+print JSON->new->canonical->pretty->encode($config);
 
 print ("\n");
 print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");

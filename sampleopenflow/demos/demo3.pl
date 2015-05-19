@@ -8,7 +8,7 @@ use BVC::Controller;
 use BVC::Openflow::OFSwitch;
 
 my $configfile = "";
-my $status = $BVC_UNKNOWN;
+my $status = undef;
 my $portlist = undef;
 my $portinfo = undef;
 
@@ -26,20 +26,16 @@ print $bvc->as_json() . "\n";
 my $ofswitch = new BVC::Openflow::OFSwitch(ctrl => $bvc, name => $sample);
 
 
-print "<<< Get detailed information about ports on OpenFlow node '" . $sample . "'\n";
+print "<<< Get detailed information about ports on OpenFlow node '$sample'\n";
 ($status, $portlist) = $ofswitch->get_ports_list();
-($BVC_OK == $status)
-    || die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
 foreach my $port (@$portlist) {
     ($status, $portinfo) = $ofswitch->get_port_detail_info($port);
-    if ($BVC_OK == $status) {
-        print "Port '$port' info:\n";
-        print JSON->new->pretty->encode($portinfo) . "\n";
-    }
-    else {
-        die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
-    }
+    $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+    print "Port '$port' info:\n";
+    print JSON->new->pretty->encode($portinfo) . "\n";
 }
 
 

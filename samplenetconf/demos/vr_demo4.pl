@@ -9,7 +9,7 @@ use BVC::Netconf::Vrouter::VR5600;
 use BVC::Netconf::Vrouter::Firewall;
 
 my $configfile = "";
-my $status = $BVC_UNKNOWN;
+my $status = undef;
 my $fwcfg = undef;
 my $http_resp = undef;
 
@@ -23,66 +23,58 @@ my $bvc = new BVC::Controller(cfgfile => $configfile);
 my $vRouter = new BVC::Netconf::Vrouter::VR5600(cfgfile => $configfile,
                                                 ctrl=>$bvc);
 
-print "<<< 'Controller': " . $bvc->{ipAddr} . ", '"
-    . $vRouter->{name} . "': " . $vRouter->{ipAddr} . "\n\n";
+print "<<< 'Controller': $bvc->{ipAddr}, '"
+    . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
 
 
 ($status, $http_resp) = $bvc->add_netconf_node($vRouter);
-($status == $BVC_OK)
-    && print "<<< '" . $vRouter->{name} . "' added to the Controller\n\n"
-    || die "Demo terminated: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "<<< '$vRouter->{name}' added to the Controller\n\n";
 
 
 $status = $bvc->check_node_conn_status($vRouter->{name});
-($status == $BVC_NODE_CONNECTED)
-    && print "<<< '" . $vRouter->{name} . "' is connected to the Controller\n\n"
-    || die "Demo terminated: " . $bvc->status_string($status) . "\n";
+$status->connected or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "<<< '$vRouter->{name}' is connected to the Controller\n\n";
 
 
-show_firewalls_cfg();
+show_firewalls_cfg($vRouter);
 
 
 my $fw_group = "FW-ACCEPT-SRC-172_22_17_108";
-print "<<< Create new firewall instance '" . $fw_group . "' on '"
-    . $vRouter->{name} . "'\n\n";
+print "<<< Create new firewall instance '$fw_group' on ' $vRouter->{name}'\n\n";
 my $firewall = new BVC::Netconf::Vrouter::Firewall;
 $firewall->add_group($fw_group);
 $firewall->add_rule($fw_group, 33,
                     'action' => 'accept',
                     'src_addr' => '172.22.17.108');
 $status = $vRouter->create_firewall_instance($firewall);
-if ($status == $BVC_OK) {
-    print "Firewall instance '" . $fw_group . "' was successfully created\n\n";
-}
-else {
-    die "Demo terminated: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Firewall instance '$fw_group' was successfully created\n\n";
 
 
-print "<<< Show content of the firewall instance '"
-    . $fw_group . "' on '" . $vRouter->{name} . "'\n";
+print "<<< Show content of the firewall instance "
+    . "'$fw_group' on '$vRouter->{name}'\n";
 ($status, $fwcfg) = $vRouter->get_firewall_instance_cfg($fw_group);
-if ($status == $BVC_OK) {
-    print "Firewall instance '" . $fw_group . "':\n";
-    print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg)) . "\n\n";
-}
-else {
-    die "Demo terminated: " . $bvc->status_string($status) . "\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Firewall instance '" . $fw_group . "':\n";
+print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg)) . "\n\n";
 
 
-show_firewalls_cfg();
+show_firewalls_cfg($vRouter);
 
 
-print "<<< Remove firewall instance '"
-    . $fw_group . "' on '" . $vRouter->{name} . "'\n";
+print "<<< Remove firewall instance '$fw_group' on '$vRouter->{name}'\n";
 $status = $vRouter->delete_firewall_instance($firewall);
-($status == $BVC_OK)
-    && print "Firewall instance '" . $fw_group . "' was successfully deleted\n\n"
-    || die "Demo terminated: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Firewall instance '$fw_group' was successfully deleted\n\n";
 
 
-show_firewalls_cfg();
+show_firewalls_cfg($vRouter);
 
 
 print ("\n");
@@ -92,14 +84,13 @@ print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
 
 sub show_firewalls_cfg {
-    print "<<< Show firewalls configuration of the '" . $vRouter->{name} . "'\n\n";
+    my $vRouter = shift;
+
+    print "<<< Show firewalls configuration of the '$vRouter->{name}'\n\n";
     ($status, $fwcfg) = $vRouter->get_firewalls_cfg();
-    if ($status == $BVC_OK) {
-        print "'" . $vRouter->{name} . "' firewalls config:\n";
-        print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg)) . "\n";
-    }
-    else {
-        die "Demo terminated: " . $bvc->status_string($status) . "\n";
-    }
+    $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+    print "'$vRouter->{name}' firewalls config:\n";
+    print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg)) . "\n";
 }
 

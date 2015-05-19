@@ -11,17 +11,14 @@ my $configfile = "";
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
-my $bvc = new BVC::Controller($configfile);
-my $vRouter = new BVC::Netconf::Vrouter::VR5600($configfile, ctrl=>$bvc);
+my $bvc = new BVC::Controller(cfgfile => $configfile);
+my $vRouter = new BVC::Netconf::Vrouter::VR5600(cfgfile => $configfile,
+                                                ctrl => $bvc);
 
-print "<<< 'Controller': " . $bvc->{ipAddr} . ", '"
-    . $vRouter->{name} . "': " . $vRouter->{ipAddr} . "\n";
+print "<<< 'Controller': $bvc->{ipAddr}, " .
+    "'$vRouter->{name}': $vRouter->{ipAddr}\n";
 my ($status, $iflist) = $vRouter->get_interfaces_list();
+$status->ok or die "Error: ${\$status->msg}\n";
 
-if ($status == $BVC_OK) {
-    print "Interfaces:\n";
-    print JSON->new->canonical->pretty->encode($iflist);
-}
-else {
-    die "Error: " . $bvc->status_string($status) . "\n";
-}
+print "Interfaces:\n";
+print JSON->new->canonical->pretty->encode($iflist);

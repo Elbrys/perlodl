@@ -23,13 +23,10 @@ print "<<< Show sessions running on the Controller\n";
 my $nodeName = 'controller-config';
 my ($status, $result) = $bvc->get_sessions_info($nodeName);
 
-if ($status == $BVC_OK) {
-    print "Sessions:\n";
-    print JSON->new->canonical->pretty->encode($result);
-}
-else {
-    die "\n!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Sessions:\n";
+print JSON->new->canonical->pretty->encode($result);
 
 print ("\n");
 print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");

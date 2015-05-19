@@ -12,7 +12,7 @@ use BVC::Openflow::Match;
 use BVC::Openflow::Action::Output;
 
 my $configfile = "";
-my $status = $BVC_UNKNOWN;
+my $status = undef;
 my $flowinfo = undef;
 
 my $ethtype = $ETH_TYPE_IPv6;
@@ -22,8 +22,8 @@ my $ipv6_flabel = 15;
 my $ip_ecn = $IP_ECN_CE;
 my $ip_dscp = $IP_DSCP_CS7;
 my $ip_proto = $IP_PROTO_ICMPv6;
-my $icmpv6_type = 1;  # XXX BVC::Const
-my $icmpv6_code = 3;  # XXX BVC::Const
+my $icmpv6_type = 1;
+my $icmpv6_code = 3;
 my $metadata = '0x0123456789ABCDEF';
 my $output_port = 'CONTROLLER';
 
@@ -94,13 +94,11 @@ print "<<< Flow to send:\n";
 print $flowentry->get_payload() . "\n\n";
 
 $status = $ofswitch->add_modify_flow($flowentry);
-($BVC_OK == $status)
-    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Flow successfully added to the Controller\n\n";
 
 ($status, $flowinfo) = $ofswitch->get_configured_flow($table_id, $flow_id);
-($BVC_OK == $status)
-    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Flow successfully read from the Controller\n";
 print "Flow info:\n";
 print JSON->new->pretty->encode(JSON::decode_json($flowinfo)) . "\n";
@@ -109,8 +107,7 @@ print "<<< Delete flow with id of '$flow_id' from the Controller's cache\n";
 print "        and from table '$table_id' on the '$ofswitch->{name}' node\n\n";
 $status = $ofswitch->delete_flow($flowentry->table_id,
                                  $flowentry->id);
-($BVC_OK == $status)
-    or die "!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Flow successfully removed from the Controller\n";
 
 

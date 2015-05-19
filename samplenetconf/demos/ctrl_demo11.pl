@@ -7,7 +7,7 @@ use Getopt::Long;
 use BVC::Controller;
 use BVC::NetconfNode;
 
-my $status = $BVC_UNKNOWN;
+my $status = undef;
 my $result = undef;
 my $configfile = "";
 
@@ -25,66 +25,49 @@ print $bvc->as_json() . "\n";
 show_all_nodes_in_config($bvc);
 
 my $ncNode = new BVC::NetconfNode(cfgfile => $configfile, ctrl=>$bvc);
-print "<<< Creating new '" . $ncNode->{name} . "' NETCONF node\n";
-print "'" . $ncNode->{name} . "':\n";
+print "<<< Creating new '$ncNode->{name}' NETCONF node\n";
+print "'$ncNode->{name}':\n";
 print $ncNode->as_json() . "\n";
 
-print "<<< Check '" . $ncNode->{name} . "' NETCONF node availability on the network\n";
-$status = system ("ping -c 1 " . $ncNode->{ipAddr});
-$status >>= 8;  # wait()
-if (0 == $status) {
-    print $ncNode->{ipAddr} . " is up!\n\n";
-}
-else {
-    die $ncNode->{ipAddr} . " is down!\n!!!Demo terminated\n\n";
-}
+print "<<< Check '$ncNode->{name}' NETCONF node availability on the network\n";
+system ("ping -c 1 " . $ncNode->{ipAddr}) and
+    die "!!! Demo terminated, reason: ncNode->{ipAddr} is down\n";
+print "$ncNode->{ipAddr} is up!\n\n";
 
-print "<<< Add '", $ncNode->{name}, "' NETCONF node to the Controller\n";
+print "<<< Add '$ncNode->{name}' NETCONF node to the Controller\n";
 ($status, $result) = $bvc->add_netconf_node($ncNode);
-if ($status == $BVC_OK) {
-    print "'", $ncNode->{name}, "' NETCONF node was successfully added to the Controller\n\n";
-}
-else {
-    die "\n!!! Demo terminated, reason: " . $bvc->status_string($status, $result) . "\n\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+print "'$ncNode->{name}' NETCONF node was successfully added to the Controller\n\n";
+
 sleep(5);    
 
 show_all_nodes_in_config($bvc);
 
-print "<<< Find the '", $ncNode->{name}, "' NETCONF node on the Controller\n";
+print "<<< Find the '$ncNode->{name}' NETCONF node on the Controller\n";
 $status = $bvc->check_node_config_status($ncNode->{name});
-if ($status == $BVC_NODE_CONFIGURED) {
-    print "'", $ncNode->{name}, "' node is configured\n\n";
-}
-else {
-    die "\n!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n\n";
-}
+$status->configured or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+print "'$ncNode->{name}' node is configured\n\n";
 
 print "<<< Show connection status for all NETCONF nodes configured on the Controller\n";
 ($status, $result) = $bvc->get_all_nodes_conn_status();
-if ($status == $BVC_OK) {
-    print "Nodes connection status:\n";
-    foreach (@$result) {
-        print "    '", $_->{'id'}, "' is";
-        print $_->{'connected'} ? "" : " not";
-        print " connected\n";
-    }
-    print "\n";
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "Nodes connection status:\n";
+foreach (@$result) {
+    print "    '", $_->{'id'}, "' is";
+    print $_->{'connected'} ? "" : " not";
+    print " connected\n";
 }
-else {
-    die "\n!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n\n";
-}
+print "\n";
 
 show_node_conn_status($bvc, $ncNode);
 
-print ">>> Remove '", $ncNode->{name} ,"' NETCONF node from the Controller\n";
+print ">>> Remove '$ncNode->{name}' NETCONF node from the Controller\n";
 ($status, $result) = $bvc->delete_netconf_node($ncNode);
-if ($status == $BVC_OK) {
-    print "'", $ncNode->{name}, "' NETCONF node was successfully removed from the Controller\n\n";
-}
-else {
-    die "\n!!! Demo terminated, reason: " . $bvc->status_string($status, $result) . "\n\n";
-}
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+print "'$ncNode->{name}' NETCONF node was successfully removed from the Controller\n\n";
+
 sleep(5);
 
 show_all_nodes_in_config($bvc);
@@ -102,16 +85,13 @@ sub show_all_nodes_in_config {
     
     print "<<< Show NETCONF nodes configured on the Controller\n";
     my ($status, $result) = $bvc->get_all_nodes_in_config();
-    if ($status == $BVC_OK) {
-        print "Nodes configured:\n";
-        foreach (@$result) {
-            print "    '$_'\n";
-        }
-        print "\n";
+    $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+
+    print "Nodes configured:\n";
+    foreach (@$result) {
+        print "    '$_'\n";
     }
-    else {
-        die "\n!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n\n";
-    }
+    print "\n";
 }
 
 
@@ -120,16 +100,11 @@ sub show_node_conn_status {
 
     print "<<< Show connection status for the '", $ncNode->{name}, "' NETCONF node\n";
     my $status = $bvc->check_node_conn_status($ncNode->{name});
-    if ($status == $BVC_NODE_CONNECTED) {
-        print "'", $ncNode->{name}, "' node is connected\n\n";
-    }
-    elsif ($status == $BVC_NODE_DISCONNECTED) {
-        print "'", $ncNode->{name}, "' node is not connected\n\n";
-    }
-    elsif ($status == $BVC_NODE_NOT_FOUND) {
-        print "'", $ncNode->{name}, "' node is not found\n\n";
+
+    if ($status->connected || $status->disconnected || $status->not_found) {
+        print "'$ncNode->{name}': ${\$status->msg}\n\n";
     }
     else {
-        die "\n!!! Demo terminated, reason: " . $bvc->status_string($status) . "\n\n";
+        die "!!! Demo terminated, reason: ${\$status->msg}\n";
     }
 }
