@@ -11,7 +11,6 @@ use BVC::Netconf::Vrouter::Firewall;
 my $configfile = "";
 my $status = undef;
 my $fwcfg = undef;
-my $http_resp = undef;
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
@@ -27,7 +26,7 @@ print "<<< 'Controller': $bvc->{ipAddr}, '"
     . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
 
 
-($status, $http_resp) = $bvc->add_netconf_node($vRouter);
+$status = $bvc->add_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
 print "<<< '$vRouter->{name}' added to the Controller\n\n";
@@ -75,6 +74,12 @@ print "Firewall instance '$fw_group' was successfully deleted\n\n";
 
 
 show_firewalls_cfg($vRouter);
+
+
+print ">>> Remove '$vRouter->{name}' NETCONF node from the Controller\n";
+$status = $bvc->delete_netconf_node($vRouter);
+$status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
+print "'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
 
 
 print ("\n");

@@ -30,7 +30,7 @@ print "'$ncNode->{name}':\n";
 print $ncNode->as_json() . "\n";
 
 print "<<< Add '$ncNode->{name}' NETCONF node to the Controller\n";
-($status, $result) = $bvc->add_netconf_node($ncNode);
+$status = $bvc->add_netconf_node($ncNode);
 
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "'$ncNode->{name}' NETCONF node was successfully added to the Controller\n\n";
@@ -60,7 +60,7 @@ print "\n";
 show_node_conn_status($bvc, $ncNode);
 
 print ">>> Remove '$ncNode->{name}' NETCONF node from the Controller\n";
-($status, $result) = $bvc->delete_netconf_node($ncNode);
+$status = $bvc->delete_netconf_node($ncNode);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
 print "'$ncNode->{name}' NETCONF node was successfully removed from the Controller\n\n";

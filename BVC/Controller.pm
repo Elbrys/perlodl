@@ -580,7 +580,7 @@ sub get_service_provider_info {
 sub add_netconf_node {
     my $self = shift;
     my $node = shift;
-    my $status = new BVC::Status;
+    my $status = new BVC::Status($BVC_OK);
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
     my %headers = ('content-type' => 'application/xml',
                    'accept' => 'application/xml');
@@ -617,8 +617,8 @@ sub add_netconf_node {
 END_XML
 
     my $resp = $self->_http_req('POST', $urlpath, $xmlPayload, \%headers);
-    $status->code($resp->is_success ? $BVC_OK : $BVC_HTTP_ERROR);
-    return ($status, $resp);
+    $resp->is_success or $status->http_err($resp);
+    return $status;
 }
 
 # Method ===============================================================
@@ -629,12 +629,12 @@ END_XML
 sub delete_netconf_node {
     my $self = shift;
     my $node = shift;
-    my $status = new BVC::Status;
+    my $status = new BVC::Status($BVC_OK);
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules/module/odl-sal-netconf-connector-cfg:sal-netconf-connector/" . $node->{name};
 
     my $resp = $self->_http_req('DELETE', $urlpath);
-    $status->code($resp->is_success ? $BVC_OK : $BVC_HTTP_ERROR);
-    return ($status, $resp);
+    $resp->is_success or $status->http_err($resp);
+    return $status;
 }
 
 # Method ===============================================================

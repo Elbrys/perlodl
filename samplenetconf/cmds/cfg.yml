@@ -5,7 +5,7 @@ ctrlUname: 'admin'
 ctrlPswd:  'admin'
 
 # NetconfNode specification
-nodeName: "vRouter-lwp"
+nodeName: "fake-device"
 nodeIpAddr: "172.22.17.65"
 nodePortNum: 830
 nodeUname: "vyatta"
