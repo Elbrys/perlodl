@@ -234,6 +234,7 @@ sub check_node_conn_status {
             if ($_->{id} eq $node) {
                 $status->code($_->{connected} ? $BVC_NODE_CONNECTED
                                               : $BVC_NODE_DISCONNECTED);
+                last;
             }
         }
     }
@@ -241,9 +242,9 @@ sub check_node_conn_status {
 }
 
 # Method ===============================================================
-# 
+#             get_all_nodes_in_config
 # Parameters: 
-# Returns   : 
+# Returns   : array ref, list of node identifiers
 #
 sub get_all_nodes_in_config {
     my $self = shift;
@@ -276,14 +277,20 @@ sub get_all_nodes_in_config {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
+#             get_all_nodes_conn_status
+# Parameters: none
+# Returns   : ref to array of hashes {id =>, connected =>}
+#
+# Openflow devices on the Controller are always prefixed with "openflow:"
+# Since Openflow devices initiate communication with the Controller, and
+# not vice versa as with NETCONF devices, any Openflow devices in the
+# operational inventory are shown as connected.
 #
 sub get_all_nodes_conn_status {
     my $self = shift;
     my @nodeStatus = ();
     my $status = new BVC::Status;
+    my $connected = undef;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -295,7 +302,12 @@ sub get_all_nodes_conn_status {
             }
             else {
                 foreach (@$nodes) {
-                    my $connected = $_->{"netconf-node-inventory:connected"};
+                    if ($_->{id} =~ /^openflow:/) {
+                        $connected = 1;
+                    }
+                    else {
+                        $connected = $_->{"netconf-node-inventory:connected"};
+                    }
                     push @nodeStatus, {'id' => $_->{id},
                                        'connected' => $connected}
                 }
@@ -311,6 +323,38 @@ sub get_all_nodes_conn_status {
     }
     return ($status, \@nodeStatus);
 }
+
+# Method ===============================================================
+#             get_netconf_nodes_in_config
+# Parameters:
+# Returns   : array ref, list of node identifiers
+#
+sub get_netconf_nodes_in_config {
+    my $self = shift;
+    my @netconf_nodes = undef;
+
+    my ($status, $nodelist_ref) = $self->get_all_nodes_in_config();
+    $status->ok and @netconf_nodes = grep !/^openflow:/, @$nodelist_ref;
+    return ($status, \@netconf_nodes);
+}
+
+# Method ===============================================================
+#             get_netconf_nodes_conn_status
+# Parameters: none
+# Returns   : ref to array of hashes {id =>, connected =>}
+#
+#             filter out the openflow nodes from full list of nodes
+#
+sub get_netconf_nodes_conn_status {
+    my $self = shift;
+    my @netconf_nodes = undef;
+
+    my ($status, $nodestatus_ref) = $self->get_all_nodes_conn_status();
+    $status->ok and
+        @netconf_nodes = grep { $_->{id} !~ /^openflow:/ } @$nodestatus_ref;
+    return ($status, \@netconf_nodes);
+}
+
 
 # Method ===============================================================
 # 
@@ -581,6 +625,7 @@ sub add_netconf_node {
     my $self = shift;
     my $node = shift;
     my $status = new BVC::Status($BVC_OK);
+
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
     my %headers = ('content-type' => 'application/xml',
                    'accept' => 'application/xml');
@@ -630,7 +675,10 @@ sub delete_netconf_node {
     my $self = shift;
     my $node = shift;
     my $status = new BVC::Status($BVC_OK);
-    my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules/module/odl-sal-netconf-connector-cfg:sal-netconf-connector/" . $node->{name};
+    my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node"
+        . "/controller-config/yang-ext:mount/config:modules/module"
+        . "/odl-sal-netconf-connector-cfg:sal-netconf-connector/"
+        . $node->{name};
 
     my $resp = $self->_http_req('DELETE', $urlpath);
     $resp->is_success or $status->http_err($resp);

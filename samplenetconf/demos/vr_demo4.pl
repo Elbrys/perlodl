@@ -34,7 +34,6 @@ sleep(2);
 
 $status = $bvc->check_node_conn_status($vRouter->{name});
 $status->connected or die "!!! Demo terminated, reason: ${\$status->msg}\n";
-
 print "<<< '$vRouter->{name}' is connected to the Controller\n\n";
 
 
@@ -50,7 +49,6 @@ $firewall->add_rule($fw_group, 33,
                     'src_addr' => '172.22.17.108');
 $status = $vRouter->create_firewall_instance($firewall);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
-
 print "Firewall instance '$fw_group' was successfully created\n\n";
 
 

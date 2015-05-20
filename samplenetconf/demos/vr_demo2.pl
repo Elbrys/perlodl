@@ -30,6 +30,7 @@ $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< '$vRouter->{name}' added to the Controller\n\n";
 sleep(2);
 
+
 $status = $bvc->check_node_conn_status($vRouter->{name});
 $status->connected or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
@@ -46,10 +47,12 @@ $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "YANG model definition:\n";
 print $schema;
 
+
 print ">>> Remove '$vRouter->{name}' NETCONF node from the Controller\n";
 $status = $bvc->delete_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
+
 
 print ("\n");
 print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
