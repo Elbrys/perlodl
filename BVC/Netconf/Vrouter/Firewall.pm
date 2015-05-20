@@ -218,7 +218,7 @@ sub get_payload {
         . $json->encode($self)
         . '}}';
     $payload =~ s/"src_addr":"([0-9\.]*)"/"source":{"address":"$1"}/g;
-    $payload =~ s/typename/type-name/g;
+    $payload =~ s/"typename":"([a-zA-Z0-9]+)"/"icmp":{"type-name":"$1"},"protocol":"icmp"/g;
     return $payload;
 }
 

@@ -34,14 +34,99 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Netconf::Vrouter::VR5600;
-
 use strict;
 use warnings;
 
+# Package ==============================================================
+# DataplaneInterfaceFirewall
+#
+#
+# ======================================================================
+package DataplaneInterfaceFirewall;
+
+# Constructor ==========================================================
+# Parameters: interface name
+# Returns   :
+#
+sub new {
+    my $class = shift;
+    my $tagnode = shift;
+
+    my $self = {
+        tagnode => $tagnode,
+        firewall => {
+            inlist  => [],
+            outlist => []
+        }
+    };
+    bless ($self, $class);
+}
+
+# Method ===============================================================
+#             add_in_item : append firewall rule to inbound rules list
+# Parameters: firewall rule name
+# Returns   :
+#
+sub add_in_item {
+    my ($self, $item) = @_;
+
+    push $self->{firewall}->{inlist}, $item;
+}
+# Method ===============================================================
+#             add_out_item : append firewall rule to outbound rules list
+# Parameters: firewall rule name
+# Returns   :
+#
+sub add_out_item {
+    my ($self, $item) = @_;
+    push $self->{firewall}->{outlist}, $item;
+}
+
+# Method ===============================================================
+#             get_url_extenstion: provide suffix for configuring *this*
+#                                 firewall; must be appended to config urlpath
+# Parameters: none
+# Returns   : url suffix
+#
+sub get_url_extension {
+    my $self = shift;
+
+    return "vyatta-interfaces:interfaces/vyatta-interfaces-dataplane:"
+        . "dataplane/$self->{tagnode}";
+}
+
+# Method ===============================================================
+#             get_payload:
+# Parameters: none
+# Returns   : self as JSON formatted for BVC REST call
+#
+sub get_payload {
+    my $self = shift;
+
+    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    my $payload = '{"vyatta-interfaces-dataplane:dataplane":'
+        . $json->encode($self)
+        . '}';
+    $payload =~ s/firewall/vyatta-security-firewall:firewall/g;
+    $payload =~ s/inlist/in/g;
+    $payload =~ s/outlist/out/g;
+
+    return $payload;
+}
+
+
+
+# Package ==============================================================
+# BVC::Netconf::Vrouter::5600
+#    model and interact with Vyatta Virtual Router 5600 via BVC
+#
+# ======================================================================
+
+package BVC::Netconf::Vrouter::VR5600;
+
 use base qw(BVC::NetconfNode);
 use HTTP::Status qw(:constants :is status_message);
-use JSON;
+use JSON -convert_blessed_universally;
 use BVC::Controller;
 use BVC::Status qw(:constants);
 
@@ -211,7 +296,24 @@ sub delete_firewall_instance {
 # Returns   : 
 #
 sub set_dataplane_interface_firewall {
-    die "XXX";
+    my ($self, %params) = @_;
+    my $status = new BVC::Status($BVC_OK);
+
+    my %headers = ('content-type' => 'application/yang.data+json');
+    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+
+    $params{ifName} or die "missing req'd parameter \$ifName";
+    my $fw = new DataplaneInterfaceFirewall($params{ifName});
+
+    $params{inFw}  and $fw->add_in_item($params{inFw});
+    $params{outFw} and $fw->add_out_item($params{outFw});
+
+    my $payload = $fw->get_payload();
+    $urlpath .= $fw->get_url_extension();
+
+    my $resp = $self->{ctrl}->_http_req('PUT', $urlpath, $payload, \%headers);
+    $resp->code == HTTP_OK or $status->http_err($resp);
+    return $status;
 }
 
 # Method ===============================================================
@@ -220,7 +322,16 @@ sub set_dataplane_interface_firewall {
 # Returns   : 
 #
 sub delete_dataplane_interface_firewall {
-    die "XXX";
+    my ($self, $ifName) = @_;
+
+    my $status = new BVC::Status($BVC_OK);
+
+    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+        . "vyatta-interfaces:interfaces/vyatta-interfaces-dataplane:dataplane"
+        . "/$ifName/vyatta-security-firewall:firewall/";
+    my $resp = $self->{ctrl}->_http_req('DELETE', $urlpath);
+    $resp->code == HTTP_OK or $status->http_err($resp);
+    return $status;
 }
 
 # Method ===============================================================
