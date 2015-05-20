@@ -28,6 +28,7 @@ $status = $bvc->add_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
 print "<<< '$vRouter->{name}' added to the Controller\n\n";
+sleep(2);
 
 $status = $bvc->check_node_conn_status($vRouter->{name});
 $status->connected or die "!!! Demo terminated, reason: ${\$status->msg}\n";
