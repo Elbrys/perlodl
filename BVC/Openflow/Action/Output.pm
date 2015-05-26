@@ -37,6 +37,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
 package BVC::Openflow::Action::Output;
 use parent qw(BVC::Openflow::Action);
 
+use Carp::Assert;
+
 use strict;
 use warnings;
 
@@ -46,13 +48,36 @@ use warnings;
 # Returns   : BVC::Openflow::Action::Output object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
-    $self->{output_action}->{'output-node-connector'} = $params{port};
-    $self->{output_action}->{'max-length'} = $params{max_len};
+    $self->{output_action}->{'output_node_connector'} = $params{port};
+    $self->{output_action}->{'max_length'} = $params{max_len};
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{output_action}->{"$key"} = $value;
+        }
+    }
+    return $self;
+}
+
+
+# Method ===============================================================
+#             as_oxm
+# Parameters: none
+# Returns   : this, as formatted for transmission to controller
+#
+sub as_oxm {
+    my $self = shift;
+
+    my $port = $self->outport();
+    assert ($port);
+    my $maxlen = $self->max_len();
+    my $oxm = "output=$port";
+    $oxm .= ":$maxlen" if defined($maxlen);
+    return $oxm;
 }
 
 
@@ -60,13 +85,13 @@ sub new {
 #             accessors
 sub outport {
     my ($self, $port) = @_;
-    $self->{output_action}->{'output-node-connector'} =
-        (2 == @_) ? $port : $self->{output_action}->{'output-node-connector'};
+    $self->{output_action}->{'output_node_connector'} =
+        (2 == @_) ? $port : $self->{output_action}->{'output_node_connector'};
 }
 sub max_len {
     my ($self, $max_len) = @_;
-    $self->{output_action}->{'max-length'} =
-        (2 == @_) ? $max_len : $self->{output_action}->{'max-length'};
+    $self->{output_action}->{'max_length'} =
+        (2 == @_) ? $max_len : $self->{output_action}->{'max_length'};
 }
 
 

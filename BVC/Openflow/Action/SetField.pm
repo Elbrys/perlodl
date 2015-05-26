@@ -46,13 +46,40 @@ use warnings;
 # Returns   : BVC::Openflow::Action::SetField object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
-    $self->{set_field}->{'vlan-match'} = undef;
-    $self->{set_field}->{'protocol-match-fields'} = undef;
+    $self->{set_field}->{'vlan_match'} = undef;
+    $self->{set_field}->{'protocol_match_fields'} = undef;
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            if ($key eq 'protocol_match_fields') {
+                $self->{set_field}->{$key} = new ProtocolMatchFields(href => $value);
+            }
+            elsif ($key eq 'vlan_match') {
+                $self->{set_field}->{$key} = new VlanMatch(href => $value);
+            }
+        }
+    }
+    return $self;
+}
+
+
+# Method ===============================================================
+#             as_oxm
+# Parameters: none
+# Returns   : this, as formatted for transmission to controller
+#
+sub as_oxm {
+    my $self = shift;
+
+    my $oxm = "";
+    $oxm .= "set_mpls_label=" . $self->mpls_label if $self->mpls_label;
+    $oxm .= q(,) if length($oxm);
+    $oxm .= "set_vlan_vid=" . $self->vlan_id if $self->vlan_id;
+    return $oxm;
 }
 
 
@@ -60,15 +87,24 @@ sub new {
 #             accessors
 sub vlan_id {
     my ($self, $vid) = @_;
-    defined $self->{set_field}->{'vlan-match'} or
-        $self->{set_field}->{'vlan-match'} = new VlanMatch;
-    $self->{set_field}->{'vlan-match'}->vid($vid);
+    my $value = undef;
+    my $match_exists = defined $self->{set_field}->{'vlan_match'};
+
+    if (@_ == 2) {
+        $match_exists or $self->{set_field}->{'vlan_match'} = new VlanMatch;
+        $self->{set_field}->{'vlan_match'}->vid($vid);
+    }
+    $match_exists and $value = $self->{set_field}->{'vlan_match'}->vid();
+    return $value;
 }
 sub mpls_label {
     my ($self, $mpls_label) = @_;
-    defined $self->{set_field}->{'protocol-match-fields'} or
-        $self->{set_field}->{'protocol-match-fields'} = new ProtocolMatchFields;
-    $self->{set_field}->{'protocol-match-fields'}->mpls_label($mpls_label);
+    my $value = undef;
+    defined $self->{set_field}->{'protocol_match_fields'} or
+        $self->{set_field}->{'protocol_match_fields'} = new ProtocolMatchFields;
+    (2 == @_) and
+        $self->{set_field}->{'protocol_match_fields'}->mpls_label($mpls_label);
+    return $self->{set_field}->{'protocol_match_fields'}->mpls_label();
 }
 
 

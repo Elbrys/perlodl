@@ -46,15 +46,21 @@ package EthernetMatch;
 
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         ethernet_type        => undef,
         ethernet_source      => undef,
-        ethernet_destination => undef,
-        @_
+        ethernet_destination => undef
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{$key} = $value;
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -62,17 +68,17 @@ sub new {
 sub type {
     my ($self, $eth_type) = @_;
     (@_ == 2) and $self->{ethernet_type}->{type} = $eth_type;
-    return $self->{ethernet_type};
+    return $self->{ethernet_type}->{type};
 }
 sub src {
     my ($self, $eth_src) = @_;
     (@_ == 2) and $self->{ethernet_source}->{address} = $eth_src;
-    return $self->{ethernet_source};
+    return $self->{ethernet_source}->{address};
 }
 sub dst {
     my ($self, $eth_dst) = @_;
     (@_ == 2) and $self->{ethernet_destination}->{address} = $eth_dst;
-    return $self->{ethernet_destination};
+    return $self->{ethernet_destination}->{address};
 }
 
 
@@ -81,16 +87,32 @@ sub dst {
 #---------------------------------------------------------------------------
 package VlanMatch;
 
+use Carp::Assert;
+
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         vlan_id => undef,
         vlan_pcp => undef,
-        @_
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            if ($key eq 'vlan_id') {
+                assert (ref $value eq "HASH");
+                $self->{vlan_id}->{vlan_id} = $value->{'vlan-id'};
+                $self->{vlan_id}->{vlan_id_present} =
+                    $value->{'vlan-id-present'};
+            }
+            else {
+                $self->{$key} = $value;
+            }
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -101,7 +123,7 @@ sub vid {
         $self->{vlan_id}->{vlan_id} = $vid;
         $self->{vlan_id}->{vlan_id_present} = JSON::true;
     }
-    return $self->{vlan_id};
+    return $self->{vlan_id}->{vlan_id};
 }
 sub pcp {
     my ($self, $pcp) = @_;
@@ -116,14 +138,20 @@ package IcmpMatch;
 
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         icmpv4_type => undef,
-        icmpv4_code => undef,
-        @_
+        icmpv4_code => undef
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{$key} = $value;
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -145,14 +173,20 @@ package IcmpV6Match;
 
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         icmpv6_type => undef,
-        icmpv6_code => undef,
-        @_
+        icmpv6_code => undef
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{$key} = $value;
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -174,15 +208,21 @@ package IpMatch;
 
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         ip_dscp  => undef,     # ip_hdr[1] 7:2
         ip_ecn   => undef,     # ip_hdr[1] 1:0
-        ip_protocol => undef,  # ip_hdr[0] 7:4
-        @_
+        ip_protocol => undef   # ip_hdr[0] 7:4
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{$key} = $value;
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -208,14 +248,20 @@ package IPv6LabelMatch;
 
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         ipv6_flabel => undef,
-        ipv6_flabel_mask => undef,
-        @_
+        ipv6_flabel_mask => undef
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{$key} = $value;
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -237,14 +283,20 @@ package IPv6ExtHdrMatch;
 
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         ipv6_exthdr => undef,
-        ipv6_exthdr_mask => undef,
-        @_
+        ipv6_exthdr_mask => undef
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{$key} = $value;
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -266,14 +318,20 @@ package Pbb;
 
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         pbb_isid => undef,
-        pbb_mask => undef,
-        @_
+        pbb_mask => undef
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{$key} = $value;
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -295,16 +353,22 @@ package ProtocolMatchFields;
 
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         mpls_label => undef,
         mpls_tc    => undef,
         mpls_bos   => undef,
-        pbb        => undef,
-        @_
+        pbb        => undef
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{$key} = $value;
+        }
+    }
+    return $self;
 }
         
 # Method ===============================================================
@@ -330,14 +394,20 @@ package Metadata;
 
 # Constructor ==========================================================
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
 
     my $self = {
         metadata => undef,
-        metadata_mask => undef,
-        @_
+        metadata_mask => undef
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{$key} = $value;
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -358,11 +428,11 @@ sub metadata_mask {
 package BVC::Openflow::Match;
 
 # Constructor ==========================================================
-# Parameters: none
+# Parameters: hash ref of values with which to instantiate Match (optional)
 # Returns   : BVC::Openflow::Match object
 # 
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
     my $self = {
         in_port => undef,
         in_phy_port => undef,
@@ -396,8 +466,93 @@ sub new {
         metadata => undef
     };
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            if ($key eq 'ethernet_match') {
+                $self->{$key} = new EthernetMatch(href => $value);
+            }
+            elsif ($key eq 'ip_match') {
+                $self->{$key} = new IpMatch(href => $value);
+            }
+            elsif ($key eq 'protocol_match_fields') {
+                $self->{$key} = new ProtocolMatchFields(href => $value);
+            }
+            elsif ($key eq 'icmpv4_match') {
+                $self->{$key} = new IcmpMatch(href => $value);
+            }
+            elsif ($key eq 'icmpv6_match') {
+                $self->{$key} = new IcmpV6Match(href => $value);
+            }
+            elsif ($key eq 'vlan_match') {
+                $self->{$key} = new VlanMatch(href => $value);
+            }
+            else {
+                $self->{$key} = $value;
+            }
+        }
+    }
+    return $self;
 }
 
+
+# Method ===============================================================
+#             as_oxm
+# Parameters: none
+# Returns   : FlowEntry formatted as Openflow eXtensible Match
+#
+no strict 'refs';
+sub as_oxm {
+    my $self = shift;
+
+    my $oxm = "";
+    #              accessor  => format
+    my @xlate = (['in_port'  => 'in_port=%d'],
+                 ['eth_type' => 'eth_type=0x%x'],
+                 ['eth_src'  => 'eth_src=%s'],
+                 ['eth_dst'  => 'eth_dst=%s'],
+                 ['vlan_id'  => 'vlan_vid=%d'],
+                 ['vlan_pcp' => 'vlan_pcp=%d'],
+                 ['ip_proto' => 'ip_proto=%d'],
+                 ['ip_dscp'  => 'ip_dscp=%d'],
+                 ['ip_ecn'   => 'ip_ecn=%d'],
+                 ['icmpv4_type'     => 'icmpv4_type=%d'],
+                 ['icmpv4_code'     => 'icmpv4_code=%d'],
+                 ['icmpv6_type'     => 'icmpv6_type=%d'],
+                 ['icmpv6_code'     => 'icmpv6_code=%d'],
+                 ['ipv4_src'        => 'ipv4_src=%s'],
+                 ['ipv4_dst'        => 'ipv4_dst=%s'],
+                 ['ipv6_src'        => 'ipv6_src=%s'],
+                 ['ipv6_dst'        => 'ipv6_dst=%s'],
+                 ['ipv6_flabel'     => 'ipv6_flabel=%d'],
+                 ['ipv6_ext_header' => 'ipv6_exthdr=%d'],
+                 ['udp_src_port'    => 'udp_src=%d'],
+                 ['udp_dst_port'    => 'udp_dst=%d'],
+                 ['tcp_src_port'    => 'tcp_src=%d'],
+                 ['tcp_dst_port'    => 'tcp_dst=%d'],
+                 ['sctp_src_port'   => 'sctp_src=%d'],
+                 ['sctp_dst_port'   => 'sctp_dst=%d'],
+                 ['arp_opcode'      => 'arp_op=%s'],
+                 ['arp_src_transport_address' => 'arp_spa=%s'],
+                 ['arp_tgt_transport_address' => 'arp_tpa=%s'],
+                 ['arp_src_hw_address'        => 'arp_sha=%s'],
+                 ['arp_tgt_hw_address'        => 'arp_tha=%s'], # XXX gsf
+                 ['mpls_label'      => 'mpls_label=%s'],
+                 ['mpls_tc'         => 'mpls_tc=%s'],
+                 ['mpls_bos'        => 'mpls_bos=%s'],
+                 ['tunnel_id'       => 'tunnel_id=%d'],
+                 ['metadata'        => 'metadata=%s']
+        );
+    foreach (@xlate) {
+        my ($value, $format) = ($_->[0]($self), $_->[1]);
+        if (defined $value) {
+            $oxm .= q(,) if length ($oxm);
+            $oxm .= sprintf ($format, $value);
+        }
+    }
+    return $oxm;
+}
+use strict 'refs';
 
 # Method ===============================================================
 #             accessors
@@ -406,31 +561,63 @@ sub new {
 #
 sub eth_type {
     my ($self, $eth_type) = @_;
-    defined $self->{ethernet_match} or
-        $self->{ethernet_match} = new EthernetMatch;
-    $self->{ethernet_match}->type($eth_type);
+    my $value = undef;
+    my $match_exists = defined $self->{ethernet_match};
+
+    if (@_ == 2) {
+        $match_exists or $self->{ethernet_match} = new EthernetMatch;
+        $self->{ethernet_match}->type($eth_type);
+    }
+    $match_exists and $value = $self->{ethernet_match}->type();
+    return $value;
 }
 sub eth_src {
     my ($self, $eth_src) = @_;
-    defined $self->{ethernet_match} or
-        $self->{ethernet_match} = new EthernetMatch;
-    $self->{ethernet_match}->src($eth_src);
+    my $value = undef;
+    my $match_exists = defined $self->{ethernet_match};
+
+    if (@_ == 2) {
+        $match_exists or $self->{ethernet_match} = new EthernetMatch;
+        $self->{ethernet_match}->src($eth_src);
+    }
+    $match_exists and $value = $self->{ethernet_match}->src();
+    return $value;
 }
 sub eth_dst {
     my ($self, $eth_dst) = @_;
-    defined $self->{ethernet_match} or
-        $self->{ethernet_match} = new EthernetMatch;
-    $self->{ethernet_match}->dst($eth_dst);
+    my $value = undef;
+    my $match_exists = defined $self->{ethernet_match};
+
+    if (@_ == 2) {
+        $match_exists or $self->{ethernet_match} = new EthernetMatch;
+        $self->{ethernet_match}->dst($eth_dst);
+    }
+    $match_exists and $value = $self->{ethernet_match}->dst();
+    return $value;
 }
 sub vlan_id {
     my ($self, $vid) = @_;
-    defined $self->{vlan_match} or $self->{vlan_match} = new VlanMatch;
-    $self->{vlan_match}->vid($vid);
+    my $value = undef;
+    my $match_exists = defined $self->{vlan_match};
+
+    if (@_ == 2) {
+        $match_exists or $self->{vlan_match} = new VlanMatch;
+        $self->{vlan_match}->vid($vid);
+    }
+    $match_exists and $value = $self->{vlan_match}->vid();
+    return $value;
 }
 sub vlan_pcp {
     my ($self, $pcp) = @_;
-    defined $self->{vlan_match} or $self->{vlan_match} = new VlanMatch;
-    $self->{vlan_match}->pcp($pcp);
+    my $value = undef;
+    my $match_exists = defined $self->{vlan_match};
+
+    if (@_ == 2) {
+        $match_exists or $self->{vlan_match} = new VlanMatch;
+        $self->{vlan_match}->pcp($pcp);
+    }
+    $match_exists and $value = $self->{vlan_match}->pcp();
+    return $value;
 }
 sub ipv4_src {
     my ($self, $ipv4_src) = @_;
@@ -452,29 +639,63 @@ sub ipv6_dst {
 }
 sub ipv6_flabel {
     my ($self, $ipv6_label) = @_;
-    defined $self->{ipv6_label} or $self->{ipv6_label} = new IPv6LabelMatch;
-    $self->{ipv6_label}->flabel($ipv6_label);
+    my $value = undef;
+    my $match_exists = defined $self->{ipv6_label};
+
+    if (@_ == 2) {
+        $match_exists or $self->{ipv6_label} = new IPv6LabelMatch;
+        $self->{ipv6_label}->flabel($ipv6_label);
+    }
+    $match_exists and $value = $self->{ipv6_label}->flabel();
+    return $value;
 }
 sub ipv6_ext_header {
     my ($self, $ipv6_ext_header) = @_;
-    defined $self->{ipv6_ext_header} or
-        $self->{ipv6_ext_header} = new IPv6ExtHdrMatch;
-    $self->{ipv6_ext_header}->exthdr($ipv6_ext_header);
+    my $value = undef;
+    my $match_exists = defined $self->{ipv6_ext_header};
+
+    if (@_ == 2) {
+        $match_exists or $self->{ipv6_ext_header} = new IPv6ExtHdrMatch;
+        $self->{ipv6_ext_header}->exthdr($ipv6_ext_header);
+    }
+    $match_exists and $value = $self->{ipv6_ext_header}->exthdr();
+    return $value;
 }
 sub ip_dscp {
     my ($self, $dscp) = @_;
-    defined $self->{ip_match} or $self->{ip_match} = new IpMatch;
-    $self->{ip_match}->dscp($dscp);
+    my $value = undef;
+    my $match_exists = defined $self->{ip_match};
+
+    if (@_== 2) {
+        $match_exists or $self->{ip_match} = new IpMatch;
+        $self->{ip_match}->dscp($dscp);
+    }
+    $match_exists and $value = $self->{ip_match}->dscp();
+    return $value;
 }
 sub ip_ecn {
     my ($self, $ecn) = @_;
-    defined $self->{ip_match} or $self->{ip_match} = new IpMatch;
-    $self->{ip_match}->ecn($ecn);
+    my $value = undef;
+    my $match_exists = defined $self->{ip_match};
+
+    if (@_== 2) {
+        $match_exists or $self->{ip_match} = new IpMatch;
+        $self->{ip_match}->ecn($ecn);
+    }
+    $match_exists and $value = $self->{ip_match}->ecn();
+    return $value;
 }
 sub ip_proto {
     my ($self, $proto) = @_;
-    defined $self->{ip_match} or $self->{ip_match} = new IpMatch;
-    $self->{ip_match}->proto($proto);
+    my $value = undef;
+    my $match_exists = defined $self->{ip_match};
+
+    if (@_== 2) {
+        $match_exists or $self->{ip_match} = new IpMatch;
+        $self->{ip_match}->proto($proto);
+    }
+    $match_exists and $value = $self->{ip_match}->proto();
+    return $value;
 }
 sub ip_proto_version {
     die "XXX IpMatch";
@@ -511,23 +732,51 @@ sub sctp_dst_port {
 }
 sub icmpv4_type {
     my ($self, $icmpv4_type) = @_;
-    defined $self->{icmpv4_match} or $self->{icmpv4_match} = new IcmpMatch;
-    $self->{icmpv4_match}->type($icmpv4_type);
+    my $value = undef;
+    my $match_exists = defined $self->{icmpv4_match};
+
+    if (@_ == 2) {
+        $match_exists or $self->{icmpv4_match} = new IcmpMatch;
+        $self->{icmpv4_match}->type($icmpv4_type);
+    }
+    $match_exists and $value = $self->{icmpv4_match}->type();
+    return $value;
 }
 sub icmpv4_code {
     my ($self, $icmpv4_code) = @_;
-    defined $self->{icmpv4_match} or $self->{icmpv4_match} = new IcmpMatch;
-    $self->{icmpv4_match}->code($icmpv4_code);
+    my $value = undef;
+    my $match_exists = defined $self->{icmpv4_match};
+
+    if (@_ == 2) {
+        $match_exists or $self->{icmpv4_match} = new IcmpMatch;
+        $self->{icmpv4_match}->code($icmpv4_code);
+    }
+    $match_exists and $value = $self->{icmpv4_match}->code();
+    return $value;
 }
 sub icmpv6_type {
     my ($self, $icmpv6_type) = @_;
-    defined $self->{icmpv6_match} or $self->{icmpv6_match} = new IcmpV6Match;
-    $self->{icmpv6_match}->type($icmpv6_type);
+    my $value = undef;
+    my $match_exists = defined $self->{icmpv6_match};
+
+    if (@_ == 2) {
+        $match_exists or $self->{icmpv4_match} = new IcmpV6Match;
+        $self->{icmpv6_match}->type($icmpv6_type);
+    }
+    $match_exists and $value = $self->{icmpv6_match}->type();
+    return $value;
 }
 sub icmpv6_code {
     my ($self, $icmpv6_code) = @_;
-    defined $self->{icmpv6_match} or $self->{icmpv6_match} = new IcmpV6Match;
-    $self->{icmpv6_match}->code($icmpv6_code);
+    my $value = undef;
+    my $match_exists = defined $self->{icmpv6_match};
+
+    if (@_ == 2) {
+        $match_exists or $self->{icmpv4_match} = new IcmpV6Match;
+        $self->{icmpv6_match}->code($icmpv6_code);
+    }
+    $match_exists and $value = $self->{icmpv6_match}->code();
+    return $value;
 }
 sub in_port {
     my ($self, $in_port) = @_;
@@ -555,48 +804,94 @@ sub arp_tgt_transport_address {
 }
 sub arp_src_hw_address {
     my ($self, $arp_src_hw_address) = @_;
-    $self->{arp_source_hardware_address}->{address}
-        = (@_ == 2) ? $arp_src_hw_address
-                    : $self->{arp_source_hardware_address}->{address};
+    my $value = undef;
+
+    (@_ == 2) and
+        $self->{arp_source_hardware_address}->{address} = $arp_src_hw_address;
+    defined $self->{arp_source_hardware_address} and
+        $value = $self->{arp_source_hardware_address}->{address};
+    return $value;
 }
 sub arp_tgt_hw_address {
     my ($self, $arp_tgt_hw_address) = @_;
-    $self->{arp_target_hardware_address}->{address}
-        = (@_ == 2) ? $arp_tgt_hw_address
-                    : $self->{arp_target_hardware_address}->{address};
+    my $value = undef;
+
+    (@_ == 2) and
+        $self->{arp_target_hardware_address}->{address} = $arp_tgt_hw_address;
+    defined $self->{arp_target_hardware_address} and
+        $value = $self->{arp_target_hardware_address}->{address};
+    return $value;
 }
 sub mpls_label {
     my ($self, $mpls_label) = @_;
-    defined $self->{protocol_match_fields} or
-        $self->{protocol_match_fields} = new ProtocolMatchFields;
-    $self->{protocol_match_fields}->mpls_label($mpls_label);
+    my $value = undef;
+    my $match_exists = defined $self->{protocol_match_fields};
+
+    if (@_ == 2) {
+        $match_exists or
+            $self->{protocol_match_fields} = new ProtocolMatchFields;
+        $self->{protocol_match_fields}->mpls_label($mpls_label);
+    }
+    $match_exists and $value = $self->{protocol_match_fields}->mpls_label();
+    return $value;
 }
 sub mpls_tc {
     my ($self, $mpls_tc) = @_;
-    defined $self->{protocol_match_fields} or
-        $self->{protocol_match_fields} = new ProtocolMatchFields;
-    $self->{protocol_match_fields}->mpls_tc($mpls_tc);
+    my $value = undef;
+    my $match_exists = defined $self->{protocol_match_fields};
+
+    if (@_ == 2) {
+        $match_exists or
+            $self->{protocol_match_fields} = new ProtocolMatchFields;
+        $self->{protocol_match_fields}->mpls_tc($mpls_tc);
+    }
+    $match_exists and $value = $self->{protocol_match_fields}->mpls_tc();
+    return $value;
 }
 sub mpls_bos {
     my ($self, $mpls_bos) = @_;
-    defined $self->{protocol_match_fields} or
-        $self->{protocol_match_fields} = new ProtocolMatchFields;
-    $self->{protocol_match_fields}->mpls_bos($mpls_bos);
+    my $value = undef;
+    my $match_exists = defined $self->{protocol_match_fields};
+
+    if (@_ == 2) {
+        $match_exists or
+            $self->{protocol_match_fields} = new ProtocolMatchFields;
+        $self->{protocol_match_fields}->mpls_bos($mpls_bos);
+    }
+    $match_exists and $value = $self->{protocol_match_fields}->mpls_bos();
+    return $value;
 }
 sub tunnel_id {
     my ($self, $tunnel_id) = @_;
-    $self->{tunnel}->{tunnel_id} = (2 == @_) ? $tunnel_id :
-                                               $self->{tunnel}->{tunnel_id};
+    my $value = undef;
+
+    (@_ == 2) and $self->{tunnel}->{tunnel_id} = $tunnel_id;
+    defined $self->{tunnel} and $value = $self->{tunnel}->{tunnel_id};
+    return $value;
 }
 sub metadata {
     my ($self, $metadata) = @_;
-    defined $self->{metadata} or $self->{metadata} = new Metadata;
-    $self->{metadata}->metadata($metadata);
+    my $value = undef;
+    my $match_exists = defined $self->{metadata};
+
+    if (@_ == 2) {
+        $match_exists or $self->{metadata} = new Metadata;
+        $self->{metadata}->metadata($metadata);
+    }
+    $match_exists and $self->{metadata}->metadata();
+    return $value;
 }
 sub metadata_mask {
-    my ($self, $mask) = @_;
-    defined $self->{metadata} or $self->{metadata} = new Metadata;
-    $self->{metadata}->metadata_mask($mask);
+    my ($self, $mask) = @_; 
+    my $value = undef;
+    my $match_exists = defined $self->{metadata};
+
+    if (@_ == 2) {
+        $match_exists or $self->{metadata} = new Metadata;
+        $self->{metadata}->metadata_mask($mask);
+    }
+    $match_exists and $self->{metadata}->metadata_mask();
+    return $value;
 }
 
 

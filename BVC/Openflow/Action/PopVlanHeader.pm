@@ -55,5 +55,17 @@ sub new {
 }
 
 
+# Method ===============================================================
+#             as_oxm
+# Parameters: none
+# Returns   : this, as formatted for transmission to controller
+#
+sub as_oxm {
+    my $self = shift;
+
+    return "pop_vlan";
+}
+
+
 # Module ===============================================================
 1;

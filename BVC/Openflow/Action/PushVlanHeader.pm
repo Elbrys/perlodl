@@ -46,16 +46,34 @@ use warnings;
 # Returns   : BVC::Openflow::Action::PushVlanHeader object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
-    $self->{push_vlan_action}->{'ethernet-type'} = $params{eth_type};
-    $self->{push_vlan_action}->{tag}             = $params{tag};
-    $self->{push_vlan_action}->{pcp}             = $params{pcp};
-    $self->{push_vlan_action}->{cfi}             = $params{cfi};
-    $self->{push_vlan_action}->{'vlan-id'}       = $params{vid};
+    $self->{push_vlan_action}->{ethernet_type} = $params{eth_type};
+    $self->{push_vlan_action}->{tag}           = $params{tag};
+    $self->{push_vlan_action}->{pcp}           = $params{pcp};
+    $self->{push_vlan_action}->{cfi}           = $params{cfi};
+    $self->{push_vlan_action}->{vlan_id}       = $params{vid};
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{push_vlan_action}->{$key} = $value;
+        }
+    }
+    return $self;
+}
+
+
+# Method ===============================================================
+#             as_oxm
+# Parameters: none
+# Returns   : this, as formatted for transmission to controller
+#
+sub as_oxm {
+    my $self = shift;
+
+    return sprintf("push_vlan=0x%x", $self->eth_type());
 }
 
 
@@ -63,8 +81,8 @@ sub new {
 #             accessors
 sub eth_type {
     my ($self, $eth_type) = @_;
-    $self->{push_vlan_action}->{'ethernet-type'} =
-        (2 == @_) ? $eth_type : $self->{push_vlan_action}->{'ethernet-type'};
+    $self->{push_vlan_action}->{ethernet_type} =
+        (2 == @_) ? $eth_type : $self->{push_vlan_action}->{ethernet_type};
 }
 sub tag {
     my ($self, $tag) = @_;
@@ -83,8 +101,8 @@ sub cfi {
 }
 sub vid {
     my ($self, $vid) = @_;
-    $self->{push_vlan_action}->{'vlan-id'} =
-        (2 == @_) ? $vid : $self->{push_vlan_action}->{'vlan-id'};
+    $self->{push_vlan_action}->{vlan_id} =
+        (2 == @_) ? $vid : $self->{push_vlan_action}->{vlan_id};
 }
 
 

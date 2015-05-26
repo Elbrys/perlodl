@@ -39,24 +39,70 @@ package BVC::Openflow::FlowEntry;
 use strict;
 use warnings;
 
+use BVC::Openflow::Match;
+
 use Data::Walk;
 use JSON -convert_blessed_universally;
 
 
-#---------------------------------------------------------------------------
-# 
-#---------------------------------------------------------------------------
+# Package ==============================================================
+# Instruction
+#    simplify serializing BVC::Openflow::FlowEntry
+#
+# ======================================================================
 package Instruction;
 
-sub new {
-    my $class = shift;
+use Carp::Assert;
 
+sub new {
+    my ($class, %params) = @_;
+
+    my $order = $params{order} ? $params{order} : 0;
     my $self = {
         apply_actions => {},
-        order => 0,
-        @_
+        order => $order,
     };
     bless ($self, $class);
+    if ($params{aref}) {
+        # XXX 
+        my $apply_action_href = ${$params{aref}}[0];
+        assert (ref($apply_action_href) eq "HASH");
+        assert (exists ($apply_action_href->{'apply-actions'}));
+        assert (exists ($apply_action_href->{'apply-actions'}->{action}));
+        my $action_aref = $apply_action_href->{'apply-actions'}->{action};
+        assert (ref($action_aref) eq "ARRAY");
+        foreach my $action (@$action_aref) {
+            if (exists $action->{'drop-action'}) {
+                my $new_action = new BVC::Openflow::Action::Drop;
+                $self->apply_actions($new_action);
+            }
+            elsif (exists $action->{'output-action'}) {
+                my $new_action = new BVC::Openflow::Action::Output(href => $action->{'output-action'});
+                $self->apply_actions($new_action);
+            }
+            elsif (exists $action->{'set-field'}) {
+                my $new_action = new BVC::Openflow::Action::SetField(href => $action->{'set-field'});
+                $self->apply_actions($new_action);
+            }
+            elsif (exists $action->{'push-vlan-action'}) {
+                my $new_action = new BVC::Openflow::Action::PushVlanHeader(href => $action->{'push-vlan-action'});
+                $self->apply_actions($new_action);
+            }
+            elsif (exists $action->{'pop-vlan-action'}) {
+                my $new_action = new BVC::Openflow::Action::PopVlanHeader(href => $action->{'pop-vlan-action'});
+                $self->apply_actions($new_action);
+            }
+            elsif (exists $action->{'push-mpls-action'}) {
+                my $new_action = new BVC::Openflow::Action::PushMplsHeader(href => $action->{'push-mpls-action'});
+                $self->apply_actions($new_action);
+            }
+            elsif (exists $action->{'pop-mpls-action'}) {
+                my $new_action = new BVC::Openflow::Action::PopMplsHeader(href => $action->{'pop-mpls-action'});
+                $self->apply_actions($new_action);
+            }
+        }
+    }
+    return $self;
 }
 
 sub apply_actions {
@@ -70,9 +116,50 @@ sub apply_actions {
     return $self->{apply_actions};
 }
 
-#---------------------------------------------------------------------------
-# 
-#---------------------------------------------------------------------------
+
+# Package ==============================================================
+# Instructions
+#    simplify serializing BVC::Openflow::FlowEntry
+#
+# ======================================================================
+package Instructions;
+
+sub new {
+    my ($class, %params) = @_;
+
+    my $self = {
+        instruction => []
+    };
+    bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            if ($key eq 'instruction') {
+                $self->instruction(new Instruction(aref => $value))
+            }
+        }
+    }
+    return $self;
+}
+
+
+# Method ===============================================================
+#             accessor
+# Parameters: none for get; new instruction for set
+# Returns   : array: instructions
+#
+sub instruction {
+    my ($self, $instruction) = @_;
+
+    defined $self->{instruction} or $self->instruction = new Instruction;
+    (2 == @_) and push $self->{instruction}, $instruction;
+    return $self->{instruction};
+}
+
+# Package ==============================================================
+# BVC::Openflow::FlowEntry
+#
+#
+# ======================================================================
 package BVC::Openflow::FlowEntry;
 
 # Constructor ==========================================================
@@ -80,7 +167,7 @@ package BVC::Openflow::FlowEntry;
 # Returns   : BVC::Openflow::FlowEntry object
 # 
 sub new {
-    my $class = shift;
+    my ($class, %params) = @_;
     my $self = {
         id => undef,
         cookie => undef,
@@ -89,18 +176,37 @@ sub new {
         priority => undef,
         idle_timeout => 0,
         hard_timeout => 0,
-        strict => 0,
+        strict => undef,
         out_port => undef,
         out_group => undef,
         flags => undef,
         flow_name => undef,
-        installHw => 0,
-        barrier => 0,
+        installHw => undef,
+        barrier => undef,
         buffer_id => undef,
         match => {},
-        instructions => {}
+        instructions => undef
     };
+    $self->{instructions} = new Instructions;
     bless ($self, $class);
+    # if ($params{json}) {
+    #     die "foobar\n";
+    # }
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            if ($key eq 'match') {
+                $self->add_match(new BVC::Openflow::Match(href => $value));
+            }
+            elsif ($key eq 'instructions') {
+                $self->{instructions} = new Instructions(href => $value);
+            }
+            else {
+                $self->{$key} = $value;
+            }
+        }
+    }
+    return $self;
 }
 
 # Method ===============================================================
@@ -141,7 +247,7 @@ sub get_payload {
     Data::Walk::walk(\&_strip_undef, $clone);
 
     my $payload = q({"flow-node-inventory:flow":)
-        . JSON->new->canonical->allow_blessed->convert_blessed->encode($clone)
+        . JSON->new->canonical->encode($clone)
         . q(});
     $payload =~ s/_/-/g;
     $payload =~ s/table-id/table_id/g;
@@ -149,6 +255,53 @@ sub get_payload {
 
     return $payload;
 }
+
+
+# Method ===============================================================
+#             as_oxm
+# Parameters: none
+# Returns   : FlowEntry as formatted for transmission to controller
+#
+no strict 'refs';
+sub as_oxm {
+    my $self = shift;
+
+    my $oxm = "";
+    #              accessor      => format
+    my @xlate = (['cookie'       => 'cookie=0x%x'],
+#                 ['duration'     => 'duration=%ds'],
+                 ['table_id'     => 'table=%d'],
+#                 ['pkts_cnt'     => 'n_packets=%d'],
+#                 ['bytes_cnt'    => 'n_bytes=%d'],
+                 ['idle_timeout' => 'idle_timeout=%d'],
+                 ['hard_timeout' => 'hard_timeout=%d'],
+                 ['priority'     => 'priority=%d']
+        );
+    foreach (@xlate) {
+        my ($value, $format) = ($_->[0]($self), $_->[1]);
+        if (defined $value) {
+            $oxm .= q(,) if length ($oxm);
+            $oxm .= sprintf ($format, $value);
+        }
+    }
+    if (defined $self->{match}) {
+        $oxm .= " matchs={" . $self->{match}->as_oxm . "}";
+    }
+    if (defined $self->{instructions}) {
+        $oxm .= " actions={";
+        foreach my $instr (@{$self->{instructions}->{instruction}}) {
+            my $action_ct = 0;
+            foreach my $action (@{$instr->{apply_actions}->{action}}) {
+                $action_ct++ and $oxm .= q(,);
+                $oxm .= $action->as_oxm();
+                print ref $action . "  <<<\n";
+            }
+        }
+        $oxm .= "}";
+    }
+    return $oxm;
+}
+use strict 'refs';
 
 
 # Method ===============================================================
@@ -201,7 +354,11 @@ sub add_instruction {
     my ($self, $order) = @_;
 
     my $instruction = new Instruction(order => $order);
-    $self->{instructions}->{instruction} = $instruction;
+    if (not exists ($self->{instructions}->{instruction})) {
+        $self->{instructions}->{instruction} = [];
+    }
+    push $self->{instructions}->{instruction}, $instruction;
+    return $instruction;
 }
 
 

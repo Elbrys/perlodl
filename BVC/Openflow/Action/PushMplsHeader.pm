@@ -46,12 +46,30 @@ use warnings;
 # Returns   : BVC::Openflow::Action::PushMplsHeader object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{push_mpls_action}->{'ethernet-type'} = $params{eth_type};
     bless ($self, $class);
+    if ($params{href}) {
+        while (my ($key, $value) = each $params{href}) {
+            $key =~ s/-/_/g;
+            $self->{push_mpls_action}->{$key} = $value;
+        }
+    }
+    return $self;
+}
+
+
+# Method ===============================================================
+#             as_oxm
+# Parameters: none
+# Returns   : this, as formatted for transmission to controller
+#
+sub as_oxm {
+    my $self = shift;
+
+    return sprintf("push_mpls=0x%x", $self->eth_type());
 }
 
 

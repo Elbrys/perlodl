@@ -44,8 +44,8 @@ use warnings;
 # Returns   : BVC::Openflow::Action object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
+
     my $self = {};
     $self->{order} = $params{order} ? $params{order} : 0;
     bless ($self, $class);

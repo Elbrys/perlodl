@@ -55,5 +55,15 @@ sub new {
 }
 
 
+# Method ===============================================================
+#             as_oxm
+# Parameters: none
+# Returns   : this, as formatted for transmission to controller
+#
+sub as_oxm {
+    return "drop";
+}
+
+
 # Module ===============================================================
 1;

@@ -40,7 +40,6 @@ use strict;
 use warnings;
 
 use Readonly;
-use HTTP::Status qw(:constants status_message);
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -117,6 +116,10 @@ sub new {
 sub ok {
     my $self = shift;
     return ($BVC_OK == $self->{code});
+}
+sub no_data {
+    my $self = shift;
+    return ($BVC_DATA_NOT_FOUND == $self->{code});
 }
 sub connected {
     my $self = shift;

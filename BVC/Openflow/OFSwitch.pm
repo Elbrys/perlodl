@@ -42,6 +42,7 @@ use warnings;
 use parent qw(BVC::OpenflowNode);
 use BVC::Controller;
 use BVC::Status qw(:constants);
+use BVC::Openflow::FlowEntry;
 
 use Regexp::Common;   # balanced paren matching
 use HTTP::Status qw(:constants :is status_message);
@@ -207,7 +208,8 @@ sub get_port_detail_info {
     my $status = new BVC::Status;
     my $port_info_ref;
 
-    my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name}) . "/node-connector/$self->{name}:$portnum";
+    my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name})
+        . "/node-connector/$self->{name}:$portnum";
     my $resp = $self->{ctrl}->_http_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
         my $node_connector = decode_json($resp->content);
@@ -270,6 +272,23 @@ sub delete_flow {
 
 
 # Method ===============================================================
+#             delete_flows
+# Parameters: table_id to be cleared of all flows
+# Returns   : success
+#
+sub delete_flows {
+    my ($self, $table_id) = @_;
+
+    my ($status, $flow_entries) = $self->get_configured_FlowEntries($table_id);
+    if ($status->ok) {
+        foreach (@$flow_entries) {
+            $self->delete_flow($table_id, $_->id);
+        }
+    }
+    return $status;
+}
+
+# Method ===============================================================
 #             get_configured_flow
 # Parameters: flow table_id, flow_id
 # Returns   : flow (JSON)
@@ -291,6 +310,69 @@ sub get_configured_flow {
         $status->http_err($resp);
     }
     return ($status, $flow);
+}
+
+# return array ref -> flow hashes
+sub get_flows {
+    my ($self, $table_id, $operational) = @_;
+    $operational //= 1;
+    my $status = new BVC::Status;
+    my $flows = undef;
+
+    my $urlpath = $operational
+        ? $self->{ctrl}->get_node_operational_urlpath($self->{name})
+        : $self->{ctrl}->get_node_config_urlpath($self->{name});
+    $urlpath .= "/flow-node-inventory:table/$table_id";
+
+    my $resp = $self->{ctrl}->_http_req('GET', $urlpath);
+    if (HTTP_OK == $resp->code) {
+        # XXX at least pretend to sanity check structure/existence
+        $flows = decode_json($resp->content)->{'flow-node-inventory:table'}[0]->{flow};
+        $status->code( defined $flows ? $BVC_OK : $BVC_DATA_NOT_FOUND );
+#        $status->code($BVC_OK);
+    }
+    else {
+        $status->http_err($resp);
+    }
+    return ($status, $flows);
+}
+
+sub get_FlowEntries {
+    my ($self, $table_id, $operational) = @_;
+    $operational //= 1;
+    my @FlowEntries = ();
+
+    my ($status, $flows) = $self->get_flows($table_id, $operational);
+    if ($status->ok) {
+        foreach (@$flows) {
+            my $flowentry = new BVC::Openflow::FlowEntry(href => $_);
+            push @FlowEntries, $flowentry;
+        }
+    }
+    return ($status, \@FlowEntries);
+}
+
+sub get_operational_FlowEntries {
+    my ($self, $table_id) = @_;
+    return $self->get_FlowEntries($table_id, 1);
+}
+
+sub get_configured_FlowEntries {
+    my ($self, $table_id) = @_;
+    return $self->get_FlowEntries($table_id, 0);
+}
+
+sub get_configured_FlowEntry {
+    my ($self, $table_id, $flow_id) = @_;
+    my $flowentry = undef;
+
+    my ($status, $flow_json) = $self->get_configured_flow($table_id, $flow_id);
+    if ($status->ok) {
+        # XXX sanity check structure/existence
+        my $flow = decode_json($flow_json)->{'flow-node-inventory:flow'}[0];
+        $flowentry = new BVC::Openflow::FlowEntry(href => $flow);
+    }
+    return ($status, $flowentry);
 }
 
 
