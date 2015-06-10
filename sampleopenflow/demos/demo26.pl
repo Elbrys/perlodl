@@ -28,25 +28,6 @@ my $instruction  = undef;
 my $action       = undef;
 my $match        = undef;
 
-#----------------------------------------------- XXX vvvvv
-my $flowinfo = undef;
-
-my $ethtype = $ETH_TYPE_MPLS_UCAST;
-my $input_port = 14;
-my $mpls_label = 44;
-
-my $pop_ether_type = $ETH_TYPE_MPLS_UCAST;
-my $output_port = 13;
-
-#my $table_id = 0;
-#my $flow_id  = 30;
-my $flow_priority = 1023;
-my $cookie = 889;
-my $cookie_mask = 255;
-my $hard_timeout = 0;
-my $idle_timeout = 0;
-#----------------------------------------------- XXX ^^^^^
-
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
@@ -76,8 +57,8 @@ $instruction->apply_actions($action);
 
 $match = new BVC::Openflow::Match;
 $match->eth_type($ETH_TYPE_ARP);
-$match->eth_src("00:11:22:33:44:55");
-$match->eth_dst("aa:bb:cc:dd:ee:ff");
+$match->eth_src('00:11:22:33:44:55');
+$match->eth_dst('aa:bb:cc:dd:ee:ff');
 $flow_entry->add_match($match);
 
 push @flow_entries, $flow_entry;
@@ -100,8 +81,8 @@ $instruction->apply_actions($action);
 
 $match = new BVC::Openflow::Match;
 $match->eth_type($ETH_TYPE_IPv4);
-$match->ipv4_src("1.2.3.4/32");
-$match->ipv4_dst("192.168.1.11/32");
+$match->ipv4_src('1.2.3.4/32');
+$match->ipv4_dst('192.168.1.11/32');
 $flow_entry->add_match($match);
 
 push @flow_entries, $flow_entry;
