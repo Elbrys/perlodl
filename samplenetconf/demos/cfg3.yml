@@ -1,0 +1,12 @@
+# Controller specification
+ctrlIpAddr: "172.22.19.67"
+ctrlPortNum: "8181"     
+ctrlUname: 'admin' 
+ctrlPswd:  'admin'   
+
+# NetconfNode specification
+nodeName: "lwp-vr-5600"
+nodeIpAddr: "172.22.17.63"
+nodePortNum: 830
+nodeUname: "vyatta"
+nodePswd: "vyatta"
