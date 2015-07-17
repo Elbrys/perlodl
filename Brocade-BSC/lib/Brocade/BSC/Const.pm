@@ -1,6 +1,6 @@
-=head1 BVC::Const
+=head1 Brocade::BSC::Const
 
-Symbolic constants used in BVC packages for well-known numbers
+Symbolic constants used in BSC packages for well-known numbers
   (network protocols/header fields).
 
 =head1 LICENCE AND COPYRIGHT
@@ -37,7 +37,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Const;
+package Brocade::BSC::Const;
 
 use strict;
 use warnings;

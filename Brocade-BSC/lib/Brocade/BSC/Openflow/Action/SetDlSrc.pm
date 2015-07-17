@@ -1,4 +1,4 @@
-=head1 BVC::Openflow::Action::SetDlSrc
+=head1 Brocade::BSC::Openflow::Action::SetDlSrc
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,8 +34,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Openflow::Action::SetDlSrc;
-use parent qw(BVC::Openflow::Action);
+package Brocade::BSC::Openflow::Action::SetDlSrc;
+use parent qw(Brocade::BSC::Openflow::Action);
 
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ use warnings;
 
 # Constructor ==========================================================
 # Parameters: none
-# Returns   : BVC::Openflow::Action::SetDlSrc object
+# Returns   : Brocade::BSC::Openflow::Action::SetDlSrc object
 # 
 sub new {
     my $class = shift;

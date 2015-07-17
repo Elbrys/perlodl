@@ -1,4 +1,4 @@
-=head1 BVC::Openflow::Action
+=head1 Brocade::BSC::Openflow::Action
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,14 +34,14 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Openflow::Action;
+package Brocade::BSC::Openflow::Action;
 
 use strict;
 use warnings;
 
 # Constructor ==========================================================
 # Parameters: order (optional)
-# Returns   : BVC::Openflow::Action object
+# Returns   : Brocade::BSC::Openflow::Action object
 # 
 sub new {
     my ($class, %params) = @_;

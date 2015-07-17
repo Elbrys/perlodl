@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
+use Brocade::BSC;
 
 my $configfile  = undef;
 my $yangId      = undef;
@@ -18,7 +18,7 @@ GetOptions("config=s"     => \$configfile,
 ($yangId && $yangVersion)
     or die "identifier and version arguments are required.";
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
 print "<<< 'Controller': $bvc->{ipAddr}\n";
 
 my ($status, $schema) = $bvc->get_schema('controller-config',

@@ -1,4 +1,4 @@
-=head1 BVC::Openflow::Action::PopPBBHeader
+=head1 Brocade::BSC::Openflow::Action::PopPBBHeader
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,8 +34,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Openflow::Action::PopPBBHeader;
-use parent qw(BVC::Openflow::Action);
+package Brocade::BSC::Openflow::Action::PopPBBHeader;
+use parent qw(Brocade::BSC::Openflow::Action);
 
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ use warnings;
 
 # Constructor ==========================================================
 # Parameters: none
-# Returns   : BVC::Openflow::Action::PopPBBHeader object
+# Returns   : Brocade::BSC::Openflow::Action::PopPBBHeader object
 # 
 sub new {
     my $class = shift;

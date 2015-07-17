@@ -1,4 +1,4 @@
-=head1 BVC::Status
+=head1 Brocade::BSC::Status
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,7 +34,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Status;
+package Brocade::BSC::Status;
 
 use strict;
 use warnings;

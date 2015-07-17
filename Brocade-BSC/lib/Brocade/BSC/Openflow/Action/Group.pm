@@ -1,4 +1,4 @@
-=head1 BVC::Openflow::Action::Group
+=head1 Brocade::BSC::Openflow::Action::Group
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,8 +34,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Openflow::Action::Group;
-use parent qw(BVC::Openflow::Action);
+package Brocade::BSC::Openflow::Action::Group;
+use parent qw(Brocade::BSC::Openflow::Action);
 
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ use warnings;
 
 # Constructor ==========================================================
 # Parameters: none
-# Returns   : BVC::Openflow::Action::Group object
+# Returns   : Brocade::BSC::Openflow::Action::Group object
 # 
 sub new {
     my $class = shift;

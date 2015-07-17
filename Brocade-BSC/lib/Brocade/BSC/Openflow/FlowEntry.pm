@@ -1,4 +1,4 @@
-=head1 BVC::Openflow::FlowEntry
+=head1 Brocade::BSC::Openflow::FlowEntry
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,12 +34,12 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Openflow::FlowEntry;
+package Brocade::BSC::Openflow::FlowEntry;
 
 use strict;
 use warnings;
 
-use BVC::Openflow::Match;
+use Brocade::BSC::Openflow::Match;
 
 use Data::Walk;
 use JSON -convert_blessed_universally;
@@ -47,7 +47,7 @@ use JSON -convert_blessed_universally;
 
 # Package ==============================================================
 # Instruction
-#    simplify serializing BVC::Openflow::FlowEntry
+#    simplify serializing Brocade::BSC::Openflow::FlowEntry
 #
 # ======================================================================
 package Instruction;
@@ -73,31 +73,31 @@ sub new {
         assert (ref($action_aref) eq "ARRAY");
         foreach my $action (@$action_aref) {
             if (exists $action->{'drop-action'}) {
-                my $new_action = new BVC::Openflow::Action::Drop;
+                my $new_action = new Brocade::BSC::Openflow::Action::Drop;
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'output-action'}) {
-                my $new_action = new BVC::Openflow::Action::Output(href => $action->{'output-action'});
+                my $new_action = new Brocade::BSC::Openflow::Action::Output(href => $action->{'output-action'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'set-field'}) {
-                my $new_action = new BVC::Openflow::Action::SetField(href => $action->{'set-field'});
+                my $new_action = new Brocade::BSC::Openflow::Action::SetField(href => $action->{'set-field'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'push-vlan-action'}) {
-                my $new_action = new BVC::Openflow::Action::PushVlanHeader(href => $action->{'push-vlan-action'});
+                my $new_action = new Brocade::BSC::Openflow::Action::PushVlanHeader(href => $action->{'push-vlan-action'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'pop-vlan-action'}) {
-                my $new_action = new BVC::Openflow::Action::PopVlanHeader(href => $action->{'pop-vlan-action'});
+                my $new_action = new Brocade::BSC::Openflow::Action::PopVlanHeader(href => $action->{'pop-vlan-action'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'push-mpls-action'}) {
-                my $new_action = new BVC::Openflow::Action::PushMplsHeader(href => $action->{'push-mpls-action'});
+                my $new_action = new Brocade::BSC::Openflow::Action::PushMplsHeader(href => $action->{'push-mpls-action'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'pop-mpls-action'}) {
-                my $new_action = new BVC::Openflow::Action::PopMplsHeader(href => $action->{'pop-mpls-action'});
+                my $new_action = new Brocade::BSC::Openflow::Action::PopMplsHeader(href => $action->{'pop-mpls-action'});
                 $self->apply_actions($new_action);
             }
         }
@@ -119,7 +119,7 @@ sub apply_actions {
 
 # Package ==============================================================
 # Instructions
-#    simplify serializing BVC::Openflow::FlowEntry
+#    simplify serializing Brocade::BSC::Openflow::FlowEntry
 #
 # ======================================================================
 package Instructions;
@@ -156,15 +156,15 @@ sub instruction {
 }
 
 # Package ==============================================================
-# BVC::Openflow::FlowEntry
+# Brocade::BSC::Openflow::FlowEntry
 #
 #
 # ======================================================================
-package BVC::Openflow::FlowEntry;
+package Brocade::BSC::Openflow::FlowEntry;
 
 # Constructor ==========================================================
 # Parameters: none
-# Returns   : BVC::Openflow::FlowEntry object
+# Returns   : Brocade::BSC::Openflow::FlowEntry object
 # 
 sub new {
     my ($class, %params) = @_;
@@ -196,7 +196,7 @@ sub new {
         while (my ($key, $value) = each $params{href}) {
             $key =~ s/-/_/g;
             if ($key eq 'match') {
-                $self->add_match(new BVC::Openflow::Match(href => $value));
+                $self->add_match(new Brocade::BSC::Openflow::Match(href => $value));
             }
             elsif ($key eq 'instructions') {
                 $self->{instructions} = new Instructions(href => $value);

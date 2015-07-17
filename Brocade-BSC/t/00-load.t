@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'Net::BSC' ) || print "Bail out!\n";
+    use_ok( 'Brocade::BSC' ) || print "Bail out!\n";
 }
 
-diag( "Testing Net::BSC $Net::BSC::VERSION, Perl $], $^X" );
+diag( "Testing Brocade::BSC $Brocade::BSC::VERSION, Perl $], $^X" );

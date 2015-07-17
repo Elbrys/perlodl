@@ -1,4 +1,4 @@
-=head1 BVC::Openflow::Action::FloodAll
+=head1 Brocade::BSC::Openflow::Action::FloodAll
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,8 +34,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Openflow::Action::FloodAll;
-use parent qw(BVC::Openflow::Action);
+package Brocade::BSC::Openflow::Action::FloodAll;
+use parent qw(Brocade::BSC::Openflow::Action);
 
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ use warnings;
 
 # Constructor ==========================================================
 # Parameters: none
-# Returns   : BVC::Openflow::Action::FloodAll object
+# Returns   : Brocade::BSC::Openflow::Action::FloodAll object
 # 
 sub new {
     my $class = shift;

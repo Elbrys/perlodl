@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::Const qw(:all);
-use BVC::Openflow::OFSwitch;
-use BVC::Openflow::FlowEntry;
-use BVC::Openflow::Match;
-use BVC::Openflow::Action::Output;
+use Brocade::BSC;
+use Brocade::BSC::Const qw(:all);
+use Brocade::BSC::Openflow::OFSwitch;
+use Brocade::BSC::Openflow::FlowEntry;
+use Brocade::BSC::Openflow::Match;
+use Brocade::BSC::Openflow::Action::Output;
 
 my $configfile = "";
 my $status = undef;
@@ -31,8 +31,8 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
-my $ofswitch = new BVC::Openflow::OFSwitch(cfgfile => $configfile,
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(cfgfile => $configfile,
                                            ctrl => $bvc);
 print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
 
@@ -44,7 +44,7 @@ print  "                VLAN ID                      ($vlan_id)\n";
 print  "                VLAN PCP                     ($vlan_pcp)\n";
 print  "        Action: Output (to Physical Port Number)\n\n";
 
-my $flowentry = new BVC::Openflow::FlowEntry;
+my $flowentry = new Brocade::BSC::Openflow::FlowEntry;
 $flowentry->table_id($table_id);
 $flowentry->id($flow_id);
 $flowentry->priority($flow_priority);
@@ -52,12 +52,12 @@ $flowentry->priority($flow_priority);
 # # --- Instruction: 'Apply-action'
 # #     Action:      'Output' NORMAL
 my $instruction = $flowentry->add_instruction(0);
-my $action = new BVC::Openflow::Action::Output(order => 0, port => 7);
+my $action = new Brocade::BSC::Openflow::Action::Output(order => 0, port => 7);
 $instruction->apply_actions($action);
 
 # # --- Match Fields
 
-my $match = new BVC::Openflow::Match();
+my $match = new Brocade::BSC::Openflow::Match();
 $match->eth_type($ethtype);
 $match->eth_src($eth_src);
 $match->eth_dst($eth_dst);

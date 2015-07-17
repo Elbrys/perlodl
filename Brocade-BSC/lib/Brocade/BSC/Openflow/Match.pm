@@ -1,4 +1,4 @@
-=head1 BVC::Openflow::Match
+=head1 Brocade::BSC::Openflow::Match
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,7 +34,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Openflow::Match;
+package Brocade::BSC::Openflow::Match;
 
 use strict;
 use warnings;
@@ -425,11 +425,11 @@ sub metadata_mask {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package BVC::Openflow::Match;
+package Brocade::BSC::Openflow::Match;
 
 # Constructor ==========================================================
 # Parameters: hash ref of values with which to instantiate Match (optional)
-# Returns   : BVC::Openflow::Match object
+# Returns   : Brocade::BSC::Openflow::Match object
 # 
 sub new {
     my ($class, %params) = @_;

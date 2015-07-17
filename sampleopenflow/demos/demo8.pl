@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::Const qw(/ETH_TYPE/ /IP_/);
-use BVC::Openflow::OFSwitch;
-use BVC::Openflow::FlowEntry;
-use BVC::Openflow::Match;
-use BVC::Openflow::Action::Output;
+use Brocade::BSC;
+use Brocade::BSC::Const qw(/ETH_TYPE/ /IP_/);
+use Brocade::BSC::Openflow::OFSwitch;
+use Brocade::BSC::Openflow::FlowEntry;
+use Brocade::BSC::Openflow::Match;
+use Brocade::BSC::Openflow::Action::Output;
 
 my $configfile = "";
 my $status = undef;
@@ -37,8 +37,8 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
-my $ofswitch = new BVC::Openflow::OFSwitch(cfgfile => $configfile,
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(cfgfile => $configfile,
                                            ctrl => $bvc);
 print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
 
@@ -54,7 +54,7 @@ print  "                IP ECN                       ($ip_ecn)\n";
 print  "                Input Port                   ($input_port)\n";
 print  "        Action: Output (CONTROLLER)\n\n";
 
-my $flowentry = new BVC::Openflow::FlowEntry;
+my $flowentry = new Brocade::BSC::Openflow::FlowEntry;
 $flowentry->table_id($table_id);
 $flowentry->id($flow_id);
 $flowentry->priority($flow_priority);
@@ -64,14 +64,14 @@ $flowentry->cookie_mask($cookie_mask);
 # # --- Instruction: 'Apply-action'
 # #     Action:      'Output' to CONTROLLER
 my $instruction = $flowentry->add_instruction(0);
-my $action = new BVC::Openflow::Action::Output(order => 0,
+my $action = new Brocade::BSC::Openflow::Action::Output(order => 0,
                                                max_len => 60,
                                                port => 'CONTROLLER');
 $instruction->apply_actions($action);
 
 # # --- Match Fields: Ethernet Type
 # #                   IPv4 Destination Address
-my $match = new BVC::Openflow::Match();
+my $match = new Brocade::BSC::Openflow::Match();
 $match->eth_type($ethtype);
 $match->eth_src($eth_src);
 $match->eth_dst($eth_dst);

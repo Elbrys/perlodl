@@ -4,15 +4,15 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::Const qw(/ETH_TYPE/);
-use BVC::Openflow::OFSwitch;
-use BVC::Openflow::FlowEntry;
-use BVC::Openflow::Match;
-use BVC::Openflow::Action::Output;
-use BVC::Openflow::Action::SetField;
-use BVC::Openflow::Action::PushVlanHeader;
-use BVC::Openflow::Action::PopVlanHeader;
+use Brocade::BSC;
+use Brocade::BSC::Const qw(/ETH_TYPE/);
+use Brocade::BSC::Openflow::OFSwitch;
+use Brocade::BSC::Openflow::FlowEntry;
+use Brocade::BSC::Openflow::Match;
+use Brocade::BSC::Openflow::Action::Output;
+use Brocade::BSC::Openflow::Action::SetField;
+use Brocade::BSC::Openflow::Action::PushVlanHeader;
+use Brocade::BSC::Openflow::Action::PopVlanHeader;
 
 my $configfile = "";
 my $status = undef;
@@ -38,9 +38,9 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
-my $ofswitch = new BVC::Openflow::OFSwitch(cfgfile => $configfile,
-                                           ctrl => $bvc);
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(cfgfile => $configfile,
+                                                    ctrl => $bvc);
 
 # ---------------------------------------------------
 # First flow entry
@@ -60,7 +60,7 @@ printf "                Push VLAN            (Ethernet Type 0x%04x)\n",
 print  "                Set Field            (VLAN ID $customer_vlan_id)\n";
 print  "                Output (Physical Port number $provider_port)\n\n";
 
-my $flowentry = new BVC::Openflow::FlowEntry;
+my $flowentry = new Brocade::BSC::Openflow::FlowEntry;
 $flowentry->flow_name("[MLX1-A] Test flow (match:inport=110,arp;actions:"
     . "push-QINQ-tag,mod_vlan=100,push-DOT1Q-tag,mod_vlan=998,output:111)");
 $flowentry->table_id($table_id);
@@ -77,29 +77,29 @@ my $instruction = $flowentry->add_instruction(0);
 
 my $action_order = 0;
 my $action;
-$action = new BVC::Openflow::Action::PushVlanHeader(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::PushVlanHeader(order => $action_order++);
 $action->eth_type($qinq_eth_type);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::SetField(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::SetField(order => $action_order++);
 $action->vlan_id($provider_vlan_id);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::PushVlanHeader(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::PushVlanHeader(order => $action_order++);
 $action->eth_type($dot1q_eth_type);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::SetField(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::SetField(order => $action_order++);
 $action->vlan_id($customer_vlan_id);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::Output(order => $action_order++,
-                                            port => $provider_port);
+$action = new Brocade::BSC::Openflow::Action::Output(order => $action_order++,
+                                                     port => $provider_port);
 $instruction->apply_actions($action);
 
 # # --- Match Fields
 
-my $match = new BVC::Openflow::Match();
+my $match = new Brocade::BSC::Openflow::Match();
 $match->eth_type($ETH_TYPE_ARP);
 $match->vlan_id($customer_vlan_id);
 $match->in_port($customer_port);
@@ -128,7 +128,7 @@ printf "                Push VLAN            (Ethernet Type 0x%04x)\n",
 print  "                Set Field            (VLAN ID $customer_vlan_id)\n";
 print  "                Output (Physical Port number $provider_port)\n\n";
 
-my $flowentry2 = new BVC::Openflow::FlowEntry;
+my $flowentry2 = new Brocade::BSC::Openflow::FlowEntry;
 $flowentry2->flow_name("[MLX1-A] Test flow (match:inport=110,ip;actions:"
     . "push-QINQ-tag,mod_vlan=100,output:111)");
 $flowentry2->table_id($table_id);
@@ -143,27 +143,27 @@ $instruction = $flowentry2->add_instruction(0);
 
 $action_order = 0;
 
-$action = new BVC::Openflow::Action::PushVlanHeader(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::PushVlanHeader(order => $action_order++);
 $action->eth_type($qinq_eth_type);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::SetField(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::SetField(order => $action_order++);
 $action->vlan_id($provider_vlan_id);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::PushVlanHeader(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::PushVlanHeader(order => $action_order++);
 $action->eth_type($dot1q_eth_type);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::SetField(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::SetField(order => $action_order++);
 $action->vlan_id($customer_vlan_id);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::Output(order => $action_order++,
-                                            port => $provider_port);
+$action = new Brocade::BSC::Openflow::Action::Output(order => $action_order++,
+                                                     port => $provider_port);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->eth_type($ip_eth_type);
 $match->vlan_id($customer_vlan_id);
 $match->in_port($customer_port);
@@ -187,7 +187,7 @@ print  "                Input Port           ($provider_port)\n";
 print  "        Action: Pop VLAN\n";
 print  "                Output (Physical Port number $customer_port)\n\n";
 
-my $flowentry3 = new BVC::Openflow::FlowEntry;
+my $flowentry3 = new Brocade::BSC::Openflow::FlowEntry;
 $flowentry3->flow_name("[MLX1-A] Test flow (match:inport=111,arp,vid=100;"
     . "actions:pop-vlan-tag,output:110)");
 $flowentry3->table_id($table_id);
@@ -202,14 +202,14 @@ $instruction = $flowentry3->add_instruction(0);
 
 $action_order = 0;
 
-$action = new BVC::Openflow::Action::PopVlanHeader(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::PopVlanHeader(order => $action_order++);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::Output(order => $action_order++,
-                                            port => $customer_port);
+$action = new Brocade::BSC::Openflow::Action::Output(order => $action_order++,
+                                                     port => $customer_port);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->eth_type($ETH_TYPE_ARP);
 $match->vlan_id($provider_vlan_id);
 $match->in_port($provider_port);
@@ -233,7 +233,7 @@ print  "                Input Port           ($provider_port)\n";
 print  "        Action: Pop VLAN\n";
 print  "                Output (Physical Port number $customer_port)\n\n";
 
-my $flowentry4 = new BVC::Openflow::FlowEntry;
+my $flowentry4 = new Brocade::BSC::Openflow::FlowEntry;
 $flowentry4->flow_name("[MLX1-A] Test flow (match:inport=111,ip,vid=100;"
     . "actions:pop-vlan-tag,output:110)");
 $flowentry4->table_id($table_id);
@@ -248,14 +248,14 @@ $instruction = $flowentry4->add_instruction(0);
 
 $action_order = 0;
 
-$action = new BVC::Openflow::Action::PopVlanHeader(order => $action_order++);
+$action = new Brocade::BSC::Openflow::Action::PopVlanHeader(order => $action_order++);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::Output(order => $action_order++,
-                                            port => $customer_port);
+$action = new Brocade::BSC::Openflow::Action::Output(order => $action_order++,
+                                                     port => $customer_port);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->eth_type($ip_eth_type);
 $match->vlan_id($provider_vlan_id);
 $match->in_port($provider_port);

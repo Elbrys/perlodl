@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::NetconfNode;
+use Brocade::BSC;
+use Brocade::BSC::NetconfNode;
 
 my $status = undef;
 my $result = undef;
@@ -18,13 +18,13 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
-my $bvc = new BVC::Controller(cfgfile => $configfile);
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 
 show_netconf_nodes_in_config($bvc);
 
-my $ncNode = new BVC::NetconfNode(cfgfile => $configfile, ctrl=>$bvc);
+my $ncNode = new Brocade::BSC::NetconfNode(cfgfile => $configfile, ctrl=>$bvc);
 print "<<< Creating new '$ncNode->{name}' NETCONF node\n";
 print "'$ncNode->{name}':\n";
 print $ncNode->as_json() . "\n";

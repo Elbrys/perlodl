@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::Openflow::OFSwitch;
+use Brocade::BSC;
+use Brocade::BSC::Openflow::OFSwitch;
 
 my $configfile = "";
 my $status = undef;
@@ -18,7 +18,7 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 
@@ -32,7 +32,7 @@ print JSON->new->allow_nonref->pretty->encode($oflist) . "\n";
 
 print "<<< Get generic information about OpenFlow nodes\n";
 foreach my $ofnode (@$oflist) {
-    my $ofswitch = new BVC::Openflow::OFSwitch(ctrl => $bvc, name => $ofnode);
+    my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(ctrl => $bvc, name => $ofnode);
     ($status, $switch_info) = $ofswitch->get_switch_info();
     $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 

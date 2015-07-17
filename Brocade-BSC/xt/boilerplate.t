@@ -50,7 +50,7 @@ TODO: {
     "placeholder date/time"       => qr(Date/time)
   );
 
-  module_boilerplate_ok('lib/Net/BSC.pm');
+  module_boilerplate_ok('lib/Brocade/BSC.pm');
 
 
 }

@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::Openflow::OFSwitch;
+use Brocade::BSC;
+use Brocade::BSC::Openflow::OFSwitch;
 
 my $configfile = "";
 my $status = undef;
@@ -20,10 +20,10 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
-my $ofswitch = new BVC::Openflow::OFSwitch(ctrl => $bvc, name => $sample);
+my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(ctrl => $bvc, name => $sample);
 
 
 print "<<< Get detailed information about ports on OpenFlow node '$sample'\n";

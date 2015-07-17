@@ -1,4 +1,4 @@
-=head1 BVC::OpenflowNode
+=head1 Brocade::BSC::OpenflowNode
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,7 +34,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::OpenflowNode;
+package Brocade::BSC::OpenflowNode;
 
 use strict;
 use warnings;
@@ -50,7 +50,7 @@ use JSON -convert_blessed_universally;
 #             ------------- | ----------
 #             ctrl          | ----------   ref to controller object
 #             name          | nodeName
-# Returns   : BVC::OpenflowNode object
+# Returns   : Brocade::BSC::OpenflowNode object
 # 
 sub new {
     my $class = shift;
@@ -76,7 +76,7 @@ sub new {
 # Method ===============================================================
 # as_json
 # Parameters: none
-# Returns   : BVC::OpenflowNode as formatted JSON string
+# Returns   : Brocade::BSC::OpenflowNode as formatted JSON string
 #
 sub as_json {
     my $self = shift;

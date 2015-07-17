@@ -1,4 +1,4 @@
-=head1 BVC::Openflow::OFSwitch
+=head1 Brocade::BSC::Openflow::OFSwitch
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,15 +34,15 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Openflow::OFSwitch;
+package Brocade::BSC::Openflow::OFSwitch;
 
 use strict;
 use warnings;
 
-use parent qw(BVC::OpenflowNode);
-use BVC::Controller;
-use BVC::Status qw(:constants);
-use BVC::Openflow::FlowEntry;
+use parent qw(Brocade::BSC::OpenflowNode);
+use Brocade::BSC;
+use Brocade::BSC::Status qw(:constants);
+use Brocade::BSC::Openflow::FlowEntry;
 
 use Regexp::Common;   # balanced paren matching
 use HTTP::Status qw(:constants :is status_message);
@@ -51,7 +51,7 @@ use JSON -convert_blessed_universally;
 # Constructor ==========================================================
 # Parameters: cfgfile : name of YAML file for configuring object (opt)
 #             explicit values override config overrides defaults
-# Returns   : BVC::Openflow::OFSwitch object
+# Returns   : Brocade::BSC::Openflow::OFSwitch object
 # 
 sub new {
     my ($class, %params) = @_;
@@ -62,7 +62,7 @@ sub new {
 # Method ===============================================================
 # as_json
 # Parameters: none
-# Returns   : BVC::Openflow::OFSwitch as formatted JSON string
+# Returns   : Brocade::BSC::Openflow::OFSwitch as formatted JSON string
 #
 sub as_json {
     my $self = shift;
@@ -78,7 +78,7 @@ sub as_json {
 #
 sub get_switch_info {
     my $self = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my %node_info = ();
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
@@ -104,7 +104,7 @@ sub get_switch_info {
 #
 sub get_features_info {
     my $self = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $feature_info_ref = undef;
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
@@ -130,7 +130,7 @@ sub get_features_info {
 #
 sub get_ports_list {
     my $self = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my @port_list = ();
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
@@ -155,7 +155,7 @@ sub get_ports_list {
 sub get_port_brief_info {
     my $self = shift;
     my $portnum = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
 
     die "XXX";
 }
@@ -168,7 +168,7 @@ sub get_port_brief_info {
 #
 sub get_ports_brief_info {
     my $self = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my @ports_info = ();
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
@@ -205,7 +205,7 @@ sub get_ports_brief_info {
 sub get_port_detail_info {
     my $self = shift;
     my $portnum = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $port_info_ref;
 
     my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name})
@@ -235,9 +235,9 @@ sub get_port_detail_info {
 #
 sub add_modify_flow {
     my ($self, $flow_entry) = @_;
-    my $status = new BVC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BVC_OK);
 
-    if($flow_entry->isa("BVC::Openflow::FlowEntry")) {
+    if($flow_entry->isa("Brocade::BSC::Openflow::FlowEntry")) {
         my %headers = ('content-type' => 'application/yang.data+json');
         my $payload = $flow_entry->get_payload();
         my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
@@ -261,7 +261,7 @@ sub add_modify_flow {
 #
 sub delete_flow {
     my ($self, $table_id, $flow_id) = @_;
-    my $status = new BVC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BVC_OK);
 
     my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
         . "/table/$table_id/flow/$flow_id";
@@ -295,7 +295,7 @@ sub delete_flows {
 #
 sub get_configured_flow {
     my ($self, $table_id, $flow_id) = @_;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $flow = undef;
 
     my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
@@ -316,7 +316,7 @@ sub get_configured_flow {
 sub get_flows {
     my ($self, $table_id, $operational) = @_;
     $operational //= 1;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $flows = undef;
 
     my $urlpath = $operational
@@ -345,7 +345,7 @@ sub get_FlowEntries {
     my ($status, $flows) = $self->get_flows($table_id, $operational);
     if ($status->ok) {
         foreach (@$flows) {
-            my $flowentry = new BVC::Openflow::FlowEntry(href => $_);
+            my $flowentry = new Brocade::BSC::Openflow::FlowEntry(href => $_);
             push @FlowEntries, $flowentry;
         }
     }
@@ -370,7 +370,7 @@ sub get_configured_FlowEntry {
     if ($status->ok) {
         # XXX sanity check structure/existence
         my $flow = decode_json($flow_json)->{'flow-node-inventory:flow'}[0];
-        $flowentry = new BVC::Openflow::FlowEntry(href => $flow);
+        $flowentry = new Brocade::BSC::Openflow::FlowEntry(href => $flow);
     }
     return ($status, $flowentry);
 }

@@ -1,4 +1,4 @@
-=head1 BVC::Netconf::Vrouter::Firewall
+=head1 Brocade::BSC::Netconf::Vrouter::Firewall
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,7 +34,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Netconf::Vrouter::Firewall;
+package Brocade::BSC::Netconf::Vrouter::Firewall;
 
 use strict;
 use warnings;
@@ -115,7 +115,7 @@ sub get_name {
 #---------------------------------------------------------------------------
 # 
 #---------------------------------------------------------------------------
-package BVC::Netconf::Vrouter::Firewall;
+package Brocade::BSC::Netconf::Vrouter::Firewall;
 
 sub new {
     my $class = shift;

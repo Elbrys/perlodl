@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::Const qw(/ETH_TYPE/);
-use BVC::Openflow::OFSwitch;
-use BVC::Openflow::FlowEntry;
-use BVC::Openflow::Match;
-use BVC::Openflow::Action::Drop;
+use Brocade::BSC;
+use Brocade::BSC::Const qw(/ETH_TYPE/);
+use Brocade::BSC::Openflow::OFSwitch;
+use Brocade::BSC::Openflow::FlowEntry;
+use Brocade::BSC::Openflow::Match;
+use Brocade::BSC::Openflow::Action::Drop;
 
 my $configfile = "";
 my $status = undef;
@@ -27,8 +27,8 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
-my $ofswitch = new BVC::Openflow::OFSwitch(cfgfile => $configfile,
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(cfgfile => $configfile,
                                            ctrl => $bvc);
 print "<<< 'Controller': $bvc->{ipAddr}, "
     . "'OpenFlow' switch: $ofswitch->{name}\n\n";
@@ -38,7 +38,7 @@ printf "        Match: Ethernet Type (0x%04x)\n", $ethtype;
 print  "        IPv4 Destination Address ($ipv4_dst)\n";
 print  "        Action: Drop\n\n";
 
-my $flowentry = new BVC::Openflow::FlowEntry;
+my $flowentry = new Brocade::BSC::Openflow::FlowEntry;
 $flowentry->table_id($table_id);
 $flowentry->id($flow_id);
 $flowentry->priority($flow_priority);
@@ -46,12 +46,12 @@ $flowentry->priority($flow_priority);
 # # --- Instruction: 'Apply-action'
 # #     Action:      'Drop'
 my $instruction = $flowentry->add_instruction(0);
-my $action = new BVC::Openflow::Action::Drop(order => 0);
+my $action = new Brocade::BSC::Openflow::Action::Drop(order => 0);
 $instruction->apply_actions($action);
 
 # # --- Match Fields: Ethernet Type
 # #                   IPv4 Destination Address
-my $match = new BVC::Openflow::Match();
+my $match = new Brocade::BSC::Openflow::Match();
 $match->eth_type($ethtype);
 $match->ipv4_dst($ipv4_dst);
 $flowentry->add_match($match);

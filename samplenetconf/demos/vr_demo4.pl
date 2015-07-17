@@ -1,12 +1,12 @@
-#!/usr/bin/perl
+yy#!/usr/bin/perl
 
 use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::Netconf::Vrouter::VR5600;
-use BVC::Netconf::Vrouter::Firewall;
+use Brocade::BSC;
+use Brocade::BSC::Netconf::Vrouter::VR5600;
+use Brocade::BSC::Netconf::Vrouter::Firewall;
 
 my $configfile = "";
 my $status = undef;
@@ -18,9 +18,9 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
-my $vRouter = new BVC::Netconf::Vrouter::VR5600(cfgfile => $configfile,
-                                                ctrl=>$bvc);
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $vRouter = new Brocade::BSC::Netconf::Vrouter::VR5600(cfgfile => $configfile,
+                                                         ctrl=>$bvc);
 
 print "<<< 'Controller': $bvc->{ipAddr}, '"
     . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
@@ -42,7 +42,7 @@ show_firewalls_cfg($vRouter);
 
 my $fw_group = "FW-ACCEPT-SRC-172_22_17_108";
 print "<<< Create new firewall instance '$fw_group' on ' $vRouter->{name}'\n\n";
-my $firewall = new BVC::Netconf::Vrouter::Firewall;
+my $firewall = new Brocade::BSC::Netconf::Vrouter::Firewall;
 $firewall->add_group($fw_group);
 $firewall->add_rule($fw_group, 33,
                     'action' => 'accept',

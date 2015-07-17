@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
+use Brocade::BSC;
 
 my $configfile = "";
 
@@ -15,7 +15,7 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
-my $bvc = new BVC::Controller(cfgfile => $configfile);
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 

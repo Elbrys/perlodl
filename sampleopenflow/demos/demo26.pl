@@ -4,16 +4,16 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::Const qw(/ETH_TYPE/);
-use BVC::Openflow::OFSwitch;
-use BVC::Openflow::FlowEntry;
-use BVC::Openflow::Match;
-use BVC::Openflow::Action::Drop;
-use BVC::Openflow::Action::Output;
-use BVC::Openflow::Action::SetField;
-use BVC::Openflow::Action::PushVlanHeader;
-use BVC::Openflow::Action::PopVlanHeader;
+use Brocade::BSC;
+use Brocade::BSC::Const qw(/ETH_TYPE/);
+use Brocade::BSC::Openflow::OFSwitch;
+use Brocade::BSC::Openflow::FlowEntry;
+use Brocade::BSC::Openflow::Match;
+use Brocade::BSC::Openflow::Action::Drop;
+use Brocade::BSC::Openflow::Action::Output;
+use Brocade::BSC::Openflow::Action::SetField;
+use Brocade::BSC::Openflow::Action::PushVlanHeader;
+use Brocade::BSC::Openflow::Action::PopVlanHeader;
 
 my $configfile = "";
 my $status = undef;
@@ -34,16 +34,16 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
-my $ofswitch = new BVC::Openflow::OFSwitch(cfgfile => $configfile,
-                                           ctrl => $bvc);
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(cfgfile => $configfile,
+                                                    ctrl => $bvc);
 print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
 
 #-----------------------------------------------
 # create all sample flows
 #-----------------------------------------------
 
-$flow_entry = new BVC::Openflow::FlowEntry;
+$flow_entry = new Brocade::BSC::Openflow::FlowEntry;
 $flow_entry->id($flow_id++);
 $flow_entry->cookie(6001);
 $flow_entry->table_id($table_id);
@@ -52,10 +52,10 @@ $flow_entry->hard_timeout(12000);
 $flow_entry->priority(1000);
 
 $instruction = $flow_entry->add_instruction(0);
-$action = new BVC::Openflow::Action::Drop(order => 0);
+$action = new Brocade::BSC::Openflow::Action::Drop(order => 0);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->eth_type($ETH_TYPE_ARP);
 $match->eth_src('00:11:22:33:44:55');
 $match->eth_dst('aa:bb:cc:dd:ee:ff');
@@ -65,7 +65,7 @@ push @flow_entries, $flow_entry;
 
 #-----------------------------------------------
 
-$flow_entry = new BVC::Openflow::FlowEntry;
+$flow_entry = new Brocade::BSC::Openflow::FlowEntry;
 $flow_entry->id($flow_id++);
 $flow_entry->cookie(7001);
 $flow_entry->table_id($table_id);
@@ -74,12 +74,12 @@ $flow_entry->hard_timeout(2400);
 $flow_entry->priority(2000);
 
 $instruction = $flow_entry->add_instruction(0);
-$action = new BVC::Openflow::Action::Output(order   => 0,
-                                            port    => 'CONTROLLER',
-                                            max_len => 60);
+$action = new Brocade::BSC::Openflow::Action::Output(order   => 0,
+                                                     port    => 'CONTROLLER',
+                                                     max_len => 60);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->eth_type($ETH_TYPE_IPv4);
 $match->ipv4_src('1.2.3.4/32');
 $match->ipv4_dst('192.168.1.11/32');
@@ -89,7 +89,7 @@ push @flow_entries, $flow_entry;
 
 #-----------------------------------------------
 
-$flow_entry = new BVC::Openflow::FlowEntry;
+$flow_entry = new Brocade::BSC::Openflow::FlowEntry;
 $flow_entry->id($flow_id++);
 $flow_entry->cookie(800);
 $flow_entry->table_id($table_id);
@@ -98,14 +98,14 @@ $flow_entry->hard_timeout(1800);
 $flow_entry->priority(3000);
 
 $instruction = $flow_entry->add_instruction(0);
-$action = new BVC::Openflow::Action::Output(order => 0, port => 5);
+$action = new Brocade::BSC::Openflow::Action::Output(order => 0, port => 5);
 $instruction->apply_actions($action);
-$action = new BVC::Openflow::Action::Output(order => 1, port => 6);
+$action = new Brocade::BSC::Openflow::Action::Output(order => 1, port => 6);
 $instruction->apply_actions($action);
-$action = new BVC::Openflow::Action::Output(order => 2, port => 7);
+$action = new Brocade::BSC::Openflow::Action::Output(order => 2, port => 7);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->in_port(1);
 $flow_entry->add_match($match);
 
@@ -113,7 +113,7 @@ push @flow_entries, $flow_entry;
 
 #-----------------------------------------------
 
-$flow_entry = new BVC::Openflow::FlowEntry;
+$flow_entry = new Brocade::BSC::Openflow::FlowEntry;
 $flow_entry->id($flow_id++);
 $flow_entry->cookie(1234);
 $flow_entry->table_id($table_id);
@@ -122,26 +122,26 @@ $flow_entry->hard_timeout(0);
 $flow_entry->priority(4000);
 
 $instruction = $flow_entry->add_instruction(0);
-$action = new BVC::Openflow::Action::PushVlanHeader(order => 0);
+$action = new Brocade::BSC::Openflow::Action::PushVlanHeader(order => 0);
 $action->eth_type($ETH_TYPE_QINQ);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::SetField(order => 1);
+$action = new Brocade::BSC::Openflow::Action::SetField(order => 1);
 $action->vlan_id(100);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::PushVlanHeader(order => 2);
+$action = new Brocade::BSC::Openflow::Action::PushVlanHeader(order => 2);
 $action->eth_type($ETH_TYPE_DOT1Q);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::SetField(order => 3);
+$action = new Brocade::BSC::Openflow::Action::SetField(order => 3);
 $action->vlan_id(998);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::Output(order => 4, port => 111);
+$action = new Brocade::BSC::Openflow::Action::Output(order => 4, port => 111);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->eth_type($ETH_TYPE_ARP);
 $match->vlan_id(998);
 $match->in_port(110);
@@ -151,7 +151,7 @@ push @flow_entries, $flow_entry;
 
 #-----------------------------------------------
 
-$flow_entry = new BVC::Openflow::FlowEntry;
+$flow_entry = new Brocade::BSC::Openflow::FlowEntry;
 $flow_entry->id($flow_id++);
 $flow_entry->cookie(1235);
 $flow_entry->table_id($table_id);
@@ -160,26 +160,26 @@ $flow_entry->hard_timeout(0);
 $flow_entry->priority(4000);
 
 $instruction = $flow_entry->add_instruction(0);
-$action = new BVC::Openflow::Action::PushVlanHeader(order => 0);
+$action = new Brocade::BSC::Openflow::Action::PushVlanHeader(order => 0);
 $action->eth_type($ETH_TYPE_QINQ);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::SetField(order => 1);
+$action = new Brocade::BSC::Openflow::Action::SetField(order => 1);
 $action->vlan_id(100);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::PushVlanHeader(order => 2);
+$action = new Brocade::BSC::Openflow::Action::PushVlanHeader(order => 2);
 $action->eth_type($ETH_TYPE_DOT1Q);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::SetField(order => 3);
+$action = new Brocade::BSC::Openflow::Action::SetField(order => 3);
 $action->vlan_id(998);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::Output(order => 4, port => 111);
+$action = new Brocade::BSC::Openflow::Action::Output(order => 4, port => 111);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->eth_type($ETH_TYPE_IPv4);
 $match->vlan_id(998);
 $match->in_port(110);
@@ -189,7 +189,7 @@ push @flow_entries, $flow_entry;
 
 #-----------------------------------------------
 
-$flow_entry = new BVC::Openflow::FlowEntry;
+$flow_entry = new Brocade::BSC::Openflow::FlowEntry;
 $flow_entry->id($flow_id++);
 $flow_entry->cookie(1236);
 $flow_entry->table_id($table_id);
@@ -198,12 +198,12 @@ $flow_entry->hard_timeout(0);
 $flow_entry->priority(4000);
 
 $instruction = $flow_entry->add_instruction(0);
-$action = new BVC::Openflow::Action::PopVlanHeader(order => 0);
+$action = new Brocade::BSC::Openflow::Action::PopVlanHeader(order => 0);
 $instruction->apply_actions($action);
-$action = new BVC::Openflow::Action::Output(order => 1, port => 110);
+$action = new Brocade::BSC::Openflow::Action::Output(order => 1, port => 110);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->eth_type($ETH_TYPE_ARP);
 $match->vlan_id(100);
 $match->in_port(111);
@@ -213,7 +213,7 @@ push @flow_entries, $flow_entry;
 
 #-----------------------------------------------
 
-$flow_entry = new BVC::Openflow::FlowEntry;
+$flow_entry = new Brocade::BSC::Openflow::FlowEntry;
 $flow_entry->id($flow_id++);
 $flow_entry->cookie(1237);
 $flow_entry->table_id($table_id);
@@ -222,12 +222,12 @@ $flow_entry->hard_timeout(0);
 $flow_entry->priority(4000);
 
 $instruction = $flow_entry->add_instruction(0);
-$action = new BVC::Openflow::Action::PopVlanHeader(order => 0);
+$action = new Brocade::BSC::Openflow::Action::PopVlanHeader(order => 0);
 $instruction->apply_actions($action);
-$action = new BVC::Openflow::Action::Output(order => 1, port => 110);
+$action = new Brocade::BSC::Openflow::Action::Output(order => 1, port => 110);
 $instruction->apply_actions($action);
 
-$match = new BVC::Openflow::Match;
+$match = new Brocade::BSC::Openflow::Match;
 $match->eth_type($ETH_TYPE_IPv4);
 $match->vlan_id(100);
 $match->in_port(111);

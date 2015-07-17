@@ -1,4 +1,4 @@
-=head1 BVC::Openflow::Action::Drop
+=head1 Brocade::BSC::Openflow::Action::Drop
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -34,8 +34,8 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-package BVC::Openflow::Action::Drop;
-use parent qw(BVC::Openflow::Action);
+package Brocade::BSC::Openflow::Action::Drop;
+use parent qw(Brocade::BSC::Openflow::Action);
 
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ use warnings;
 
 # Constructor ==========================================================
 # Parameters: none
-# Returns   : BVC::Openflow::Action::Drop object
+# Returns   : Brocade::BSC::Openflow::Action::Drop object
 # 
 sub new {
     my $class = shift;

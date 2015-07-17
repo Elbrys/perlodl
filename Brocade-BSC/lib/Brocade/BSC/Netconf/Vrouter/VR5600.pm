@@ -1,4 +1,4 @@
-=head1 BVC::Netconf::Vrouter::VR5600
+=head1 Brocade::BSC::Netconf::Vrouter::VR5600
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -98,7 +98,7 @@ sub get_url_extension {
 # Method ===============================================================
 #             get_payload:
 # Parameters: none
-# Returns   : self as JSON formatted for BVC REST call
+# Returns   : self as JSON formatted for BSC REST call
 #
 sub get_payload {
     my $self = shift;
@@ -117,18 +117,18 @@ sub get_payload {
 
 
 # Package ==============================================================
-# BVC::Netconf::Vrouter::5600
-#    model and interact with Vyatta Virtual Router 5600 via BVC
+# Brocade::BSC::Netconf::Vrouter::5600
+#    model and interact with Vyatta Virtual Router 5600 via BSC
 #
 # ======================================================================
 
-package BVC::Netconf::Vrouter::VR5600;
+package Brocade::BSC::Netconf::Vrouter::VR5600;
 
-use base qw(BVC::NetconfNode);
+use base qw(Brocade::BSC::NetconfNode);
 use HTTP::Status qw(:constants :is status_message);
 use JSON -convert_blessed_universally;
-use BVC::Controller;
-use BVC::Status qw(:constants);
+use Brocade::BSC;
+use Brocade::BSC::Status qw(:constants);
 
 # Method ===============================================================
 # 
@@ -160,7 +160,7 @@ sub get_schema {
 #
 sub get_cfg {
     my $self = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $config = undef;
 
     my $url = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
@@ -182,7 +182,7 @@ sub get_cfg {
 #
 sub get_firewalls_cfg {
     my $self = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $config = undef;
 
     my $url = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
@@ -206,7 +206,7 @@ sub get_firewalls_cfg {
 sub get_firewall_instance_cfg {
     my $self = shift;
     my $instance = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $config = undef;
 
     my $url = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
@@ -231,7 +231,7 @@ sub get_firewall_instance_cfg {
 sub create_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
-    my $status = new BVC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BVC_OK);
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
     my %headers = ('content-type'=>'application/yang.data+json');
@@ -269,7 +269,7 @@ sub update_firewall_instance_rule {
 sub delete_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
         . $fwInstance->get_url_extension()
@@ -297,7 +297,7 @@ sub delete_firewall_instance {
 #
 sub set_dataplane_interface_firewall {
     my ($self, %params) = @_;
-    my $status = new BVC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BVC_OK);
 
     my %headers = ('content-type' => 'application/yang.data+json');
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
@@ -324,7 +324,7 @@ sub set_dataplane_interface_firewall {
 sub delete_dataplane_interface_firewall {
     my ($self, $ifName) = @_;
 
-    my $status = new BVC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BVC_OK);
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
         . "vyatta-interfaces:interfaces/vyatta-interfaces-dataplane:dataplane"
@@ -341,7 +341,7 @@ sub delete_dataplane_interface_firewall {
 #
 sub get_interfaces_list {
     my $self = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $ifcfg = undef;
     my @iflist = ();
 
@@ -362,7 +362,7 @@ sub get_interfaces_list {
 #
 sub get_interfaces_cfg {
     my $self = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $config = undef;
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
@@ -386,7 +386,7 @@ sub get_interfaces_cfg {
 #
 sub get_dataplane_interfaces_list {
     my $self = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $dpifcfg = undef;
     my $iflist = undef;
     my @dpiflist;
@@ -433,7 +433,7 @@ sub get_dataplane_interfaces_cfg {
 sub get_dataplane_interface_cfg {
     my $self = shift;
     my $ifname = shift;
-    my $status = new BVC::Status;
+    my $status = new Brocade::BSC::Status;
     my $cfg = undef;
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
@@ -500,7 +500,7 @@ sub get_loopback_interfaces_cfg {
 sub get_loopback_interface_cfg {
     my $self = shift;
     my $ifName = shift;
-    my $status = new BVC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BVC_OK);
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
         . "vyatta-interfaces:interfaces/vyatta-interfaces-loopback:loopback/"

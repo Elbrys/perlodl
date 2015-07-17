@@ -4,14 +4,14 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use BVC::Controller;
-use BVC::Const qw(/ETH_TYPE/);
-use BVC::Openflow::OFSwitch;
-use BVC::Openflow::FlowEntry;
-use BVC::Openflow::Match;
-use BVC::Openflow::Action::Output;
-use BVC::Openflow::Action::SetField;
-use BVC::Openflow::Action::PushVlanHeader;
+use Brocade::BSC;
+use Brocade::BSC::Const qw(/ETH_TYPE/);
+use Brocade::BSC::Openflow::OFSwitch;
+use Brocade::BSC::Openflow::FlowEntry;
+use Brocade::BSC::Openflow::Match;
+use Brocade::BSC::Openflow::Action::Output;
+use Brocade::BSC::Openflow::Action::SetField;
+use Brocade::BSC::Openflow::Action::PushVlanHeader;
 
 my $configfile = "";
 my $status   = undef;
@@ -40,9 +40,9 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new BVC::Controller(cfgfile => $configfile);
-my $ofswitch = new BVC::Openflow::OFSwitch(cfgfile => $configfile,
-                                           ctrl => $bvc);
+my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(cfgfile => $configfile,
+                                                    ctrl => $bvc);
 print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
 
 print  "<<< Set OpenFlow flow on the Controller\n";
@@ -54,7 +54,7 @@ printf "        Action: 'Push VLAN'         (Eth Type 0x%04x)\n", $push_eth_type
 print  "                'Set Field'         (VLAN ID  $push_vlan_id)\n";
 print  "                'Output' (to Physical Port Number $output_port)\n\n";
 
-my $flowentry = new BVC::Openflow::FlowEntry;
+my $flowentry = new Brocade::BSC::Openflow::FlowEntry;
 $flowentry->flow_name("push_vlan_flow");
 $flowentry->table_id($table_id);
 $flowentry->id($flow_id);
@@ -68,21 +68,21 @@ $flowentry->idle_timeout($idle_timeout);
 # #     Action:      'Output' NORMAL
 my $instruction = $flowentry->add_instruction(0);
 
-my $action = new BVC::Openflow::Action::PushVlanHeader(order => 0);
+my $action = new Brocade::BSC::Openflow::Action::PushVlanHeader(order => 0);
 $action->eth_type($push_eth_type);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::SetField(order => 1);
+$action = new Brocade::BSC::Openflow::Action::SetField(order => 1);
 $action->vlan_id($push_vlan_id);
 $instruction->apply_actions($action);
 
-$action = new BVC::Openflow::Action::Output(order => 2,
-                                            port => $output_port);
+$action = new Brocade::BSC::Openflow::Action::Output(order => 2,
+                                                     port => $output_port);
 $instruction->apply_actions($action);
 
 # # --- Match Fields
 
-my $match = new BVC::Openflow::Match();
+my $match = new Brocade::BSC::Openflow::Match();
 $match->eth_type($ethtype);
 $match->eth_src($eth_src);
 $match->eth_dst($eth_dst);
