@@ -56,7 +56,7 @@ sub new {
     $self->{push_vlan_action}->{vlan_id}       = $params{vid};
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{push_vlan_action}->{$key} = $value;
         }

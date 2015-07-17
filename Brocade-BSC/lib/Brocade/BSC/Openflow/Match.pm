@@ -55,7 +55,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{$key} = $value;
         }
@@ -99,7 +99,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'vlan_id') {
                 assert (ref $value eq "HASH");
@@ -146,7 +146,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{$key} = $value;
         }
@@ -181,7 +181,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{$key} = $value;
         }
@@ -217,7 +217,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{$key} = $value;
         }
@@ -256,7 +256,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{$key} = $value;
         }
@@ -291,7 +291,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{$key} = $value;
         }
@@ -326,7 +326,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{$key} = $value;
         }
@@ -363,7 +363,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{$key} = $value;
         }
@@ -402,7 +402,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{$key} = $value;
         }
@@ -467,7 +467,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'ethernet_match') {
                 $self->{$key} = new EthernetMatch(href => $value);
@@ -760,7 +760,7 @@ sub icmpv6_type {
     my $match_exists = defined $self->{icmpv6_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv4_match} = new IcmpV6Match;
+        $match_exists or $self->{icmpv6_match} = new IcmpV6Match;
         $self->{icmpv6_match}->type($icmpv6_type);
     }
     $match_exists and $value = $self->{icmpv6_match}->type();
@@ -772,7 +772,7 @@ sub icmpv6_code {
     my $match_exists = defined $self->{icmpv6_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv4_match} = new IcmpV6Match;
+        $match_exists or $self->{icmpv6_match} = new IcmpV6Match;
         $self->{icmpv6_match}->code($icmpv6_code);
     }
     $match_exists and $value = $self->{icmpv6_match}->code();

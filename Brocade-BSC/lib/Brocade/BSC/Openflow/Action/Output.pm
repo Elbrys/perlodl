@@ -55,7 +55,7 @@ sub new {
     $self->{output_action}->{'max_length'} = $params{max_len};
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{output_action}->{"$key"} = $value;
         }

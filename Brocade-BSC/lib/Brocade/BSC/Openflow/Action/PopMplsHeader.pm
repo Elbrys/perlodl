@@ -52,7 +52,7 @@ sub new {
     $self->{pop_mpls_action}->{'ethernet-type'} = $params{eth_type};
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             $self->{pop_mpls_action}->{$key} = $value;
         }

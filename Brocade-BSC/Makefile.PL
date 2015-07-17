@@ -20,6 +20,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp'         => 1.36,
         'Carp::Assert' => 0.21,
+        'Data::Walk'   => 1.00,
         'JSON'         => 2.90,
         'Readonly'     => 2.00,
         'XML::Parser'  => 2.44,

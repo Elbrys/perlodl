@@ -53,7 +53,7 @@ sub new {
     $self->{set_field}->{'protocol_match_fields'} = undef;
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'protocol_match_fields') {
                 $self->{set_field}->{$key} = new ProtocolMatchFields(href => $value);

@@ -70,7 +70,7 @@ sub new {
 sub add_in_item {
     my ($self, $item) = @_;
 
-    push $self->{firewall}->{inlist}, $item;
+    push @{$self->{firewall}->{inlist}}, $item;
 }
 # Method ===============================================================
 #             add_out_item : append firewall rule to outbound rules list
@@ -79,7 +79,8 @@ sub add_in_item {
 #
 sub add_out_item {
     my ($self, $item) = @_;
-    push $self->{firewall}->{outlist}, $item;
+
+    push @{$self->{firewall}->{outlist}}, $item;
 }
 
 # Method ===============================================================

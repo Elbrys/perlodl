@@ -112,7 +112,7 @@ sub apply_actions {
     if (not exists ($self->{apply_actions}->{action})) {
         $self->{apply_actions}->{action} = [];
     }
-    $action_ref and push $self->{apply_actions}->{action}, $action_ref;
+    $action_ref and push @{$self->{apply_actions}->{action}}, $action_ref;
     return $self->{apply_actions};
 }
 
@@ -132,7 +132,7 @@ sub new {
     };
     bless ($self, $class);
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             if ($key eq 'instruction') {
                 $self->instruction(new Instruction(aref => $value))
             }
@@ -151,7 +151,7 @@ sub instruction {
     my ($self, $instruction) = @_;
 
     defined $self->{instruction} or $self->instruction = new Instruction;
-    (2 == @_) and push $self->{instruction}, $instruction;
+    (2 == @_) and push @{$self->{instruction}}, $instruction;
     return $self->{instruction};
 }
 
@@ -193,7 +193,7 @@ sub new {
     #     die "foobar\n";
     # }
     if ($params{href}) {
-        while (my ($key, $value) = each $params{href}) {
+        while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'match') {
                 $self->add_match(new Brocade::BSC::Openflow::Match(href => $value));
@@ -357,7 +357,7 @@ sub add_instruction {
     if (not exists ($self->{instructions}->{instruction})) {
         $self->{instructions}->{instruction} = [];
     }
-    push $self->{instructions}->{instruction}, $instruction;
+    push @{$self->{instructions}->{instruction}}, $instruction;
     return $instruction;
 }
 

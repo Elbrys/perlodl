@@ -147,7 +147,7 @@ sub add_group {
     my $name = shift;
 
     my $group = new FirewallGroup($name);
-    push $self->{name}, $group;
+    push @{$self->{name}}, $group;
 }
 
 # Method ===============================================================
@@ -180,7 +180,7 @@ sub add_rule {
 
     my $rule = new FirewallRule($rule_id, @_);
     my $group = $self->get_group($group_name);
-    push $group->{rule}, $rule;
+    push @{$group->{rule}}, $rule;
 }
 
 # Method ===============================================================
