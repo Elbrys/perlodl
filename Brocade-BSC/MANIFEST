@@ -2,7 +2,6 @@ Changes
 ignore.txt
 lib/Brocade/BSC.pm
 lib/Brocade/BSC/Const.pm
-lib/Brocade/BSC/Controller.pm
 lib/Brocade/BSC/Netconf/Vrouter/Firewall.pm
 lib/Brocade/BSC/Netconf/Vrouter/VR5600.pm
 lib/Brocade/BSC/NetconfNode.pm
@@ -51,6 +50,6 @@ t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-t/standalone/Controller.t
+t/standalone/BSC.t
 t/standalone/VR5600.t
 xt/boilerplate.t

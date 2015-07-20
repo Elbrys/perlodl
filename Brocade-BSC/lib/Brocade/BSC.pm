@@ -1,6 +1,6 @@
 =head1 Brocade::BSC
 
-Configure and query the Brocade SDN Controller.
+Brocade::BSC - Configure and query the Brocade SDN Controller.
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -35,6 +35,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
+
+use version; our $VERSION = qv("v0.1.0");
 
 use strict;
 use warnings;
