@@ -17,7 +17,7 @@ use warnings;
 #
 #
 # ======================================================================
-package DataplaneInterfaceFirewall;
+package Brocade::BSC::Netconf::Vrouter::VR5600::DataplaneInterfaceFirewall;
 
 # Constructor ==========================================================
 # Parameters: interface name
@@ -313,7 +313,7 @@ sub set_dataplane_interface_firewall {
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
 
     $params{ifName} or die "missing req'd parameter \$ifName";
-    my $fw = new DataplaneInterfaceFirewall($params{ifName});
+    my $fw = new Brocade::BSC::Netconf::Vrouter::VR5600::DataplaneInterfaceFirewall($params{ifName});
 
     $params{inFw}  and $fw->add_in_item($params{inFw});
     $params{outFw} and $fw->add_out_item($params{outFw});

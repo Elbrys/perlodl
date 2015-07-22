@@ -16,7 +16,7 @@ use warnings;
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package EthernetMatch;
+package Brocade::BSC::Openflow::Match::Ethernet;
 
 # Constructor ==========================================================
 sub new {
@@ -59,7 +59,7 @@ sub dst {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package VlanMatch;
+package Brocade::BSC::Openflow::Match::Vlan;
 
 use Carp::Assert;
 
@@ -108,7 +108,7 @@ sub pcp {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package IcmpMatch;
+package Brocade::BSC::Openflow::Match::Icmp;
 
 # Constructor ==========================================================
 sub new {
@@ -143,7 +143,7 @@ sub code {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package IcmpV6Match;
+package Brocade::BSC::Openflow::Match::IcmpV6;
 
 # Constructor ==========================================================
 sub new {
@@ -178,7 +178,7 @@ sub code {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package IpMatch;
+package Brocade::BSC::Openflow::Match::Ip;
 
 # Constructor ==========================================================
 sub new {
@@ -218,7 +218,7 @@ sub proto {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package IPv6LabelMatch;
+package Brocade::BSC::Openflow::Match::IPv6Label;
 
 # Constructor ==========================================================
 sub new {
@@ -253,7 +253,7 @@ sub flabel_mask {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package IPv6ExtHdrMatch;
+package Brocade::BSC::Openflow::Match::IPv6ExtHdr;
 
 # Constructor ==========================================================
 sub new {
@@ -288,7 +288,7 @@ sub exthdr_mask {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package Pbb;
+package Brocade::BSC::Openflow::Match::Pbb;
 
 # Constructor ==========================================================
 sub new {
@@ -323,7 +323,7 @@ sub mask {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package ProtocolMatchFields;
+package Brocade::BSC::Openflow::Match::ProtocolMatchFields;
 
 # Constructor ==========================================================
 sub new {
@@ -364,7 +364,7 @@ sub mpls_bos {
 #---------------------------------------------------------------------------
 #
 #---------------------------------------------------------------------------
-package Metadata;
+package Brocade::BSC::Openflow::Match::Metadata;
 
 # Constructor ==========================================================
 sub new {
@@ -459,22 +459,22 @@ sub new {
         while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'ethernet_match') {
-                $self->{$key} = new EthernetMatch(href => $value);
+                $self->{$key} = new Brocade::BSC::Openflow::Match::Ethernet(href => $value);
             }
             elsif ($key eq 'ip_match') {
-                $self->{$key} = new IpMatch(href => $value);
+                $self->{$key} = new Brocade::BSC::Openflow::Match::Ip(href => $value);
             }
             elsif ($key eq 'protocol_match_fields') {
-                $self->{$key} = new ProtocolMatchFields(href => $value);
+                $self->{$key} = new Brocade::BSC::Openflow::Match::ProtocolMatchFields(href => $value);
             }
             elsif ($key eq 'icmpv4_match') {
-                $self->{$key} = new IcmpMatch(href => $value);
+                $self->{$key} = new Brocade::BSC::Openflow::Match::Icmp(href => $value);
             }
             elsif ($key eq 'icmpv6_match') {
-                $self->{$key} = new IcmpV6Match(href => $value);
+                $self->{$key} = new Brocade::BSC::Openflow::Match::IcmpV6(href => $value);
             }
             elsif ($key eq 'vlan_match') {
-                $self->{$key} = new VlanMatch(href => $value);
+                $self->{$key} = new Brocade::BSC::Openflow::Match::Vlan(href => $value);
             }
             else {
                 $self->{$key} = $value;
@@ -559,7 +559,7 @@ sub eth_type {
     my $match_exists = defined $self->{ethernet_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{ethernet_match} = new EthernetMatch;
+        $match_exists or $self->{ethernet_match} = new Brocade::BSC::Openflow::Match::Ethernet;
         $self->{ethernet_match}->type($eth_type);
     }
     $match_exists and $value = $self->{ethernet_match}->type();
@@ -576,7 +576,7 @@ sub eth_src {
     my $match_exists = defined $self->{ethernet_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{ethernet_match} = new EthernetMatch;
+        $match_exists or $self->{ethernet_match} = new Brocade::BSC::Openflow::Match::Ethernet;
         $self->{ethernet_match}->src($eth_src);
     }
     $match_exists and $value = $self->{ethernet_match}->src();
@@ -593,7 +593,7 @@ sub eth_dst {
     my $match_exists = defined $self->{ethernet_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{ethernet_match} = new EthernetMatch;
+        $match_exists or $self->{ethernet_match} = new Brocade::BSC::Openflow::Match::Ethernet;
         $self->{ethernet_match}->dst($eth_dst);
     }
     $match_exists and $value = $self->{ethernet_match}->dst();
@@ -610,7 +610,7 @@ sub vlan_id {
     my $match_exists = defined $self->{vlan_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{vlan_match} = new VlanMatch;
+        $match_exists or $self->{vlan_match} = new Brocade::BSC::Openflow::Match::Vlan;
         $self->{vlan_match}->vid($vid);
     }
     $match_exists and $value = $self->{vlan_match}->vid();
@@ -627,7 +627,7 @@ sub vlan_pcp {
     my $match_exists = defined $self->{vlan_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{vlan_match} = new VlanMatch;
+        $match_exists or $self->{vlan_match} = new Brocade::BSC::Openflow::Match::Vlan;
         $self->{vlan_match}->pcp($pcp);
     }
     $match_exists and $value = $self->{vlan_match}->pcp();
@@ -682,7 +682,7 @@ sub ipv6_flabel {
     my $match_exists = defined $self->{ipv6_label};
 
     if (@_ == 2) {
-        $match_exists or $self->{ipv6_label} = new IPv6LabelMatch;
+        $match_exists or $self->{ipv6_label} = new Brocade::BSC::Openflow::Match::IPv6Label;
         $self->{ipv6_label}->flabel($ipv6_label);
     }
     $match_exists and $value = $self->{ipv6_label}->flabel();
@@ -699,7 +699,7 @@ sub ipv6_ext_header {
     my $match_exists = defined $self->{ipv6_ext_header};
 
     if (@_ == 2) {
-        $match_exists or $self->{ipv6_ext_header} = new IPv6ExtHdrMatch;
+        $match_exists or $self->{ipv6_ext_header} = new Brocade::BSC::Openflow::Match::IPv6ExtHdr;
         $self->{ipv6_ext_header}->exthdr($ipv6_ext_header);
     }
     $match_exists and $value = $self->{ipv6_ext_header}->exthdr();
@@ -716,7 +716,7 @@ sub ip_dscp {
     my $match_exists = defined $self->{ip_match};
 
     if (@_== 2) {
-        $match_exists or $self->{ip_match} = new IpMatch;
+        $match_exists or $self->{ip_match} = new Brocade::BSC::Openflow::Match::Ip;
         $self->{ip_match}->dscp($dscp);
     }
     $match_exists and $value = $self->{ip_match}->dscp();
@@ -733,7 +733,7 @@ sub ip_ecn {
     my $match_exists = defined $self->{ip_match};
 
     if (@_== 2) {
-        $match_exists or $self->{ip_match} = new IpMatch;
+        $match_exists or $self->{ip_match} = new Brocade::BSC::Openflow::Match::Ip;
         $self->{ip_match}->ecn($ecn);
     }
     $match_exists and $value = $self->{ip_match}->ecn();
@@ -750,7 +750,7 @@ sub ip_proto {
     my $match_exists = defined $self->{ip_match};
 
     if (@_== 2) {
-        $match_exists or $self->{ip_match} = new IpMatch;
+        $match_exists or $self->{ip_match} = new Brocade::BSC::Openflow::Match::Ip;
         $self->{ip_match}->proto($proto);
     }
     $match_exists and $value = $self->{ip_match}->proto();
@@ -830,7 +830,7 @@ sub icmpv4_type {
     my $match_exists = defined $self->{icmpv4_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv4_match} = new IcmpMatch;
+        $match_exists or $self->{icmpv4_match} = new Brocade::BSC::Openflow::Match::Icmp;
         $self->{icmpv4_match}->type($icmpv4_type);
     }
     $match_exists and $value = $self->{icmpv4_match}->type();
@@ -847,7 +847,7 @@ sub icmpv4_code {
     my $match_exists = defined $self->{icmpv4_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv4_match} = new IcmpMatch;
+        $match_exists or $self->{icmpv4_match} = new Brocade::BSC::Openflow::Match::Icmp;
         $self->{icmpv4_match}->code($icmpv4_code);
     }
     $match_exists and $value = $self->{icmpv4_match}->code();
@@ -864,7 +864,7 @@ sub icmpv6_type {
     my $match_exists = defined $self->{icmpv6_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv6_match} = new IcmpV6Match;
+        $match_exists or $self->{icmpv6_match} = new Brocade::BSC::Openflow::Match::IcmpV6;
         $self->{icmpv6_match}->type($icmpv6_type);
     }
     $match_exists and $value = $self->{icmpv6_match}->type();
@@ -881,7 +881,7 @@ sub icmpv6_code {
     my $match_exists = defined $self->{icmpv6_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv6_match} = new IcmpV6Match;
+        $match_exists or $self->{icmpv6_match} = new Brocade::BSC::Openflow::Match::IcmpV6;
         $self->{icmpv6_match}->code($icmpv6_code);
     }
     $match_exists and $value = $self->{icmpv6_match}->code();
@@ -978,7 +978,7 @@ sub mpls_label {
 
     if (@_ == 2) {
         $match_exists or
-            $self->{protocol_match_fields} = new ProtocolMatchFields;
+            $self->{protocol_match_fields} = new Brocade::BSC::Openflow::Match::ProtocolMatchFields;
         $self->{protocol_match_fields}->mpls_label($mpls_label);
     }
     $match_exists and $value = $self->{protocol_match_fields}->mpls_label();
@@ -996,7 +996,7 @@ sub mpls_tc {
 
     if (@_ == 2) {
         $match_exists or
-            $self->{protocol_match_fields} = new ProtocolMatchFields;
+            $self->{protocol_match_fields} = new Brocade::BSC::Openflow::Match::ProtocolMatchFields;
         $self->{protocol_match_fields}->mpls_tc($mpls_tc);
     }
     $match_exists and $value = $self->{protocol_match_fields}->mpls_tc();
@@ -1014,7 +1014,7 @@ sub mpls_bos {
 
     if (@_ == 2) {
         $match_exists or
-            $self->{protocol_match_fields} = new ProtocolMatchFields;
+            $self->{protocol_match_fields} = new Brocade::BSC::Openflow::Match::ProtocolMatchFields;
         $self->{protocol_match_fields}->mpls_bos($mpls_bos);
     }
     $match_exists and $value = $self->{protocol_match_fields}->mpls_bos();
@@ -1044,7 +1044,7 @@ sub metadata {
     my $match_exists = defined $self->{metadata};
 
     if (@_ == 2) {
-        $match_exists or $self->{metadata} = new Metadata;
+        $match_exists or $self->{metadata} = new Brocade::BSC::Openflow::Match::Metadata;
         $self->{metadata}->metadata($metadata);
     }
     $match_exists and $self->{metadata}->metadata();
@@ -1061,7 +1061,7 @@ sub metadata_mask {
     my $match_exists = defined $self->{metadata};
 
     if (@_ == 2) {
-        $match_exists or $self->{metadata} = new Metadata;
+        $match_exists or $self->{metadata} = new Brocade::BSC::Openflow::Match::Metadata;
         $self->{metadata}->metadata_mask($mask);
     }
     $match_exists and $self->{metadata}->metadata_mask();

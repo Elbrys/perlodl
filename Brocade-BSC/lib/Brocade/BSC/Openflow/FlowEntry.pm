@@ -24,7 +24,7 @@ use JSON -convert_blessed_universally;
 #    simplify serializing Brocade::BSC::Openflow::FlowEntry
 #
 # ======================================================================
-package Instruction;
+package Brocade::BSC::Openflow::FlowEntry::Instruction;
 
 use Carp::Assert;
 
@@ -96,7 +96,7 @@ sub apply_actions {
 #    simplify serializing Brocade::BSC::Openflow::FlowEntry
 #
 # ======================================================================
-package Instructions;
+package Brocade::BSC::Openflow::FlowEntry::Instructions;
 
 sub new {
     my ($class, %params) = @_;
@@ -108,7 +108,7 @@ sub new {
     if ($params{href}) {
         while (my ($key, $value) = each %{$params{href}}) {
             if ($key eq 'instruction') {
-                $self->instruction(new Instruction(aref => $value))
+                $self->instruction(new Brocade::BSC::Openflow::FlowEntry::Instruction(aref => $value))
             }
         }
     }
@@ -124,7 +124,7 @@ sub new {
 sub instruction {
     my ($self, $instruction) = @_;
 
-    defined $self->{instruction} or $self->instruction = new Instruction;
+    defined $self->{instruction} or $self->instruction = new Brocade::BSC::Openflow::FlowEntry::Instruction;
     (2 == @_) and push @{$self->{instruction}}, $instruction;
     return $self->{instruction};
 }
@@ -189,7 +189,7 @@ sub new {
         match => {},
         instructions => undef
     };
-    $self->{instructions} = new Instructions;
+    $self->{instructions} = new Brocade::BSC::Openflow::FlowEntry::Instructions;
     bless ($self, $class);
     # if ($params{json}) {
     #     die "foobar\n";
@@ -201,7 +201,7 @@ sub new {
                 $self->add_match(new Brocade::BSC::Openflow::Match(href => $value));
             }
             elsif ($key eq 'instructions') {
-                $self->{instructions} = new Instructions(href => $value);
+                $self->{instructions} = new Brocade::BSC::Openflow::FlowEntry::Instructions(href => $value);
             }
             else {
                 $self->{$key} = $value;
@@ -425,7 +425,7 @@ Add a new instruction to the FlowEntry.
 sub add_instruction {
     my ($self, $order) = @_;
 
-    my $instruction = new Instruction(order => $order);
+    my $instruction = new Brocade::BSC::Openflow::FlowEntry::Instruction(order => $order);
     if (not exists ($self->{instructions}->{instruction})) {
         $self->{instructions}->{instruction} = [];
     }

@@ -56,10 +56,10 @@ sub new {
         while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'protocol_match_fields') {
-                $self->{set_field}->{$key} = new ProtocolMatchFields(href => $value);
+                $self->{set_field}->{$key} = new Brocade::BSC::Openflow::Match::ProtocolMatchFields(href => $value);
             }
             elsif ($key eq 'vlan_match') {
-                $self->{set_field}->{$key} = new VlanMatch(href => $value);
+                $self->{set_field}->{$key} = new Brocade::BSC::Openflow::Match::Vlan(href => $value);
             }
         }
     }
@@ -91,7 +91,7 @@ sub vlan_id {
     my $match_exists = defined $self->{set_field}->{'vlan_match'};
 
     if (@_ == 2) {
-        $match_exists or $self->{set_field}->{'vlan_match'} = new VlanMatch;
+        $match_exists or $self->{set_field}->{'vlan_match'} = new Brocade::BSC::Openflow::Match::Vlan;
         $self->{set_field}->{'vlan_match'}->vid($vid);
     }
     $match_exists and $value = $self->{set_field}->{'vlan_match'}->vid();
@@ -101,7 +101,7 @@ sub mpls_label {
     my ($self, $mpls_label) = @_;
     my $value = undef;
     defined $self->{set_field}->{'protocol_match_fields'} or
-        $self->{set_field}->{'protocol_match_fields'} = new ProtocolMatchFields;
+        $self->{set_field}->{'protocol_match_fields'} = new Brocade::BSC::Openflow::Match::ProtocolMatchFields;
     (2 == @_) and
         $self->{set_field}->{'protocol_match_fields'}->mpls_label($mpls_label);
     return $self->{set_field}->{'protocol_match_fields'}->mpls_label();

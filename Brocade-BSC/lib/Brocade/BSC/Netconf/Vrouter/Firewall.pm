@@ -23,7 +23,7 @@ use JSON -convert_blessed_universally;
 #---------------------------------------------------------------------------
 # 
 #---------------------------------------------------------------------------
-package FirewallRule;
+package Brocade::BSC::Netconf::Vrouter::Firewall::Rule;
 
 sub new {
     my $class = shift;
@@ -62,7 +62,7 @@ sub get_name {
 #---------------------------------------------------------------------------
 # 
 #---------------------------------------------------------------------------
-package FirewallGroup;
+package Brocade::BSC::Netconf::Vrouter::Firewall::Group;
 
 sub new {
     my $class = shift;
@@ -134,7 +134,7 @@ sub add_group {
     my $self = shift;
     my $name = shift;
 
-    my $group = new FirewallGroup($name);
+    my $group = new Brocade::BSC::Netconf::Vrouter::Firewall::Group($name);
     push @{$self->{name}}, $group;
 }
 
@@ -170,7 +170,7 @@ sub add_rule {
     my $group_name = shift;
     my $rule_id    = shift;
 
-    my $rule = new FirewallRule($rule_id, @_);
+    my $rule = new Brocade::BSC::Netconf::Vrouter::Firewall::Rule($rule_id, @_);
     my $group = $self->get_group($group_name);
     push @{$group->{rule}}, $rule;
 }
