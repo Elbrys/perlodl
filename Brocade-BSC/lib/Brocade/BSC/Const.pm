@@ -1,4 +1,8 @@
-=head1 Brocade::BSC::Const
+=head1 NAME
+
+Brocade::BSC::Const
+
+=head1 SYNOPSIS
 
 Symbolic constants used in BSC packages for well-known numbers
   (network protocols/header fields).

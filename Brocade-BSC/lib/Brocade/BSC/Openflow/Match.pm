@@ -1,36 +1,10 @@
-=head1 Brocade::BSC::Openflow::Match
+=head1 NAME
 
-=head1 LICENCE AND COPYRIGHT
+Brocade::BSC::Openflow::Match
 
-Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+=head1 DESCRIPTION
 
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its
-contributors may be used to endorse or promote products derived from this
-software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-THE POSSIBILITY OF SUCH DAMAGE.
+Model Match field of FlowEntry.
 
 =cut
 
@@ -431,6 +405,21 @@ package Brocade::BSC::Openflow::Match;
 # Parameters: hash ref of values with which to instantiate Match (optional)
 # Returns   : Brocade::BSC::Openflow::Match object
 # 
+=head1 METHODS
+
+=cut
+
+# Constructor ==========================================================
+#
+=over 4
+
+=item B<new>
+
+Creates and returns a new Match object.  Use accessor functions to
+modify Match after creation, or provide hash of values to B<new()>
+to set values in constructor call.
+
+=cut ===================================================================
 sub new {
     my ($class, %params) = @_;
     my $self = {
@@ -536,7 +525,7 @@ sub as_oxm {
                  ['arp_src_transport_address' => 'arp_spa=%s'],
                  ['arp_tgt_transport_address' => 'arp_tpa=%s'],
                  ['arp_src_hw_address'        => 'arp_sha=%s'],
-                 ['arp_tgt_hw_address'        => 'arp_tha=%s'], # XXX gsf
+                 ['arp_tgt_hw_address'        => 'arp_tha=%s'],
                  ['mpls_label'      => 'mpls_label=%s'],
                  ['mpls_tc'         => 'mpls_tc=%s'],
                  ['mpls_bos'        => 'mpls_bos=%s'],
@@ -559,6 +548,11 @@ use strict 'refs';
 # Parameters: none for gets; value to set for sets
 # Returns   : Match value
 #
+=item B<eth_type>
+
+Set or retrieve the FlowEntry ethernet type match field.
+
+=cut
 sub eth_type {
     my ($self, $eth_type) = @_;
     my $value = undef;
@@ -571,6 +565,11 @@ sub eth_type {
     $match_exists and $value = $self->{ethernet_match}->type();
     return $value;
 }
+=item B<eth_src>
+
+Set or retrieve the FlowEntry ethernet source address match field.
+
+=cut
 sub eth_src {
     my ($self, $eth_src) = @_;
     my $value = undef;
@@ -583,6 +582,11 @@ sub eth_src {
     $match_exists and $value = $self->{ethernet_match}->src();
     return $value;
 }
+=item B<eth_dst>
+
+Set or retrieve the FlowEntry ethernet destination address match field.
+
+=cut
 sub eth_dst {
     my ($self, $eth_dst) = @_;
     my $value = undef;
@@ -595,6 +599,11 @@ sub eth_dst {
     $match_exists and $value = $self->{ethernet_match}->dst();
     return $value;
 }
+=item B<vlan_id>
+
+Set or retrieve the FlowEntry vlan ID match field.
+
+=cut
 sub vlan_id {
     my ($self, $vid) = @_;
     my $value = undef;
@@ -607,6 +616,11 @@ sub vlan_id {
     $match_exists and $value = $self->{vlan_match}->vid();
     return $value;
 }
+=item B<vlan_pcp>
+
+Set or retrieve the FlowEntry VLAN Priority Code Point match field.
+
+=cut
 sub vlan_pcp {
     my ($self, $pcp) = @_;
     my $value = undef;
@@ -619,24 +633,49 @@ sub vlan_pcp {
     $match_exists and $value = $self->{vlan_match}->pcp();
     return $value;
 }
+=item B<ipv4_src>
+
+Set or retrieve the FlowEntry IPv4 source address match field.
+
+=cut
 sub ipv4_src {
     my ($self, $ipv4_src) = @_;
     $self->{ipv4_source} = (@_ == 2) ? $ipv4_src : $self->{ipv4_source};
 }
+=item B<ipv4_dst>
+
+Set or retrieve the FlowEntry IPv4 destination address match field.
+
+=cut
 sub ipv4_dst {
     my ($self, $ipv4_dst) = @_;
     $self->{ipv4_destination}
         = (@_ == 2) ? $ipv4_dst : $self->{ipv4_destination};
 }
+=item B<ipv6_src>
+
+Set or retrieve the FlowEntry IPv6 source address match field.
+
+=cut
 sub ipv6_src {
     my ($self, $ipv6_src) = @_;
     $self->{ipv6_source} = (@_ == 2) ? $ipv6_src : $self->{ipv6_source};
 }
+=item B<ipv6_dst>
+
+Set or retrieve the FlowEntry IPv6 destination address match field.
+
+=cut
 sub ipv6_dst {
     my ($self, $ipv6_dst) = @_;
     $self->{ipv6_destination}
         = (@_ == 2) ? $ipv6_dst : $self->{ipv6_destination};
 }
+=item B<ipv6_flabel>
+
+Set or retrieve the FlowEntry IPv6 flow label.
+
+=cut
 sub ipv6_flabel {
     my ($self, $ipv6_label) = @_;
     my $value = undef;
@@ -649,6 +688,11 @@ sub ipv6_flabel {
     $match_exists and $value = $self->{ipv6_label}->flabel();
     return $value;
 }
+=item B<ipv6_ext_header>
+
+Set or retrieve the FlowEntry IPv6 extension header match field.
+
+=cut
 sub ipv6_ext_header {
     my ($self, $ipv6_ext_header) = @_;
     my $value = undef;
@@ -661,6 +705,11 @@ sub ipv6_ext_header {
     $match_exists and $value = $self->{ipv6_ext_header}->exthdr();
     return $value;
 }
+=item B<ip_dscp>
+
+Set or retrieve the FlowEntry IP Differentiated Services Code Point match field.
+
+=cut
 sub ip_dscp {
     my ($self, $dscp) = @_;
     my $value = undef;
@@ -673,6 +722,11 @@ sub ip_dscp {
     $match_exists and $value = $self->{ip_match}->dscp();
     return $value;
 }
+=item B<ip_ecn>
+
+Set or retrieve the FlowEntry Explicit Congestion Notification match field.
+
+=cut
 sub ip_ecn {
     my ($self, $ecn) = @_;
     my $value = undef;
@@ -685,6 +739,11 @@ sub ip_ecn {
     $match_exists and $value = $self->{ip_match}->ecn();
     return $value;
 }
+=item B<ip_proto>
+
+Set or retrieve the FlowEntry IP Protocol match field.
+
+=cut
 sub ip_proto {
     my ($self, $proto) = @_;
     my $value = undef;
@@ -700,36 +759,71 @@ sub ip_proto {
 sub ip_proto_version {
     die "XXX IpMatch";
 }
+=item B<udp_src_port>
+
+Set or retrieve the FlowEntry UDP source port match field.
+
+=cut
 sub udp_src_port {
     my ($self, $udp_src_port) = @_;
     $self->{udp_source_port}
         = (@_ == 2) ? $udp_src_port : $self->{udp_source_port};
 }
+=item B<udp_dst_port>
+
+Set or retrieve the FlowEntry UDP destination port match field.
+
+=cut
 sub udp_dst_port {
     my ($self, $udp_dst_port) = @_;
     $self->{udp_destination_port}
         = (@_ == 2) ? $udp_dst_port : $self->{udp_destination_port};
 }
+=item B<tcp_src_port>
+
+Set or retrieve the FlowEntry TCP source port match field.
+
+=cut
 sub tcp_src_port {
     my ($self, $tcp_src_port) = @_;
     $self->{tcp_source_port}
         = (@_ == 2) ? $tcp_src_port : $self->{tcp_source_port};
 }
+=item B<tcp_dst_port>
+
+Set or retrieve the FlowEntry TCP destination port match field.
+
+=cut
 sub tcp_dst_port {
     my ($self, $tcp_dst_port) = @_;
     $self->{tcp_destination_port}
         = (@_ == 2) ? $tcp_dst_port : $self->{tcp_destination_port};
 }
+=item B<sctp_src_port>
+
+Set or retrieve the FlowEntry SCTP source port match field.
+
+=cut
 sub sctp_src_port {
     my ($self, $sctp_src_port) = @_;
     $self->{sctp_source_port}
         = (@_ == 2) ? $sctp_src_port : $self->{sctp_source_port};
 }
+=item B<sctp_dst_port>
+
+Set or retrieve the FlowEntry SCTP destination port match field.
+
+=cut
 sub sctp_dst_port {
     my ($self, $sctp_dst_port) = @_;
     $self->{sctp_destination_port}
         = (@_ == 2) ? $sctp_dst_port : $self->{sctp_destination_port};
 }
+=item B<icmpv4_type>
+
+Set or retrieve the FlowEntry ICMPv4 type match field.
+
+=cut
 sub icmpv4_type {
     my ($self, $icmpv4_type) = @_;
     my $value = undef;
@@ -742,6 +836,11 @@ sub icmpv4_type {
     $match_exists and $value = $self->{icmpv4_match}->type();
     return $value;
 }
+=item B<icmpv4_code>
+
+Set or retrieve the FlowEntry ICMPv4 code match field.
+
+=cut
 sub icmpv4_code {
     my ($self, $icmpv4_code) = @_;
     my $value = undef;
@@ -754,6 +853,11 @@ sub icmpv4_code {
     $match_exists and $value = $self->{icmpv4_match}->code();
     return $value;
 }
+=item B<icmpv6_type>
+
+Set or retrieve the FlowEntry ICMPv6 type match field.
+
+=cut
 sub icmpv6_type {
     my ($self, $icmpv6_type) = @_;
     my $value = undef;
@@ -766,6 +870,11 @@ sub icmpv6_type {
     $match_exists and $value = $self->{icmpv6_match}->type();
     return $value;
 }
+=item B<icmpv6_code>
+
+Set or retrieve the FlowEntry ICMPv6 code match field.
+
+=cut
 sub icmpv6_code {
     my ($self, $icmpv6_code) = @_;
     my $value = undef;
@@ -778,30 +887,60 @@ sub icmpv6_code {
     $match_exists and $value = $self->{icmpv6_match}->code();
     return $value;
 }
+=item B<in_port>
+
+Set or retrieve the FlowEntry port match field.
+
+=cut
 sub in_port {
     my ($self, $in_port) = @_;
     $self->{in_port} = (@_ == 2) ? $in_port : $self->{in_port};
 }
+=item B<in_phy_port>
+
+Set or retrieve the FlowEntry physical port match field.
+
+=cut
 sub in_phy_port {
     my ($self, $in_phy_port) = @_;
     $self->{in_phy_port} = (@_ == 2) ? $in_phy_port : $self->{in_phy_port};
 }
+=item B<arp_opcode>
+
+Set or retrieve the FlowEntry ARP code match field.
+
+=cut
 sub arp_opcode {
     my ($self, $arp_opcode) = @_;
     $self->{arp_op} = (@_ == 2) ? $arp_opcode : $self->{arp_op};
 }
+=item B<arp_src_transport_address>
+
+Set or retrieve the FlowEntry ARP source transport address match field.
+
+=cut
 sub arp_src_transport_address {
     my ($self, $arp_src_transport_address) = @_;
     $self->{arp_source_transport_address}
         = (@_ == 2) ? $arp_src_transport_address
                     : $self->{arp_source_transport_address};
 }
+=item B<arp_tgt_transport_address>
+
+Set or retrieve the FlowEntry ARP target transport address match field.
+
+=cut
 sub arp_tgt_transport_address {
     my ($self, $arp_tgt_transport_address) = @_;
     $self->{arp_target_transport_address}
         = (@_ == 2) ? $arp_tgt_transport_address
                     : $self->{arp_target_transport_address};
 }
+=item B<arp_src_hw_address>
+
+Set or retrieve the FlowEntry ARP source hardware address match field.
+
+=cut
 sub arp_src_hw_address {
     my ($self, $arp_src_hw_address) = @_;
     my $value = undef;
@@ -812,6 +951,11 @@ sub arp_src_hw_address {
         $value = $self->{arp_source_hardware_address}->{address};
     return $value;
 }
+=item B<arp_tgt_hw_address>
+
+Set or retrieve the FlowEntry ARP target hardware address match field.
+
+=cut
 sub arp_tgt_hw_address {
     my ($self, $arp_tgt_hw_address) = @_;
     my $value = undef;
@@ -822,6 +966,11 @@ sub arp_tgt_hw_address {
         $value = $self->{arp_target_hardware_address}->{address};
     return $value;
 }
+=item B<mpls_label>
+
+Set or retrieve the FlowEntry MPLS label match field.
+
+=cut
 sub mpls_label {
     my ($self, $mpls_label) = @_;
     my $value = undef;
@@ -835,6 +984,11 @@ sub mpls_label {
     $match_exists and $value = $self->{protocol_match_fields}->mpls_label();
     return $value;
 }
+=item B<mpls_tc>
+
+Set or retrieve the FlowEntry MPLS TC match field.
+
+=cut
 sub mpls_tc {
     my ($self, $mpls_tc) = @_;
     my $value = undef;
@@ -848,6 +1002,11 @@ sub mpls_tc {
     $match_exists and $value = $self->{protocol_match_fields}->mpls_tc();
     return $value;
 }
+=item B<mpls_bos>
+
+Set or retrieve the FlowEntry MPLS BOS match field.
+
+=cut
 sub mpls_bos {
     my ($self, $mpls_bos) = @_;
     my $value = undef;
@@ -861,6 +1020,11 @@ sub mpls_bos {
     $match_exists and $value = $self->{protocol_match_fields}->mpls_bos();
     return $value;
 }
+=item B<tunnel_id>
+
+Set or retrieve the FlowEntry tunnel ID match field.
+
+=cut
 sub tunnel_id {
     my ($self, $tunnel_id) = @_;
     my $value = undef;
@@ -869,6 +1033,11 @@ sub tunnel_id {
     defined $self->{tunnel} and $value = $self->{tunnel}->{tunnel_id};
     return $value;
 }
+=item B<metadata>
+
+Set or retrieve the FlowEntry metadata match field.
+
+=cut
 sub metadata {
     my ($self, $metadata) = @_;
     my $value = undef;
@@ -881,6 +1050,11 @@ sub metadata {
     $match_exists and $self->{metadata}->metadata();
     return $value;
 }
+=item B<metadata_mask>
+
+Set or retrieve the FlowEntry metadata mask match field.
+
+=cut
 sub metadata_mask {
     my ($self, $mask) = @_; 
     my $value = undef;
@@ -897,3 +1071,37 @@ sub metadata_mask {
 
 # Module ===============================================================
 1;
+
+=back
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.

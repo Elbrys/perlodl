@@ -1,4 +1,87 @@
-=head1 Brocade::BSC::OpenflowNode
+=head1 NAME
+
+Brocade::BSC::OpenflowNode
+
+=head1 DESCRIPTION
+
+A I<Brocade::BSC::OpenflowNode> object is used to model, query, and configure
+openflow devices via Brocade's OpenDaylight-based Software-Defined Networking
+controller.
+
+=cut
+
+package Brocade::BSC::OpenflowNode;
+
+use strict;
+use warnings;
+
+use YAML;
+use JSON -convert_blessed_universally;
+
+=head1 METHODS
+
+=cut
+
+# Constructor ==========================================================
+#
+=over 4
+
+=item B<new>
+
+Creates a new I<Brocade::BSC::OpenflowNode> object and populates fields with
+values from argument hash, if present, or YAML configuration file.
+
+  ### parameters:
+  #   + cfgfile       - path to YAML configuration file specifying node attributes
+  #   + ctrl          - reference to Brocade::BSC controller object (required)
+  #   + name          - name of controlled openflow node
+  #
+  ### YAML configuration file labels and default values
+  #
+  #   parameter hash | YAML label  | default value
+  #   -------------- | ----------- | -------------
+  #   name           | nodeName    |
+
+Returns new I<Brocade::BSC::NetconfNode> object.
+=cut
+sub new {
+    my $class = shift;
+    my %params = @_;
+
+    my $yamlcfg = undef;
+    if ($params{cfgfile} && ( -e $params{cfgfile})) {
+        $yamlcfg = YAML::LoadFile($params{cfgfile});
+    }
+    my $self = {
+        ctrl => '',
+        name => ''
+    };
+    if ($yamlcfg) {
+        $yamlcfg->{nodeName}
+            && ($self->{name} = $yamlcfg->{nodeName});
+    }
+    map { $params{$_} && ($self->{$_} = $params{$_}) }
+        qw(ctrl name);
+    bless ($self, $class);
+}
+
+# Method ===============================================================
+#
+=item B<as_json>
+
+  # Returns   : Returns pretty-printed JSON string representing openflow node.
+
+=cut
+sub as_json {
+    my $self = shift;
+    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    return $json->pretty->encode($self);
+}
+
+# Module ===============================================================
+1;
+
+=back
 
 =head1 LICENCE AND COPYRIGHT
 
@@ -31,57 +114,3 @@ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 THE POSSIBILITY OF SUCH DAMAGE.
-
-=cut
-
-package Brocade::BSC::OpenflowNode;
-
-use strict;
-use warnings;
-
-use YAML;
-use JSON -convert_blessed_universally;
-
-# Constructor ==========================================================
-# Parameters: cfgfile : name of YAML file for configuring object (opt)
-#             explicit values override config overrides defaults
-#
-#             object hash   | YAML label
-#             ------------- | ----------
-#             ctrl          | ----------   ref to controller object
-#             name          | nodeName
-# Returns   : Brocade::BSC::OpenflowNode object
-# 
-sub new {
-    my $class = shift;
-    my %params = @_;
-
-    my $yamlcfg = undef;
-    if ($params{cfgfile} && ( -e $params{cfgfile})) {
-        $yamlcfg = YAML::LoadFile($params{cfgfile});
-    }
-    my $self = {
-        ctrl => '',
-        name => ''
-    };
-    if ($yamlcfg) {
-        $yamlcfg->{nodeName}
-            && ($self->{name} = $yamlcfg->{nodeName});
-    }
-    map { $params{$_} && ($self->{$_} = $params{$_}) }
-        qw(ctrl name);
-    bless ($self, $class);
-}
-
-# Method ===============================================================
-# as_json
-# Parameters: none
-# Returns   : Brocade::BSC::OpenflowNode as formatted JSON string
-#
-sub as_json {
-    my $self = shift;
-    my $json = new JSON->canonical->allow_blessed->convert_blessed;
-    return $json->pretty->encode($self);
-}
-
-1;

@@ -1,36 +1,10 @@
-=head1 Brocade::BSC::Openflow::FlowEntry
+=head1 NAME
 
-=head1 LICENCE AND COPYRIGHT
+Brocade::BSC::Openflow::FlowEntry
 
-Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+=head1 DESCRIPTION
 
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its
-contributors may be used to endorse or promote products derived from this
-software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-THE POSSIBILITY OF SUCH DAMAGE.
+Model a flow table entry in an OpenFlow capable device.
 
 =cut
 
@@ -162,10 +136,38 @@ sub instruction {
 # ======================================================================
 package Brocade::BSC::Openflow::FlowEntry;
 
+=head1 METHODS
+
+=cut
+
 # Constructor ==========================================================
-# Parameters: none
-# Returns   : Brocade::BSC::Openflow::FlowEntry object
-# 
+#
+=over 4
+
+=item B<new>
+
+Creates and returns a new I<Brocade::BSC::Openflow::FlowEntry> object.
+
+  ### parameters:
+  #   + id
+  #   + cookie
+  #   + cookie_mask
+  #   + table_id
+  #   + priority
+  #   + idle_timeout
+  #   + hard_timeout
+  #   + strict
+  #   + out_port
+  #   + out_group
+  #   + flags
+  #   + flow_name
+  #   + installHw
+  #   + barrier
+  #   + buffer_id
+  #   + match
+  #   + instructions
+
+=cut
 sub new {
     my ($class, %params) = @_;
     my $self = {
@@ -210,10 +212,12 @@ sub new {
 }
 
 # Method ===============================================================
-#             as_json
-# Parameters: none
-# Returns   : FlowEntry as formatted JSON string
 #
+=item B<as_json>
+
+  # Returns   : FlowEntry as formatted JSON string.
+
+=cut ===================================================================
 sub as_json {
     my $self = shift;
     my $json = new JSON->canonical->allow_blessed->convert_blessed;
@@ -235,10 +239,12 @@ sub _strip_undef {
 }
 
 # Method ===============================================================
-#             get_payload
-# Parameters: none
-# Returns   : FlowEntry as formatted for transmission to controller
 #
+=item B<get_payload>
+
+  # Returns   : FlowEntry as formatted for transmission to controller.
+
+=cut ===================================================================
 sub get_payload {
     my $self = shift;
 
@@ -309,47 +315,113 @@ use strict 'refs';
 # Parameters: none for gets; value to set for sets
 # Returns   : FlowEntry value
 #
+=item B<table_id>
+
+Set or retrieve the FlowEntry table id.
+
+=cut
 sub table_id {
     my ($self, $table_id) = @_;
     $self->{table_id} = (2 == @_) ? $table_id : $self->{table_id};
 }
+=item B<flow_name>
+
+Set or retrieve the FlowEntry name.
+
+=cut
 sub flow_name {
     my ($self, $flow_name) = @_;
     $self->{flow_name} = (2 == @_) ? $flow_name : $self->{flow_name};
 }
+=item B<id>
+
+Set or retrieve the FlowEntry ID.
+
+=cut
 sub id {
     my ($self, $id) = @_;
     $self->{id} = (2 == @_) ? $id : $self->{id};
 }
+=item B<install_hw>
+
+Set or retrieve the FlowEntry installHw flag.  This is used to force
+the OpenFlow switch to do ordered message processing.  Barrier request/reply
+messages are used by the controller to ensure message dependencies have
+been met or to receive notifications for completed operations.  When the
+controller wants to ensure message dependencies have been met or wants
+to receive notifications for completed operations, it may use an
+OFPT_BARRIER_REQUEST message.  This message has no body.  Upon receipt,
+the switch must finish all previously received messages--including
+sending corresponding reply or error messages--before executing any
+messages beyond the Barrier Request.
+
+=cut
 sub install_hw {
     my ($self, $install_hw) = @_;
     $self->{installHw} = (2 == @_) ? $install_hw : $self->{installHw};
 }
+=item B<priority>
+
+Set or retrieve the FlowEntry priority.
+
+=cut
 sub priority {
     my ($self, $priority) = @_;
     $self->{priority} = (2 == @_) ? $priority : $self->{priority};
 }
+=item B<hard_timeout>
+
+Set or retrieve the FlowEntry hard timeout: max time before discarding
+packet (seconds).
+
+=cut
 sub hard_timeout {
     my ($self, $timeout) = @_;
     $self->{hard_timeout} = (2 == @_) ? $timeout : $self->{hard_timeout};
 }
+=item B<idle_timeout>
+
+Set or retrieve the FlowEntry idle timeout: idle time before discarding
+packets (seconds).
+
+=cut
 sub idle_timeout {
     my ($self, $timeout) = @_;
     $self->{idle_timeout} = (2 == @_) ? $timeout : $self->{idle_timeout};
 }
+=item B<cookie>
+
+Set or retrieve the FlowEntry cookie.
+
+=cut
 sub cookie {
     my ($self, $cookie) = @_;
     $self->{cookie} = (2 == @_) ? $cookie : $self->{cookie};
 }
+=item B<cookie_mask>
+
+Set or retrieve the FlowEntry cookie mask.
+
+=cut
 sub cookie_mask {
     my ($self, $mask) = @_;
     $self->{cookie_mask} = (2 == @_) ? $mask : $self->{cookie_mask};
 }
+=item B<strict>
+
+Set or retrieve the FlowEntry I<strict> flag.
+
+=cut
 sub strict {
     my ($self, $strict) = @_;
     $self->{strict} = (2 == @_) ? $strict : $self->{strict};
 }
 
+=item B<add_instruction>
+
+Add a new instruction to the FlowEntry.
+
+=cut
 sub add_instruction {
     my ($self, $order) = @_;
 
@@ -361,7 +433,11 @@ sub add_instruction {
     return $instruction;
 }
 
+=item B<add_match>
 
+Add a new match to the FlowEntry.
+
+=cut
 sub add_match {
     my $self = shift;
     my $match_ref = shift;
@@ -372,3 +448,37 @@ sub add_match {
 
 # Module ===============================================================
 1;
+
+=back
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.

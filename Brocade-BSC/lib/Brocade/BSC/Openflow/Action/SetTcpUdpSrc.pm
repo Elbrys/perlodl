@@ -57,7 +57,7 @@ sub new {
 
 # Method ===============================================================
 #             accessors
-sub tcp_udp_src {
+sub port {
     my ($self, $port) = @_;
     $self->{set_tp_src_action}->{port} =
         (2 == @_) ? $port : $self->{set_tp_src_action}->{port};

@@ -1,36 +1,11 @@
-=head1 Brocade::BSC::Netconf::Vrouter::Firewall
+=head1 NAME
 
-=head1 LICENCE AND COPYRIGHT
+Brocade::BSC::Netconf::Vrouter::Firewall
 
-Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+=head1 DESCRIPTION
 
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its
-contributors may be used to endorse or promote products derived from this
-software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-THE POSSIBILITY OF SUCH DAMAGE.
+Create and modify firewall rules on a Vyatta virtual router controlled
+by a Brocade::BSC controller.
 
 =cut
 
@@ -111,12 +86,23 @@ sub get_name {
 }
 
 
+=head1 METHODS
 
-#---------------------------------------------------------------------------
-# 
-#---------------------------------------------------------------------------
+=over 4
+
+=cut
+
+# Package ===============================================================
+#
 package Brocade::BSC::Netconf::Vrouter::Firewall;
 
+# Method ===============================================================
+#
+=item B<new>
+
+  # Returns   : empty BSC::Netconf::Vrouter::Firewall object
+
+=cut ===================================================================
 sub new {
     my $class = shift;
     my $self = {
@@ -126,10 +112,12 @@ sub new {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<as_json>
+
+  # Returns   : pretty-printed JSON string representing Firewall object.
+
+=cut ===================================================================
 sub as_json {
     my $self = shift;
 
@@ -138,10 +126,10 @@ sub as_json {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+# Parameters: name of new firewall group
+# Returns   : array including new group
+#           :
 sub add_group {
     my $self = shift;
     my $name = shift;
@@ -152,7 +140,7 @@ sub add_group {
 
 # Method ===============================================================
 # 
-# Parameters: 
+# Parameters: name of firewall group
 # Returns   : 
 #
 sub get_group {
@@ -169,10 +157,14 @@ sub get_group {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<add_rule>
+
+  # Parameters: name - firewall group to which to add rule
+  #           : id   - for new rule
+  # Returns   :
+
+=cut ===================================================================
 sub add_rule {
     my $self       = shift;
     my $group_name = shift;
@@ -206,10 +198,13 @@ sub get_rules {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_payload>
+
+  # Returns   : firewall configuration formatted as JSON appropriate
+  #               for POST to BSC controller.
+
+=cut ===================================================================
 sub get_payload {
     my $self = shift;
 
@@ -233,4 +228,39 @@ sub get_url_extension {
     return "vyatta-security:security/vyatta-security-firewall:firewall";
 }
 
+# Module ===============================================================
 1;
+
+=back
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.

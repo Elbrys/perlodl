@@ -31,7 +31,7 @@ print $ncNode->as_json() . "\n";
 
 print "<<< Check '$ncNode->{name}' NETCONF node availability on the network\n";
 system ("ping -c 1 " . $ncNode->{ipAddr}) and
-    die "!!! Demo terminated, reason: ncNode->{ipAddr} is down\n";
+    die "!!! Demo terminated, reason: $ncNode->{ipAddr} is down\n";
 print "$ncNode->{ipAddr} is up!\n\n";
 
 print "<<< Add '$ncNode->{name}' NETCONF node to the Controller\n";

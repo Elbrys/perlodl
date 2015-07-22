@@ -57,7 +57,7 @@ sub new {
 
 # Method ===============================================================
 #             accessors
-sub dl_dst {
+sub mac_addr {
     my ($self, $mac_addr) = @_;
     $self->{set_dl_dst_action}->{address} =
         (2 == @_) ? $mac_addr : $self->{set_dl_dst_action}->{address};

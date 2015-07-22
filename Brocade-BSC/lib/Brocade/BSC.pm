@@ -1,51 +1,28 @@
-=head1 Brocade::BSC
+=head1 NAME
 
-Brocade::BSC - Configure and query the Brocade SDN Controller.
+Brocade::BSC - Configure and query the Brocade SDN controller.
 
-=head1 LICENCE AND COPYRIGHT
+=head1 VERSION
 
-Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+Version 1.0.0
 
-All rights reserved.
+=head1 DESCRIPTION
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+A I<Brocade::BSC> object is used to model, query, and configure Brocade's
+OpenDaylight-based Software-Defined Networking controller.
 
-1. Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its
-contributors may be used to endorse or promote products derived from this
-software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-THE POSSIBILITY OF SUCH DAMAGE.
+Most API methods return a duple: a I<Brocade::BSC::Status> object, and a
+reference to a data structure with the requested information.  Status
+should always be verified before attempting to dereference the second
+return value.
 
 =cut
 
-use version; our $VERSION = qv("v0.1.0");
+use version; our $VERSION = qv("v1.0.0");
 
 use strict;
 use warnings;
 
-# Package ==============================================================
-# Brocade::BSC
-#    model and interact with Brocade SDN Controller
-#
-# ======================================================================
 package Brocade::BSC;
 
 use Brocade::BSC::Status qw(:constants);
@@ -57,19 +34,40 @@ use JSON -convert_blessed_universally;
 use XML::Parser;
 use Carp::Assert;
 
+=head1 METHODS
+
+=cut
+
 # Constructor ==========================================================
-# Parameters: cfgfile : name of YAML file for configuring object (opt)
-#             explicit values override config overrides defaults
 #
-#             object hash   | YAML label
-#             ------------- | ----------
-#             ipAddr        | ctrlIpAddr   IP address of controller
-#             portNum       | ctrlPortNum  TCP port of ctrl REST interface
-#             adminName     | ctrlUname    username
-#             adminPassword | ctrlPswd     password
-#             timeout       | timeout      in seconds on HTTP requests
-# Returns   : Brocade::BSC object
-# 
+=over 4
+
+=item B<new>
+
+Creates a new I<Brocade::BSC> object and populates fields with values
+from argument hash, if present, or YAML configuration file.
+
+  ### parameters:
+  #   + cfgfile       - path to YAML configuration file specifying controller attributes
+  #   + ipAddr        - IP address of controller
+  #   + portNum       - TCP port for controller's REST interface
+  #   + adminName     - username
+  #   + adminPassword - password
+  #   + timeout       - for HTTP requests, in seconds
+  #
+  ### YAML configuration file labels and default values
+  #
+  #   parameter hash | YAML label  | default value
+  #   -------------- | ----------- | -------------
+  #   ipAddr         | ctrlIpAddr  | 127.0.0.1
+  #   portNum        | ctrlPortNum | 8181
+  #   adminName      | ctrlUname   | admin
+  #   adminPassword  | ctrlPswd    | admin
+  #   timeout        | timeout     | 5
+
+Returns new I<Brocade::BSC> object.
+
+=cut
 sub new {
     my $caller = shift;
     my %params = @_;
@@ -131,10 +129,12 @@ sub _http_req {
 }
 
 # Method ===============================================================
-# as_json
-# Parameters: none
-# Returns   : Brocade::BSC as formatted JSON string
 #
+=item B<as_json>
+
+  # Returns pretty-printed JSON string representing BSC object.
+
+=cut
 sub as_json {
     my $self = shift;
     my $json = new JSON->canonical->allow_blessed->convert_blessed;
@@ -142,11 +142,13 @@ sub as_json {
 }
 
 # Method ===============================================================
-# get_nodes_operational_list
-# Parameters: none
-# Returns   : status code (integer)
-#           : reference to array of node names
 #
+=item B<get_nodes_operational_list>
+
+  # Returns   : BSC::Status
+  #           : reference to an array of node names
+
+=cut
 sub get_nodes_operational_list {
     my $self = shift;
     my @nodeNames = ();
@@ -158,17 +160,17 @@ sub get_nodes_operational_list {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status->code($BVC_DATA_NOT_FOUND);
+                $status->code($BSC_DATA_NOT_FOUND);
             }
             else {
                 foreach (@$nodes) {
                     push @nodeNames, $_->{id};
                 }
-                $status->code($BVC_OK);
+                $status->code($BSC_OK);
             }
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -178,11 +180,14 @@ sub get_nodes_operational_list {
 }
 
 # Method ===============================================================
-# get_node_info 
-# Parameters: node name (string)
-# Returns   : status code (integer)
-#           : node_info XXX
 #
+=item B<get_node_info>
+
+  # Parameter : node name (string, required)
+  # Returns   : BSC::Status
+  #           : array reference containing node info
+
+=cut
 sub get_node_info {
     my $self = shift;
     my $node = shift;
@@ -194,7 +199,7 @@ sub get_node_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"node\"/) {
             $node_info = decode_json($resp->content)->{node};
-            $status->code($node_info ? $BVC_OK : $BVC_DATA_NOT_FOUND);
+            $status->code($node_info ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -204,10 +209,13 @@ sub get_node_info {
 }
 
 # Method ===============================================================
-# check_node_config_status
-# Parameters: 
-# Returns   : 
 #
+=item B<check_node_config_status>
+
+  # Parameter : node name (string, required)
+  # Returns   : BSC::Status - NODE_CONFIGURED or NODE_NOT_FOUND
+
+=cut
 sub check_node_config_status {
     my $self = shift;
     my $node = shift;
@@ -216,26 +224,29 @@ sub check_node_config_status {
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/$node";
     my $resp = $self->_http_req('GET', $urlpath);
     $status->code(($resp->code == HTTP_OK)
-        ? $BVC_NODE_CONFIGURED : $BVC_NODE_NOT_FOUND);
+        ? $BSC_NODE_CONFIGURED : $BSC_NODE_NOT_FOUND);
     return $status;
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<check_node_conn_status>
+
+  # Parameter : node name (string, required)
+  # Returns   : BSC::Status - NODE_CONNECTED or NODE_DISCONNECTED
+
+=cut
 sub check_node_conn_status {
     my $self = shift;
     my $node = shift;
     my $status = new Brocade::BSC::Status;
     ($status, my $nodeStatus) = $self->get_all_nodes_conn_status();
     if ($status->ok) {
-        $status->code($BVC_NODE_NOT_FOUND);
+        $status->code($BSC_NODE_NOT_FOUND);
         foreach (@$nodeStatus) {
             if ($_->{id} eq $node) {
-                $status->code($_->{connected} ? $BVC_NODE_CONNECTED
-                                              : $BVC_NODE_DISCONNECTED);
+                $status->code($_->{connected} ? $BSC_NODE_CONNECTED
+                                              : $BSC_NODE_DISCONNECTED);
                 last;
             }
         }
@@ -244,10 +255,13 @@ sub check_node_conn_status {
 }
 
 # Method ===============================================================
-#             get_all_nodes_in_config
-# Parameters: 
-# Returns   : array ref, list of node identifiers
 #
+=item B<get_all_nodes_in_config>
+
+  # Returns   : BSC::Status
+  #           : array reference - list of node identifiers
+
+=cut
 sub get_all_nodes_in_config {
     my $self = shift;
     my @nodeNames = ();
@@ -259,17 +273,17 @@ sub get_all_nodes_in_config {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status->code($BVC_DATA_NOT_FOUND);
+                $status->code($BSC_DATA_NOT_FOUND);
             }
             else {
                 foreach (@$nodes) {
                     push @nodeNames, $_->{id};
                 }
-                $status->code($BVC_OK);
+                $status->code($BSC_OK);
             }
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -279,9 +293,15 @@ sub get_all_nodes_in_config {
 }
 
 # Method ===============================================================
-#             get_all_nodes_conn_status
-# Parameters: none
-# Returns   : ref to array of hashes {id =>, connected =>}
+#
+=item B<get_all_nodes_conn_status>
+
+  # Returns   : BSC::Status
+  #           : reference to array of hashes:
+  #             { id        => nodename,
+  #               connected => boolean }
+
+=cut
 #
 # Openflow devices on the Controller are always prefixed with "openflow:"
 # Since Openflow devices initiate communication with the Controller, and
@@ -300,7 +320,7 @@ sub get_all_nodes_conn_status {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status->code($BVC_DATA_NOT_FOUND);
+                $status->code($BSC_DATA_NOT_FOUND);
             }
             else {
                 foreach (@$nodes) {
@@ -313,11 +333,11 @@ sub get_all_nodes_conn_status {
                     push @nodeStatus, {'id' => $_->{id},
                                        'connected' => $connected}
                 }
-                $status->code($BVC_OK);
+                $status->code($BSC_OK);
             }
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -327,10 +347,13 @@ sub get_all_nodes_conn_status {
 }
 
 # Method ===============================================================
-#             get_netconf_nodes_in_config
-# Parameters:
-# Returns   : array ref, list of node identifiers
 #
+=item B<get_netconf_nodes_in_config>
+
+  # Returns   : BSC::Status
+  #           : array reference - list of node identifiers
+
+=cut
 sub get_netconf_nodes_in_config {
     my $self = shift;
     my @netconf_nodes = undef;
@@ -341,12 +364,15 @@ sub get_netconf_nodes_in_config {
 }
 
 # Method ===============================================================
-#             get_netconf_nodes_conn_status
-# Parameters: none
-# Returns   : ref to array of hashes {id =>, connected =>}
 #
-#             filter out the openflow nodes from full list of nodes
-#
+=item B<get_all_nodes_conn_status>
+
+  # Returns   : BSC::Status
+  #           : reference to array of hashes:
+  #             { id        => nodename,
+  #               connected => boolean }
+
+=cut
 sub get_netconf_nodes_conn_status {
     my $self = shift;
     my @netconf_nodes = undef;
@@ -357,12 +383,15 @@ sub get_netconf_nodes_conn_status {
     return ($status, \@netconf_nodes);
 }
 
-
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : array ref of supported schemas
 #
+=item B<get_schemas>
+
+  # Parameters: node name (string, required)
+  # Returns   : BSC::Status
+  #           : array reference - supported schemas on node
+
+=cut
 sub get_schemas {
     my $self = shift;
     my $node = shift;
@@ -375,10 +404,10 @@ sub get_schemas {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"schemas\"/) {
             $schemas = decode_json($resp->content)->{schemas}->{schema};
-            $status->code($schemas ? $BVC_OK : $BVC_DATA_NOT_FOUND);
+            $status->code($schemas ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -388,10 +417,16 @@ sub get_schemas {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : specified YANG schema as formatted JSON
 #
+=item B<get_schema>
+
+  # Parameters: node name
+  #           : YANG schema ID
+  #           : YANG schema version
+  # Returns   : BSC::Status
+  #           : requested YANG schema as formatted JSON
+
+=cut
 sub get_schema {
     my $self = shift;
     my ($node, $schemaId, $schemaVersion) = @_;
@@ -413,7 +448,7 @@ sub get_schema {
         assert   ($xmltree_ref->[1][2][1]    eq 'data');
         assert   ($xmltree_ref->[1][2][2][1] == 0);
         $schema = $xmltree_ref->[1][2][2][2];
-        $status->code($BVC_OK);
+        $status->code($BSC_OK);
     }
     else {
         $status->http_err($resp);
@@ -422,10 +457,14 @@ sub get_schema {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_netconf_operations>
+
+  # Parameters: node name
+  # Returns   : BSC::Status
+  #           : hash reference - operations supported by specified node
+
+=cut
 sub get_netconf_operations {
     my $self = shift;
     my $node = shift;
@@ -437,10 +476,10 @@ sub get_netconf_operations {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"operations\"/) {
             $operations = decode_json($resp->content)->{operations};
-            $status->code($BVC_OK);
+            $status->code($BSC_OK);
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -450,10 +489,13 @@ sub get_netconf_operations {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_all_modules_operational_state>
+
+  # Returns   : BSC::Status
+  #           : array reference - hashes of module state
+
+=cut
 sub get_all_modules_operational_state {
     my $self = shift;
     my $modules = undef;
@@ -467,10 +509,10 @@ sub get_all_modules_operational_state {
             my $json = $resp->content;
             $json =~ s/\\\n//g;
             $modules = decode_json($json)->{modules}->{module};
-            $status->code($modules ? $BVC_OK : $BVC_DATA_NOT_FOUND);
+            $status->code($modules ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -481,9 +523,14 @@ sub get_all_modules_operational_state {
 
 # Method ===============================================================
 # 
-# Parameters: 
-# Returns   : 
-#
+=item B<get_module_operational_state>
+
+  # Parameter : module type
+  #           : module name
+  # Returns   : BSC::Status
+  #           : array reference - hash of module state
+
+=cut
 sub get_module_operational_state {
     my $self = shift;
     my ($moduleType, $moduleName) = @_;
@@ -495,10 +542,10 @@ sub get_module_operational_state {
     if ($resp->code == HTTP_OK ) {
         if ($resp->content =~ /\"module\"/) {
             $module = decode_json($resp->content)->{module};
-            $status->code($module ? $BVC_OK : $BVC_DATA_NOT_FOUND);
+            $status->code($module ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -509,9 +556,13 @@ sub get_module_operational_state {
 
 # Method ===============================================================
 # 
-# Parameters: 
-# Returns   : 
-#
+=item B<get_sessions_info>
+
+  # Parameters: node name
+  # Returns   : BSC::Status
+  #           : hash reference - session listing on specified node
+
+=cut
 sub get_sessions_info {
     my $self = shift;
     my $node = shift;
@@ -523,10 +574,10 @@ sub get_sessions_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"sessions\"/) {
             $sessions = decode_json($resp->content)->{sessions};
-            $status->code($sessions ? $BVC_OK : $BVC_DATA_NOT_FOUND);
+            $status->code($sessions ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -537,9 +588,13 @@ sub get_sessions_info {
 
 # Method ===============================================================
 # 
-# Parameters: 
-# Returns   : 
-#
+=item B<get_streams_info>
+
+  # Parameters:
+  # Returns   : BSC::Status
+  #           : hash reference - streams info
+
+=cut
 sub get_streams_info {
     my $self = shift;
     my $streams = undef;
@@ -550,10 +605,10 @@ sub get_streams_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"streams\"/) {
             $streams = decode_json($resp->content)->{streams};
-            $status->code($streams ? $BVC_OK : $BVC_DATA_NOT_FOUND);
+            $status->code($streams ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -564,9 +619,13 @@ sub get_streams_info {
 
 # Method ===============================================================
 # 
-# Parameters: 
-# Returns   : 
-#
+=item B<get_service_providers_info>
+
+  # Parameters:
+  # Returns   : BSC::Status
+  #           : array reference ~ name/provider pairs
+
+=cut
 sub get_service_providers_info {
     my $self = shift;
     my $service = undef;
@@ -577,10 +636,10 @@ sub get_service_providers_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"services\"/) {
             $service = decode_json($resp->content)->{services}->{service};
-            $status->code($service ? $BVC_OK : $BVC_DATA_NOT_FOUND);
+            $status->code($service ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -590,10 +649,14 @@ sub get_service_providers_info {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_service_provider_info>
+
+  # Parameters: node name
+  # Returns   : BSC::Status
+  #           : array reference ~ name/provider pairs
+
+=cut
 sub get_service_provider_info {
     my $self = shift;
     my $name = shift;
@@ -606,10 +669,10 @@ sub get_service_provider_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"service\"/) {
             $service = decode_json($resp->content)->{service};
-            $status->code($BVC_OK);
+            $status->code($BSC_OK);
         }
         else {
-            $status->code($BVC_DATA_NOT_FOUND);
+            $status->code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
@@ -619,14 +682,19 @@ sub get_service_provider_info {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<add_netconf_node>
+
+Add a mount point on controller for specified node.
+
+  # Parameters: node name
+  # Returns   : BSC::Status
+
+=cut
 sub add_netconf_node {
     my $self = shift;
     my $node = shift;
-    my $status = new Brocade::BSC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BSC_OK);
 
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
     my %headers = ('content-type' => 'application/xml',
@@ -669,14 +737,18 @@ END_XML
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<delete_netconf_node>
+
+  # Parameters: node name
+  # Returns   : BSC::Status
+  #           :
+
+=cut
 sub delete_netconf_node {
     my $self = shift;
     my $node = shift;
-    my $status = new Brocade::BSC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BSC_OK);
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node"
         . "/controller-config/yang-ext:mount/config:modules/module"
         . "/odl-sal-netconf-connector-cfg:sal-netconf-connector/"
@@ -688,10 +760,14 @@ sub delete_netconf_node {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+# =item B<modify_netconf_node_in_config>
+#
+#   # Parameters:
+#   # Returns   : BSC::Status
+#   #           :
+#
+# =cut
 sub modify_netconf_node_in_config {
     my $self = shift;
     my $node = shift;
@@ -700,10 +776,13 @@ sub modify_netconf_node_in_config {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_ext_mount_config_urlpath>
+
+  # Parameters: node name
+  # Returns   : base restconf URL for configuration of mounted netconf node
+
+=cut
 sub get_ext_mount_config_urlpath {
     my $self = shift;
     my $node = shift;
@@ -713,10 +792,13 @@ sub get_ext_mount_config_urlpath {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_ext_mount_operational_urlpath>
+
+  # Parameters: node name
+  # Returns   : base restconf URL for operational status of mounted netconf node
+
+=cut
 sub get_ext_mount_operational_urlpath {
     my $self = shift;
     my $node = shift;
@@ -727,9 +809,12 @@ sub get_ext_mount_operational_urlpath {
 
 # Method ===============================================================
 # 
-# Parameters: 
-# Returns   : 
-#
+=item B<get_node_operational_urlpath>
+
+  # Parameters: node name
+  # Returns   : base restconf URL for node, operational status
+
+=cut
 sub get_node_operational_urlpath {
     my $self = shift;
     my $node = shift;
@@ -738,10 +823,13 @@ sub get_node_operational_urlpath {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_node_config_urlpath>
+
+  # Parameters: node name
+  # Returns   : base restconf URL for node, configuration
+
+=cut
 sub get_node_config_urlpath {
     my $self = shift;
     my $node = shift;
@@ -750,10 +838,13 @@ sub get_node_config_urlpath {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_openflow_nodes_operational_list>
+
+  # Returns   : BSC::Status
+  #           : array reference - node names
+
+=cut
 sub get_openflow_nodes_operational_list {
     my $self = shift;
     my $status = new Brocade::BSC::Status;
@@ -765,10 +856,10 @@ sub get_openflow_nodes_operational_list {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status->code($BVC_DATA_NOT_FOUND);
+                $status->code($BSC_DATA_NOT_FOUND);
             }
             else {
-                $status->code($BVC_OK);
+                $status->code($BSC_OK);
                 foreach (@$nodes) {
                     $_->{id} =~ /^(openflow:[0-9]*)/ && push @nodelist, $1;
                 }
@@ -783,3 +874,74 @@ sub get_openflow_nodes_operational_list {
 
 # Module ===============================================================
 1;
+
+=back
+
+=head1 AUTHOR
+
+laird pruiksma, C<< <pruiklw at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-brocade-bsc at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Brocade-BSC>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Brocade::BSC
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Brocade-BSC>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Brocade::BSC is entirely based on L<pybvc|https://github.com/BRCDCOMM/pybvc>
+created by Sergei Garbuzov.
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.

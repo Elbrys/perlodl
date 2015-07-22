@@ -11,7 +11,6 @@ my $configfile = "";
 my $status = undef;
 my @iflist;
 my $ifcfg = undef;
-my $http_resp = undef;
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
@@ -49,11 +48,11 @@ print JSON->new->pretty->encode($ifcfg) . "\n";
 my $sample_if = "lo";
 print "<<< Show '$sample_if' loopback interface configuration on the "
     . "'$vRouter->{name}'\n";
-($status, $http_resp) = $vRouter->get_loopback_interface_cfg($sample_if);
+($status, $ifcfg) = $vRouter->get_loopback_interface_cfg($sample_if);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
 print "Loopback interface '$sample_if' config:\n";
-print JSON->new->canonical->allow_nonref->pretty->encode(JSON::decode_json($http_resp->content)) . "\n";
+print JSON->new->canonical->pretty->encode(JSON::decode_json($ifcfg)) . "\n";
 
 
 print "<<< Show configuration of loopback interfaces on the "

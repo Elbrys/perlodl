@@ -57,7 +57,7 @@ sub new {
 
 # Method ===============================================================
 #             accessors
-sub nw_src {
+sub ip_addr {
     my ($self, $ip_addr) = @_;
     $self->{set_nw_src_action}->{address} =
         (2 == @_) ? $ip_addr : $self->{set_nw_src_action}->{address};

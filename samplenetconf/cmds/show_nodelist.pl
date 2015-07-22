@@ -5,7 +5,7 @@ use warnings;
 
 use Getopt::Long;
 use Brocade::BSC;
-use Brocade::BSC::yNetconfNode;
+use Brocade::BSC::NetconfNode;
 
 my $configfile = "";
 

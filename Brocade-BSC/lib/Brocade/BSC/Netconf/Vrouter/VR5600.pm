@@ -1,36 +1,11 @@
-=head1 Brocade::BSC::Netconf::Vrouter::VR5600
+=head1 NAME
 
-=head1 LICENCE AND COPYRIGHT
+Brocade::BSC::Netconf::Vrouter::VR5600
 
-Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+=head1 DESCRIPTION
 
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its
-contributors may be used to endorse or promote products derived from this
-software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
-THE POSSIBILITY OF SUCH DAMAGE.
+The I<::Vrouter::VR5600> object models a Vyatta 5600 Virtual router
+controlled via netconf by a I<Brocade::BSC> instance.
 
 =cut
 
@@ -131,11 +106,19 @@ use JSON -convert_blessed_universally;
 use Brocade::BSC;
 use Brocade::BSC::Status qw(:constants);
 
+=head1 METHODS
+
+=over 4
+
+=cut
+
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_schemas>
+
+  # Returns   : array ref - YANG schemas supported by node
+
+=cut ===================================================================
 sub get_schemas {
     my $self = shift;
 
@@ -143,10 +126,12 @@ sub get_schemas {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_schema>
+
+  # Returns   : requested YANG schema as formatted JSON
+
+=cut ===================================================================
 sub get_schema {
     my $self = shift;
     my ($yangId, $yangVersion) = @_;
@@ -155,10 +140,13 @@ sub get_schema {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_cfg>
+
+  # Returns   : BSC::Status
+  #           : hash ref - VR5600 node configuration
+
+=cut ===================================================================
 sub get_cfg {
     my $self = shift;
     my $status = new Brocade::BSC::Status;
@@ -168,7 +156,7 @@ sub get_cfg {
     my $resp = $self->{ctrl}->_http_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = decode_json($resp->content);
-        $status->code($BVC_OK);
+        $status->code($BSC_OK);
     }
     else {
         $status->http_err($resp);
@@ -177,10 +165,13 @@ sub get_cfg {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_firewalls_cfg>
+
+  # Returns   : BSC::Status
+  #           : firewall configuration of VR5600 as a JSON string
+
+=cut ===================================================================
 sub get_firewalls_cfg {
     my $self = shift;
     my $status = new Brocade::BSC::Status;
@@ -191,7 +182,7 @@ sub get_firewalls_cfg {
     my $resp = $self->{ctrl}->_http_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status->code($BVC_OK);
+        $status->code($BSC_OK);
     }
     else {
         $status->http_err($resp);
@@ -200,10 +191,15 @@ sub get_firewalls_cfg {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_firewall_instance_cfg>
+
+  # Parameters: name of firewall instance
+  # Returns   : BSC::Status
+  #           : specified ruleset from VR5600 firewall configuration
+  #               as JSON string
+
+=cut ===================================================================
 sub get_firewall_instance_cfg {
     my $self = shift;
     my $instance = shift;
@@ -216,7 +212,7 @@ sub get_firewall_instance_cfg {
     my $resp = $self->{ctrl}->_http_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status->code($BVC_OK);
+        $status->code($BSC_OK);
     }
     else {
         $status->http_err($resp);
@@ -225,14 +221,18 @@ sub get_firewall_instance_cfg {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<create_firewall_instance>
+
+Create empty firewall instance on VR5600
+
+  # Returns   : BSC::Status - success of operation
+
+=cut ===================================================================
 sub create_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
-    my $status = new Brocade::BSC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BSC_OK);
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
     my %headers = ('content-type'=>'application/yang.data+json');
@@ -263,10 +263,13 @@ sub update_firewall_instance_rule {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<delete_firewall_instance>
+
+  # Parameters: name of instance to delete
+  # Returns   : BSC::Status - success of operation
+
+=cut ===================================================================
 sub delete_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
@@ -285,20 +288,26 @@ sub delete_firewall_instance {
             last;
         }
         else {
-            $status->code($BVC_OK);
+            $status->code($BSC_OK);
         }
     }
     return $status;
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<set_dataplane_interface_firewall>
+
+  # Parameters: ifName (required) - dataplane interface to which to apply
+  #                                   firewall rules
+  #           : inFw              - name of firewall instance for inbound traffic
+  #           : outFw             - name of firewall instance for outbound traffic
+  # Returns   : BSC::Status       - success of operation
+
+=cut ===================================================================
 sub set_dataplane_interface_firewall {
     my ($self, %params) = @_;
-    my $status = new Brocade::BSC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BSC_OK);
 
     my %headers = ('content-type' => 'application/yang.data+json');
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
@@ -318,14 +327,17 @@ sub set_dataplane_interface_firewall {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<delete_dataplane_interface_firewall>
+
+  # Parameters: ifName (required) - interface from which to clear firewall rules
+  # Returns   : BSC::Status       - success of operation
+
+=cut ===================================================================
 sub delete_dataplane_interface_firewall {
     my ($self, $ifName) = @_;
 
-    my $status = new Brocade::BSC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BSC_OK);
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
         . "vyatta-interfaces:interfaces/vyatta-interfaces-dataplane:dataplane"
@@ -336,10 +348,13 @@ sub delete_dataplane_interface_firewall {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_interfaces_list>
+
+  # Returns   : BSC::Status
+  #           : array ref - interface names
+
+=cut ===================================================================
 sub get_interfaces_list {
     my $self = shift;
     my $status = new Brocade::BSC::Status;
@@ -348,19 +363,21 @@ sub get_interfaces_list {
 
     ($status, $ifcfg) = $self->get_interfaces_cfg();
     if ($status->ok) {
-        if ($ifcfg =~ /interfaces/) {
-            my $XXXfoo = decode_json($ifcfg)->{interfaces};
-            # XXX
+        while ($ifcfg =~ m/"tagnode":"([^"]*)"/g) {
+            push @iflist, $1;
         }
     }
     return ($status, \@iflist);
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_interfaces_cfg>
+
+  # Returns   : BSC::Status
+  #           : VR5600 network interface configuration as JSON string
+
+=cut ===================================================================
 sub get_interfaces_cfg {
     my $self = shift;
     my $status = new Brocade::BSC::Status;
@@ -372,7 +389,7 @@ sub get_interfaces_cfg {
     my $resp = $self->{ctrl}->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status->code($BVC_OK);
+        $status->code($BSC_OK);
     }
     else {
         $status->http_err($resp);
@@ -381,10 +398,13 @@ sub get_interfaces_cfg {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_dataplane_interfaces_list>
+
+  # Returns   : BSC::Status
+  #           : array - dataplane interface names
+
+=cut ===================================================================
 sub get_dataplane_interfaces_list {
     my $self = shift;
     my $status = new Brocade::BSC::Status;
@@ -394,23 +414,26 @@ sub get_dataplane_interfaces_list {
 
     ($status, $dpifcfg) = $self->get_interfaces_cfg();
     if (! $dpifcfg) {
-        $status->code($BVC_DATA_NOT_FOUND);
+        $status->code($BSC_DATA_NOT_FOUND);
     }
     else {
         $iflist = decode_json($dpifcfg)->{interfaces}->{'vyatta-interfaces-dataplane:dataplane'};
         foreach my $interface (@$iflist) {
             push @dpiflist, $interface->{tagnode};
         }
-        $status->code($BVC_OK);
+        $status->code($BSC_OK);
     }
     return ($status, @dpiflist);
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_dataplane_interfaces_cfg>
+
+  # Returns   : BSC::Status
+  #           : array ref - configuration of all dataplane interfaces
+
+=cut ===================================================================
 sub get_dataplane_interfaces_cfg {
     my $self = shift;
     my $dpifcfg = undef;
@@ -427,10 +450,14 @@ sub get_dataplane_interfaces_cfg {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_dataplane_interface_cfg>
+
+  # Parameters: name of interface
+  # Returns   : BSC::Status
+  #           : configuration of specified interface as JSON string
+
+=cut ===================================================================
 sub get_dataplane_interface_cfg {
     my $self = shift;
     my $ifname = shift;
@@ -443,7 +470,7 @@ sub get_dataplane_interface_cfg {
     my $resp = $self->{ctrl}->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         $cfg = $resp->content;
-        $status->code($BVC_OK);
+        $status->code($BSC_OK);
     }
     else {
         $status->http_err($resp);
@@ -452,32 +479,38 @@ sub get_dataplane_interface_cfg {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_loopback_interfaces_list>
+
+  # Returns   : BSC::Status
+  #           : array ref - loopback interface names
+
+=cut ===================================================================
 sub get_loopback_interfaces_list {
     my $self = shift;
     my @lbiflist = ();
 
     my ($status, $lbifcfg) = $self->get_loopback_interfaces_cfg();
     if (! $lbifcfg) {
-        $status->code($BVC_DATA_NOT_FOUND);
+        $status->code($BSC_DATA_NOT_FOUND);
     }
     else {
         foreach (@$lbifcfg) {
             push @lbiflist, $_->{tagnode};
         }
-        $status->code($BVC_OK);
+        $status->code($BSC_OK);
     }
     return ($status, \@lbiflist);
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_loopback_interfaces_cfg>
+
+  # Returns   : BSC::Status
+  #           : array ref - configuration of loopback interfaces
+
+=cut ===================================================================
 sub get_loopback_interfaces_cfg {
     my $self = shift;
     my $lbifcfg = undef;
@@ -494,23 +527,68 @@ sub get_loopback_interfaces_cfg {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
 #
+=item B<get_loopback_interface_cfg>
+
+  # Parameters: name of interface
+  # Returns   : BSC::Status
+  #           : requested loopback configuration as JSON string
+
+=cut ===================================================================
 sub get_loopback_interface_cfg {
     my $self = shift;
     my $ifName = shift;
-    my $status = new Brocade::BSC::Status($BVC_OK);
+    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $config = undef;
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
         . "vyatta-interfaces:interfaces/vyatta-interfaces-loopback:loopback/"
         . $ifName;
     my $resp = $self->{ctrl}->_http_req('GET', $urlpath);
-    $resp->code == HTTP_OK or $status->http_err($resp);
+    if ($resp->code == HTTP_OK) {
+        $config = $resp->content;
+        $status->code($BSC_OK);
+    }
+    else {
+        $status->http_err($resp);
+    }
 
-    return ($status, $resp);
+    return ($status, $config);
 }
 
 # Module ===============================================================
 1;
+
+=back
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGE.
