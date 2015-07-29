@@ -5,8 +5,8 @@ use warnings;
 
 use Getopt::Long;
 use Brocade::BSC;
-use Brocade::BSC::Netconf::Vrouter::VR5600;
-use Brocade::BSC::Netconf::Vrouter::Firewall;
+use Brocade::BSC::Node::NC::Vrouter::VR5600;
+use Brocade::BSC::Node::NC::Vrouter::Firewall;
 
 my $configfile = "";
 my $status = undef;
@@ -25,7 +25,7 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $vRouter = new Brocade::BSC::Netconf::Vrouter::VR5600(cfgfile => $configfile,
+my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(cfgfile => $configfile,
                                                          ctrl=>$bvc);
 
 print "<<< 'Controller': $bvc->{ipAddr}, '"
@@ -48,7 +48,7 @@ show_firewalls_cfg($vRouter);
 
 my $fw_name_1 = "ACCEPT-SRC-IPADDR";
 print ">>> Create new firewall instance '$fw_name_1' on '$vRouter->{name}'\n";
-my $fw1 = new Brocade::BSC::Netconf::Vrouter::Firewall;
+my $fw1 = new Brocade::BSC::Node::NC::Vrouter::Firewall;
 $fw1->add_group($fw_name_1);
 $fw1->add_rule($fw_name_1, 30,
                'action' => 'accept',
@@ -59,7 +59,7 @@ print "Firewall instance '$fw_name_1' was successfully created\n\n";
 
 my $fw_name_2 = "DROP-ICMP";
 print ">>> Create new firewall instance '$fw_name_2' on '$vRouter->{name}'\n";
-my $fw2 = new Brocade::BSC::Netconf::Vrouter::Firewall;
+my $fw2 = new Brocade::BSC::Node::NC::Vrouter::Firewall;
 $fw2->add_group($fw_name_2);
 $fw2->add_rule($fw_name_2, 40,
                'action' => 'drop',

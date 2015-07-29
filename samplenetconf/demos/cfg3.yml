@@ -6,7 +6,7 @@ ctrlPswd:  'admin'
 
 # NetconfNode specification
 nodeName: "lwp-vr-5600"
-nodeIpAddr: "172.22.17.63"
+nodeIpAddr: "172.22.17.67"
 nodePortNum: 830
 nodeUname: "vyatta"
 nodePswd: "vyatta"

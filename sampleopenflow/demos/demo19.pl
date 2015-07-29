@@ -6,10 +6,10 @@ use warnings;
 use Getopt::Long;
 use Brocade::BSC;
 use Brocade::BSC::Const qw(/ETH_TYPE/ /IP_/);
-use Brocade::BSC::Openflow::OFSwitch;
-use Brocade::BSC::Openflow::FlowEntry;
-use Brocade::BSC::Openflow::Match;
-use Brocade::BSC::Openflow::Action::Output;
+use Brocade::BSC::Node::OF::Switch;
+use Brocade::BSC::Node::OF::FlowEntry;
+use Brocade::BSC::Node::OF::Match;
+use Brocade::BSC::Node::OF::Action::Output;
 
 my $configfile = "";
 my $status = undef;
@@ -39,7 +39,7 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(cfgfile => $configfile,
+my $ofswitch = new Brocade::BSC::Node::OF::Switch(cfgfile => $configfile,
                                                     ctrl => $bvc);
 print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
 
@@ -54,7 +54,7 @@ print  "                TCP Source Port      ($tcp_src_port)\n";
 print  "                TCP Destination Port ($tcp_dst_port)\n";
 print  "        Action: Output (to $output_port)\n\n";
 
-my $flowentry = new Brocade::BSC::Openflow::FlowEntry;
+my $flowentry = new Brocade::BSC::Node::OF::FlowEntry;
 $flowentry->flow_name(__FILE__);
 $flowentry->table_id($table_id);
 $flowentry->id($flow_id);
@@ -66,13 +66,13 @@ $flowentry->idle_timeout($idle_timeout);
 # # --- Instruction: 'Apply-action'
 # #     Action:      'Output' NORMAL
 my $instruction = $flowentry->add_instruction(0);
-my $action = new Brocade::BSC::Openflow::Action::Output(order => 0,
+my $action = new Brocade::BSC::Node::OF::Action::Output(order => 0,
                                                         port => $output_port);
 $instruction->apply_actions($action);
 
 # # --- Match Fields
 
-my $match = new Brocade::BSC::Openflow::Match();
+my $match = new Brocade::BSC::Node::OF::Match();
 $match->eth_type($ethtype);
 $match->ipv6_src($ipv6_src);
 $match->ipv6_dst($ipv6_dst);

@@ -6,10 +6,10 @@ use warnings;
 use Getopt::Long;
 use Brocade::BSC;
 use Brocade::BSC::Const qw(/ETH_TYPE/);
-use Brocade::BSC::Openflow::OFSwitch;
-use Brocade::BSC::Openflow::FlowEntry;
-use Brocade::BSC::Openflow::Match;
-use Brocade::BSC::Openflow::Action::Output;
+use Brocade::BSC::Node::OF::Switch;
+use Brocade::BSC::Node::OF::FlowEntry;
+use Brocade::BSC::Node::OF::Match;
+use Brocade::BSC::Node::OF::Action::Output;
 
 my $configfile = "";
 my $status = undef;
@@ -33,7 +33,7 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(cfgfile => $configfile,
+my $ofswitch = new Brocade::BSC::Node::OF::Switch(cfgfile => $configfile,
                                            ctrl => $bvc);
 print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
 
@@ -46,7 +46,7 @@ print  "                IPv4 Destination Address     ($ipv4_dst)\n";
 print  "                Input Port                   ($input_port)\n";
 print  "        Action: Output (CONTROLLER)\n\n";
 
-my $flowentry = new Brocade::BSC::Openflow::FlowEntry;
+my $flowentry = new Brocade::BSC::Node::OF::FlowEntry;
 $flowentry->table_id($table_id);
 $flowentry->id($flow_id);
 $flowentry->priority($flow_priority);
@@ -54,14 +54,14 @@ $flowentry->priority($flow_priority);
 # # --- Instruction: 'Apply-action'
 # #     Action:      'Output' to CONTROLLER
 my $instruction = $flowentry->add_instruction(0);
-my $action = new Brocade::BSC::Openflow::Action::Output(order => 0,
+my $action = new Brocade::BSC::Node::OF::Action::Output(order => 0,
                                                max_len => 60,
                                                port => 'CONTROLLER');
 $instruction->apply_actions($action);
 
 # # --- Match Fields: Ethernet Type
 # #                   IPv4 Destination Address
-my $match = new Brocade::BSC::Openflow::Match();
+my $match = new Brocade::BSC::Node::OF::Match();
 $match->eth_type($ethtype);
 $match->eth_src($eth_src);
 $match->eth_dst($eth_dst);

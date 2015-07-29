@@ -5,7 +5,7 @@ use warnings;
 
 use Getopt::Long;
 use Brocade::BSC;
-use Brocade::BSC::Netconf::Vrouter::VR5600;
+use Brocade::BSC::Node::NC::Vrouter::VR5600;
 
 my $configfile  = undef;
 my $yangId      = undef;
@@ -20,7 +20,7 @@ GetOptions("config=s"     => \$configfile,
     or die "identifier and version arguments are required.";
 
 my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $vRouter = new Brocade::BSC::Netconf::Vrouter::VR5600(cfgfile => $configfile,
+my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(cfgfile => $configfile,
                                                          ctrl => $bvc);
 
 print "<<< 'Controller': $bvc->{ipAddr}, " .

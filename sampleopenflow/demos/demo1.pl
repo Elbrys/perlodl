@@ -5,7 +5,7 @@ use warnings;
 
 use Getopt::Long;
 use Brocade::BSC;
-use Brocade::BSC::Openflow::OFSwitch;
+use Brocade::BSC::Node::OF::Switch;
 
 my $configfile = "";
 my $status = undef;
@@ -32,7 +32,7 @@ print JSON->new->allow_nonref->pretty->encode($oflist) . "\n";
 
 print "<<< Get generic information about OpenFlow nodes\n";
 foreach my $ofnode (@$oflist) {
-    my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(ctrl => $bvc, name => $ofnode);
+    my $ofswitch = new Brocade::BSC::Node::OF::Switch(ctrl => $bvc, name => $ofnode);
     ($status, $switch_info) = $ofswitch->get_switch_info();
     $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 

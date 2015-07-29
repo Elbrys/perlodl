@@ -5,7 +5,7 @@ use warnings;
 
 use Getopt::Long;
 use Brocade::BSC;
-use Brocade::BSC::Openflow::OFSwitch;
+use Brocade::BSC::Node::OF::Switch;
 
 my $configfile = "";
 my $status = undef;
@@ -25,7 +25,7 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 my $bvc = new Brocade::BSC(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
-my $ofswitch = new Brocade::BSC::Openflow::OFSwitch(ctrl => $bvc, name => $sample);
+my $ofswitch = new Brocade::BSC::Node::OF::Switch(ctrl => $bvc, name => $sample);
 
     
 print "<<< Get information about OpenFlow node '$sample'\n";
