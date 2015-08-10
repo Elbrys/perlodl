@@ -1,10 +1,10 @@
-Brocade::BSC Version 1.0.1
+Brocade::BSC Version 1.0.2
 
 Brocade::BSC provides a perl API for interacting with the Brocade
 Communications Systems port of the OpenDaylight Software-defined
 networking controller ('Brocade SDN Controller').
 
-Brocade::BSC is a port of the python library pybvc.  Version 1.0.0 is
+Brocade::BSC is a port of the python library pybvc.  Version 1.0.2 is
 pre-alpha software and provides functionality equivalent to version 1.0.2
 of pybvc.
 
@@ -13,8 +13,8 @@ James Clark's XML parser, expat, version 1.95.0 or greater.  The expat
 development package may be downloaded from http://expat.sourceforge.net/
 or installed using your OS package manager, for example
 
-ubuntu$ apt-get install libexpat1-dev
-
+ubuntu$ sudo apt-get install libexpat1-dev
+fedora$ sudo yum install expat-devel
 
 INSTALLATION
 

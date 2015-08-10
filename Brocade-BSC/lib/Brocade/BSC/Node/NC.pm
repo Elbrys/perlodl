@@ -28,7 +28,7 @@ use YAML;
 
 =item B<new>
 
-Creates a new I<Brocade::BSC::NetconfNode> object and populates fields with
+Creates a new I<Brocade::BSC::Node::NC> object and populates fields with
 values from argument hash, if present, or YAML configuration file.
 
   ### parameters:
@@ -51,9 +51,8 @@ values from argument hash, if present, or YAML configuration file.
   #   tcpOnly        |             | 0
   #   adminName      | nodeUname   | admin
   #   adminPassword  | nodePswd    | admin
-  #   timeout        | timeout     | 5
 
-Returns new I<Brocade::BSC::NetconfNode> object.
+Returns new I<Brocade::BSC::Node::NC> object.
 =cut
 sub new {
     my ($class, %params) = @_;

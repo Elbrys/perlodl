@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'Brocade::BSC',
-    AUTHOR           => q{laird pruiksma <pruiklw@cpan.org>},
+    AUTHOR           => q{lwp <pruiklw@cpan.org>},
     VERSION_FROM     => 'lib/Brocade/BSC.pm',
     ABSTRACT_FROM    => 'lib/Brocade/BSC.pm',
     LICENSE          => 'BSD',

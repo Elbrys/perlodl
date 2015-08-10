@@ -53,6 +53,7 @@ $fw1->add_group($fw_name_1);
 $fw1->add_rule($fw_name_1, 30,
                'action' => 'accept',
                'src_addr' => $XXX_remote_ip);
+print $fw1->as_json() . "\n";
 $status = $vRouter->create_firewall_instance($fw1);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "Firewall instance '$fw_name_1' was successfully created\n\n";
@@ -64,6 +65,7 @@ $fw2->add_group($fw_name_2);
 $fw2->add_rule($fw_name_2, 40,
                'action' => 'drop',
                'typename' => 'ping');
+print $fw2->as_json() . "\n";
 $status = $vRouter->create_firewall_instance($fw2);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "Firewall instance '$fw_name_2' was successfully created\n\n";
@@ -127,6 +129,10 @@ sub show_firewalls_cfg {
 
     print "<<< Show firewalls configuration on the '$vRouter->{name}'\n";
     ($status, $fwcfg) = $vRouter->get_firewalls_cfg();
+    if ($status->no_data) {
+	print "No firewall configuration found.\n";
+	return;
+    }
     $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
     print "'$vRouter->{name}' firewalls config:\n";
     print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg))

@@ -1,5 +1,8 @@
 Revision history for Brocade-BSC
 
+1.0.2   2015-08-10
+        Support basic IPsec VPN configuration on VR-5600
+
 1.0.1   2015-07-22
         First alpha, released on an unsuspecting world.
         Based on https://pypi.python.org/pypi/pybvc/1.0.2

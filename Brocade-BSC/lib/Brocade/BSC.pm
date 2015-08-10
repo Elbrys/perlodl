@@ -4,7 +4,7 @@ Brocade::BSC - Configure and query the Brocade SDN controller.
 
 =head1 VERSION
 
-Version 1.0.1
+Version 1.0.2
 
 =head1 DESCRIPTION
 
@@ -18,7 +18,7 @@ return value.
 
 =cut
 
-use version; our $VERSION = qv("v1.0.1");
+use version; our $VERSION = qv("v1.0.2");
 
 use strict;
 use warnings;
@@ -879,7 +879,7 @@ sub get_openflow_nodes_operational_list {
 
 =head1 AUTHOR
 
-laird pruiksma, C<< <pruiklw at cpan.org> >>
+C<< <pruiklw at cpan.org> >>
 
 =head1 BUGS
 

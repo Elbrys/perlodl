@@ -28,30 +28,19 @@ use JSON -convert_blessed_universally;
 
 =item B<new>
 
-Creates a new I<Brocade::BSC::NetconfNode> object and populates fields with
+Creates a new I<Brocade::BSC::Node> object and populates fields with
 values from argument hash, if present, or YAML configuration file.
 
   ### parameters:
   #   + cfgfile       - path to YAML configuration file specifying node attributes
   #   + ctrl          - reference to Brocade::BSC controller object (required)
-  #   + name          - name of controlled netconf node
-  #   + ipAddr        - IP address of netconf node
-  #   + portNum       - TCP port for node's NETCONF interface
-  #   + tcpOnly       - boolean
-  #   + adminName     - username
-  #   + adminPassword - password
+  #   + name          - name of controlled node
   #
   ### YAML configuration file labels and default values
   #
   #   parameter hash | YAML label  | default value
   #   -------------- | ----------- | -------------
   #   name           | nodeName    |
-  #   ipAddr         | nodeIpAddr  |
-  #   portNum        | nodePortNum | 830
-  #   tcpOnly        |             | 0
-  #   adminName      | nodeUname   | admin
-  #   adminPassword  | nodePswd    | admin
-  #   timeout        | timeout     | 5
 
 Returns new I<Brocade::BSC::Node> object.
 =cut
@@ -90,6 +79,17 @@ sub as_json {
 }
 
 
+# Method ===============================================================
+#
+=item B<ctrl_req>
+
+  # Parameters: $method (string, req) HTTP verb
+  #           : $urlpath (string, req) path for REST request
+  #           : $data (string, opt)
+  #           : $headerref (hash ref, opt)
+  # Returns   : HTTP::Response
+
+=cut
 sub ctrl_req {
     my $self = shift;
 

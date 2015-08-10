@@ -184,6 +184,9 @@ sub get_firewalls_cfg {
         $config = $resp->content;
         $status->code($BSC_OK);
     }
+    elsif ($resp->code == HTTP_NOT_FOUND) {
+	$status->code($BSC_DATA_NOT_FOUND)
+    }
     else {
         $status->http_err($resp);
     }
@@ -555,6 +558,79 @@ sub get_loopback_interface_cfg {
 
     return ($status, $config);
 }
+
+
+# Method ===============================================================
+#
+=item B<set_vpn_cfg>
+
+  # Parameters: BSC::Node::NC::Vrouter::VPN
+  # Returns   : BSC::Status
+
+=cut ===================================================================
+sub set_vpn_cfg {
+    my ($self, $vpn) = @_;
+    my $status = new Brocade::BSC::Status($BSC_OK);
+
+    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my %headers = ('content-type' => 'application/yang.data+json');
+
+    my $resp = $self->ctrl_req('POST', $urlpath, $vpn->get_payload(), \%headers);
+    $resp->is_success or $status->http_err($resp);
+    return $status;
+}
+
+
+# Method ===============================================================
+#
+=item B<get_vpn_cfg>
+
+  # Returns   : BSC::Status
+  #           : VPN configuration as JSON string
+
+=cut ===================================================================
+sub get_vpn_cfg {
+    my $self = shift;
+    my $status = new Brocade::BSC::Status;
+    my $config = undef;
+    
+    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+	. "vyatta-security:security/vyatta-security-vpn-ipsec:vpn";
+    my $resp = $self->ctrl_req('GET', $urlpath);
+    if ($resp->code == HTTP_OK) {
+	$config = $resp->content;
+	$status->code($BSC_OK);
+    }
+    elsif ($resp->code == HTTP_NOT_FOUND) {
+	$status->code($BSC_DATA_NOT_FOUND);
+    }
+    else {
+	$status->http_err($resp);
+    }
+
+    return ($status, $config);
+}
+
+
+# Method ===============================================================
+#
+=item B<delete_vpn_cfg>
+
+  # Parameters: none - deletes all vpn configuration
+  # Returns   : BSC::Status
+
+=cut ===================================================================
+sub delete_vpn_cfg {
+    my $self = shift;
+    my $status = new Brocade::BSC::Status($BSC_OK);
+
+    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+	. "vyatta-security:security/vyatta-security-vpn-ipsec:vpn";
+    my $resp = $self->ctrl_req('DELETE', $urlpath);
+    $resp->is_success() or $status->http_err($resp);
+    return $status;
+}
+
 
 # Module ===============================================================
 1;
