@@ -62,6 +62,14 @@ my $upswd2="user2_password";
 my $uname3="user3";
 my $upswd3="user3_password";
 
+print " NOTE: For this demo to succeed the following files must exist on the ";
+print "'$vRouter->{name}'\n";
+print "       (empty files can be created for the sake of the demo):\n";
+print "        $ca_cert_file\n";
+print "        $srv_cert_file\n";
+print "        $crl_file\n";
+print "        $srv_key_file\n\n";
+
 print " VPN options to be set:\n"
     . "   - Configuration description         : '$description'\n"
     . "   - Server external address           : '$external_ipaddr'\n"
