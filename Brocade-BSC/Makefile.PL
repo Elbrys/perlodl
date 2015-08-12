@@ -23,6 +23,7 @@ WriteMakefile(
         'warnings'       => 0,
         'Carp'           => 0,
         'Carp::Assert'   => 0.21,
+        'Clone'          => 0,
         'Data::Walk'     => 1.00,
         'Exporter'       => 0,
         'HTTP::Status'   => 0,
