@@ -33,19 +33,19 @@
 use Test::More tests => 15;
 
 # check module load 1
-use_ok( 'BVC::Netconf::Vrouter::VR5600' );
+use_ok( 'Brocade::BSC::Node::NC::Vrouter::VR5600' );
 use Brocade::BSC;
 
 # create object with specified values 10
 my $bsc = new Brocade::BSC;
-my $vRouter = new BVC::Netconf::Vrouter::VR5600(ctrl => $bsc,
-                                                name => 'vr5600',
-                                                ipAddr => '192.168.99.4',
-                                                adminName => 'vyatta',
-                                                adminPassword => 'Vy@tt@');
+my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(ctrl => $bsc,
+                                                          name => 'vr5600',
+                                                          ipAddr => '192.168.99.4',
+                                                          adminName => 'vyatta',
+                                                          adminPassword => 'Vy@tt@');
 
 ok( defined($vRouter),                            "created VR5600 object");
-ok( $vRouter->isa(BVC::Netconf::Vrouter::VR5600), "...and its a VR5600");
+ok( $vRouter->isa(Brocade::BSC::Node::NC::Vrouter::VR5600), "...and its a VR5600");
 is( scalar keys %$vRouter, 7,                     "   a HASH with seven keys");
 ok( $vRouter->{ctrl}->isa(Brocade::BSC),          "controller object (specified)");
 is( $vRouter->{name}, 'vr5600',                   "name (specified)");

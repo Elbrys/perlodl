@@ -773,7 +773,7 @@ sub l2tp_remote_access_ipsec_auth_psk {
 
 # Method ==============================================================
 #
-=item B<auth_ca_cert_file
+=item B<auth_ca_cert_file>
 
   # Parameters: path to file on vrouter containing x509 certificate
   #             of trusted certificate authority
@@ -947,7 +947,7 @@ sub rsa_key {
 # Module ===============================================================
 1;
 
-# =back
+=back
 
 =head1 LICENCE AND COPYRIGHT
 
