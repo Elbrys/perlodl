@@ -44,11 +44,6 @@ my $searchroot = '..';
 require File::Find;
 require File::Spec;
 
-my $Test = Test::Builder->new;
-
-my @files = _brocade_files();
-$Test->plan( tests => scalar @files );
-
 my $copy = qr/^# Copyright \(c\) 201.*,  BROCADE COMMUNICATIONS SYSTEMS, INC
 #
 # All rights reserved.
@@ -78,6 +73,11 @@ my $copy = qr/^# Copyright \(c\) 201.*,  BROCADE COMMUNICATIONS SYSTEMS, INC
 # CONTRACT, STRICT LIABILITY, OR TORT \(INCLUDING NEGLIGENCE OR OTHERWISE\)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGE./;
+
+my $Test = Test::Builder->new;
+
+my @files = _brocade_files();
+$Test->plan( tests => scalar @files );
 
 # slurp files in one gulp
 undef $/;
