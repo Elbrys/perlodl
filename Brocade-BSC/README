@@ -4,7 +4,7 @@ Brocade::BSC provides a perl API for interacting with the Brocade
 Communications Systems port of the OpenDaylight Software-defined
 networking controller ('Brocade SDN Controller').
 
-Brocade::BSC is a port of the python library pybvc.  Version 1.0.3 is
+Brocade::BSC is a port of the python library pybvc.  Version 1.0.4 is
 pre-alpha software and provides functionality equivalent to version 1.0.2
 of pybvc.
 
