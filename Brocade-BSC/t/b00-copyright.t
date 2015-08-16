@@ -1,3 +1,5 @@
+#!perl -T
+
 # Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
 #
 # All rights reserved.
@@ -28,7 +30,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGE.
 
-#!perl -T
 use 5.006;
 use strict;
 use warnings;
@@ -44,7 +45,7 @@ my $searchroot = '..';
 require File::Find;
 require File::Spec;
 
-my $copy = qr/^# Copyright \(c\) 201.*,  BROCADE COMMUNICATIONS SYSTEMS, INC
+my $copy = qr/# Copyright \(c\) 201.*,  BROCADE COMMUNICATIONS SYSTEMS, INC
 #
 # All rights reserved.
 #
