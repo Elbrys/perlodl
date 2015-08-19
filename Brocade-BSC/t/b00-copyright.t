@@ -1,4 +1,4 @@
-#!perl -T
+#!/usr/bin/perl -T
 
 # Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
 #

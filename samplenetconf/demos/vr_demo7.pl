@@ -45,7 +45,7 @@ my $ifcfg = undef;
 my $http_resp = undef;
 
 my $fw_if = "dp0p192p1";         # unused but existing interface on vRouter
-my $remote_ip = "172.22.19.120"; # XXX
+my $remote_ip = "172.22.19.120"; # IP from which to allow traffic
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 

@@ -51,7 +51,7 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-print "<<< OpenVPN configuration example: Site-to-Site Mode with Preshared Secret\n\n";
+print "<<< OpenVPN configuration example: Site-to-Site Mode with TLS\n\n";
 
 my $bsc = new Brocade::BSC(cfgfile => $configfile);
 my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(cfgfile => $configfile,
@@ -90,11 +90,23 @@ else {
 print ">>> Configure new '$ifname' OpenVPN tunnel interface on the '$vRouter->{name}'\n";
 my $vpnif = new Brocade::BSC::Node::NC::Vrouter::OvpnIf($ifname);
 
+
+#=======================================================================
+#=======================================================================
+#=======================================================================
+
+
 $vpnif->mode('site-to-site');
-$vpnif->shared_secret_key_file('/config/auth/secret');
 $vpnif->local_address('192.168.200.1');
 $vpnif->remote_address('192.168.200.2');
 $vpnif->remote_host('87.65.43.21');
+$vpnif->tls_role('passive');
+
+$vpnif->tls_ca_cert_file('/config/auth/ca.crt');
+$vpnif->tls_cert_file('/config/auth/V1.crt');
+$vpnif->tls_crl_file('/config/auth/crl.pem');
+$vpnif->tls_dh_file('/config/auth/dh1024.pem');
+$vpnif->tls_key_file('/config/auth/V1.key');
 
 
 $status = $vRouter->set_openvpn_interface_cfg($vpnif);

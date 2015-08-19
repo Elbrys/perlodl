@@ -68,7 +68,6 @@ sub new {
     };
     bless ($self, $class);
     if ($params{aref}) {
-        # XXX 
         my $apply_action_href = ${$params{aref}}[0];
         assert (ref($apply_action_href) eq "HASH");
         assert (exists ($apply_action_href->{'apply-actions'}));

@@ -31,6 +31,7 @@ WriteMakefile(
         'LWP'            => 6.08,
         'Readonly'       => 2.00,
         'Regexp::Common' => 2013031301,
+        'URI::Escape'    => 0,
         'XML::Parser'    => 2.44,
         'YAML'           => 1.15,
     },

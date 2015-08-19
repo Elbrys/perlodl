@@ -5,6 +5,8 @@ lib/Brocade/BSC/Const.pm
 lib/Brocade/BSC/Node.pm
 lib/Brocade/BSC/Node/NC.pm
 lib/Brocade/BSC/Node/NC/Vrouter/Firewall.pm
+lib/Brocade/BSC/Node/NC/Vrouter/OvpnIf.pm
+lib/Brocade/BSC/Node/NC/Vrouter/StaticRoute.pm
 lib/Brocade/BSC/Node/NC/Vrouter/VPN.pm
 lib/Brocade/BSC/Node/NC/Vrouter/VR5600.pm
 lib/Brocade/BSC/Node/OF.pm
