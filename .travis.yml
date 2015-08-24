@@ -4,5 +4,5 @@ perl:
   - "5.18"
   - "5.14"
   - "5.8"
-install:
-  cpanm --quiet --installdeps --notest ./Brocade-BSC
+before_install:
+  - cd Brocade-BSC
