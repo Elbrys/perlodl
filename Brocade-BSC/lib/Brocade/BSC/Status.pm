@@ -129,6 +129,7 @@ sub new {
 # Parameters: none
 # Returns   : boolean: is the current status OK (configured, connected)?
 #
+
 =item B<ok>
 
   # Returns   : true iff the current status is OK.
@@ -138,6 +139,7 @@ sub ok {
     my $self = shift;
     return ($BSC_OK == $self->{code});
 }
+
 =item B<no_data>
 
   # Returns   : true if requested data was not found.
@@ -147,6 +149,7 @@ sub no_data {
     my $self = shift;
     return ($BSC_DATA_NOT_FOUND == $self->{code});
 }
+
 =item B<connected>
 
   # Returns   : true if last API call indicates node connected to controller.
@@ -156,6 +159,7 @@ sub connected {
     my $self = shift;
     return ($BSC_NODE_CONNECTED == $self->{code});
 }
+
 =item B<disconnected>
 
   # Returns   : true if last API call indicates node is not connected.
@@ -165,6 +169,7 @@ sub disconnected {
     my $self = shift;
     return ($BSC_NODE_DISCONNECTED == $self->{code});
 }
+
 =item B<not_found>
 
   # Returns   : true if last API call indicates node is unknown to controller.
@@ -174,6 +179,7 @@ sub not_found {
     my $self = shift;
     return ($BSC_NODE_NOT_FOUND == $self->{code});
 }
+
 =item B<configured>
 
   # Returns   : true if last API call indicates node is configured.
@@ -185,22 +191,22 @@ sub configured {
 }
 
 # Method ===============================================================
-#             code
+#             _code
 # Parameters: integer code for set
 #             none for get
 # Returns   : status code
 #
-sub code {
+sub _code {
     my ($self, $code) = @_;
     $self->{code} = (2 == @_) ? $code : $self->{code};
 }
 
 # Method ===============================================================
-#             http_err
+#             _http_err
 # Parameters: HTTP::Response object
 # Returns   : ignore; updates BVCStatus object with values from http response
 #
-sub http_err {
+sub _http_err {
     my ($self, $http_resp) = @_;
     (2 == @_) or die "missing required argument \$http_resp\n";
     $self->{code}      = $BSC_HTTP_ERROR;
@@ -209,7 +215,7 @@ sub http_err {
 }
 
 # Method ===============================================================
-#
+
 =item B<msg>
 
   # Returns   : status string for current status

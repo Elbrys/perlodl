@@ -127,7 +127,7 @@ sub new {
 
 
 # Method ===============================================================
-#
+
 =item B<as_json>
 
   # Returns   : VPN as formatted JSON string.
@@ -162,7 +162,7 @@ sub _strip_undef {
 
 
 # Method ===============================================================
-#
+
 =item B<get_payload>
 
   # Returns   : VPN configuration as JSON for posting to controller.
@@ -211,7 +211,7 @@ sub _find_ike_group {
 
 
 # Method ===============================================================
-#
+
 =item B<set_ipsec_ike_group_proposal>
 
   # Parameters: group      => name of IKE group to modify
@@ -235,7 +235,7 @@ sub set_ipsec_ike_group_proposal {
 
 
 # Method ===============================================================
-#
+
 =item B<set_ipsec_ike_group_lifetime>
 
   # Parameters: group    => name of IKE group to modify
@@ -278,7 +278,7 @@ sub _find_esp_group {
 
 
 # Method ===============================================================
-#
+
 =item B<set_ipsec_esp_group_proposal>
 
   # Parameters: group      => name of ESP group to modify
@@ -301,7 +301,7 @@ sub set_ipsec_esp_group_proposal {
 
 
 # Method ===============================================================
-#
+
 =item B<set_ipsec_esp_group_lifetime>
 
   # Parameters: group    => name of ESP group to modify
@@ -346,7 +346,7 @@ sub _find_site_site_peer {
 
 
 # Method ===============================================================
-#
+
 =item B<ipsec_site_site_peer_description>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -361,7 +361,7 @@ sub ipsec_site_site_peer_description {
 
 
 # Method ===============================================================
-#
+
 =item B<ipsec_site_site_peer_auth_mode>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -376,7 +376,7 @@ sub ipsec_site_site_peer_auth_mode {
 
 
 # Method ===============================================================
-#
+
 =item B<ipsec_site_site_peer_auth_psk>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -391,7 +391,7 @@ sub ipsec_site_site_peer_auth_psk {
 
 
 # Method ==============================================================
-#
+
 =item B<ipsec_site_site_peer_auth_rsa_key_name>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -406,7 +406,7 @@ sub ipsec_site_site_peer_auth_rsa_key_name {
 
 
 # Method ==============================================================
-#
+
 =item B<ipsec_site_site_peer_auth_remote_id>
 
   # Parameters: peertag => identifer for peer entry to modify
@@ -421,7 +421,7 @@ sub ipsec_site_site_peer_auth_remote_id {
 
 
 # Method ==============================================================
-#
+
 =item B<ipsec_site_site_peer_auth_ca_cert_file>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -434,7 +434,7 @@ sub ipsec_site_site_peer_auth_ca_cert_file {
     $peer->{authentication}->{x509}->{ca_cert_file} = $ca_cert_file;
 }
 # Method ==============================================================
-#
+
 =item B<ipsec_site_site_peer_auth_srv_cert_file>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -447,7 +447,7 @@ sub ipsec_site_site_peer_auth_srv_cert_file {
     $peer->{authentication}->{x509}->{cert_file} = $cert_file;
 }
 # Method ==============================================================
-#
+
 =item B<ipsec_site_site_peer_auth_srv_key_file>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -460,7 +460,7 @@ sub ipsec_site_site_peer_auth_srv_key_file {
     $peer->{authentication}->{x509}->{key}->{file} = $srv_key_file;
 }
 # Method ==============================================================
-#
+
 =item B<ipsec_site_site_peer_auth_srv_key_pswd>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -475,7 +475,7 @@ sub ipsec_site_site_peer_auth_srv_key_pswd {
 
 
 # Method ===============================================================
-#
+
 =item B<ipsec_site_site_peer_dflt_esp_grp>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -490,7 +490,7 @@ sub ipsec_site_site_peer_dflt_esp_grp {
 
 
 # Method ===============================================================
-#
+
 =item B<ipsec_site_site_peer_ike_grp>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -505,7 +505,7 @@ sub ipsec_site_site_peer_ike_grp {
 
 
 # Method ===============================================================
-#
+
 =item B<ipsec_site_site_peer_local_addr>
 
   # Parameters: peertag => identifier for peer entry to modify
@@ -546,7 +546,7 @@ sub _find_create_tunnel {
 
 
 # Method ===============================================================
-#
+
 =item B<ipsec_site_site_peer_tunnel_local_pfx>
 
   # Parameters: peer   => identifier for peer entry to modify
@@ -564,7 +564,7 @@ sub ipsec_site_site_peer_tunnel_local_pfx {
 
 
 # Method ===============================================================
-#
+
 =item B<ipsec_site_site_peer_tunnel_remote_pfx>
 
   # Parameters: peer   => identifier for peer entry to modify
@@ -582,7 +582,7 @@ sub ipsec_site_site_peer_tunnel_remote_pfx {
 
 
 # Method ===============================================================
-#
+
 =item B<nat_allow_network>
 
   # Parameters: subnet to be allowed through NAT, CIDR notation (w.x.y.z/d)
@@ -600,7 +600,7 @@ sub nat_allow_network {
 }
 
 # Method ===============================================================
-#
+
 =item B<nat_traversal>
 
   # Parameters: boolean: enable/disable NAT traversal
@@ -620,7 +620,7 @@ sub nat_traversal {
 
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_user>
 
   # Parameters: hash {'name' => ..., 'pswd' => ...}
@@ -639,7 +639,7 @@ sub l2tp_remote_access_user {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_user_auth_mode>
 
   # Parameters: mode
@@ -655,7 +655,7 @@ sub l2tp_remote_access_user_auth_mode {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_client_ip_pool>
 
   # Parameters: 'start' => IPADDR, 'end' => IPADDR
@@ -675,7 +675,7 @@ sub l2tp_remote_access_client_ip_pool {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_description>
 
   # Parameters: description string
@@ -691,7 +691,7 @@ sub l2tp_remote_access_description {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_dhcp_interface>
 
   # Parameters:
@@ -705,7 +705,7 @@ sub l2tp_remote_access_dhcp_interface {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_primary_dns_server>
 
   # Parameters: IP address of DNS server
@@ -721,7 +721,7 @@ sub l2tp_remote_access_primary_dns_server {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_secondary_dns_server>
 
   # Parameters: IP address of DNS server
@@ -737,7 +737,7 @@ sub l2tp_remote_access_secondary_dns_server {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_primary_wins_server>
 
   # Parameters: IP address of WINS server
@@ -753,7 +753,7 @@ sub l2tp_remote_access_primary_wins_server {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_secondary_wins_server>
 
   # Parameters: IP address of WINS server
@@ -770,8 +770,8 @@ sub l2tp_remote_access_secondary_wins_server {
 
 
 # Method ==============================================================
-#
-=item B<ipsec_auth_mode>
+
+=item B<l2tp_remote_access_ipsec_auth_mode>
 
   # Parameters: ipsec authentication mode
   # Returns   : current mode
@@ -786,8 +786,8 @@ sub l2tp_remote_access_ipsec_auth_mode {
 
 
 # Method ==============================================================
-#
-=item B<auth_psk>
+
+=item B<l2tp_remote_access_ipsec_auth_psk>
 
   # Parameters: pre-shared secret key for ipsec vpn
   # Returns   : psk
@@ -802,8 +802,8 @@ sub l2tp_remote_access_ipsec_auth_psk {
 
 
 # Method ==============================================================
-#
-=item B<auth_ca_cert_file>
+
+=item B<l2tp_remote_access_ipsec_auth_ca_cert_file>
 
   # Parameters: path to file on vrouter containing x509 certificate
   #             of trusted certificate authority
@@ -818,8 +818,8 @@ sub l2tp_remote_access_ipsec_auth_ca_cert_file {
 
 
 # Method ==============================================================
-#
-=item B<auth_crl_file>
+
+=item B<l2tp_remote_access_ipsec_auth_crl_file>
 
   # Parameters: path to file on vrouter containing x509 certificate
   #             revocation list
@@ -834,8 +834,8 @@ sub l2tp_remote_access_ipsec_auth_crl_file {
 
 
 # Method ==============================================================
-#
-=item B<auth_srv_cert_file>
+
+=item B<l2tp_remote_access_ipsec_auth_srv_cert_file>
 
   # Parameters: path to file on vrouter containing x509 server certificate
   # Returns   : file path
@@ -849,8 +849,8 @@ sub l2tp_remote_access_ipsec_auth_srv_cert_file {
 
 
 # Method ==============================================================
-#
-=item B<auth_srv_key_file>
+
+=item B<l2tp_remote_access_ipsec_auth_srv_key_file>
 
   # Parameters: path to file on vrouter containing x509 key
   # Returns   : file path
@@ -864,7 +864,7 @@ sub l2tp_remote_access_ipsec_auth_srv_key_file {
 
 
 # Method ==============================================================
-#
+
 =item B<l2tp_remote_access_ipsec_auth_srv_key_pswd>
 
   # Parameters: path to file on vrouter containing x509 key password
@@ -879,7 +879,7 @@ sub l2tp_remote_access_ipsec_auth_srv_key_pswd {
 
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_mtu>
 
   # Parameters: maximum transmission unit to apply [128..16384]
@@ -893,7 +893,7 @@ sub l2tp_remote_access_mtu {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_outside_address>
 
   # Parameters: IP address
@@ -907,7 +907,7 @@ sub l2tp_remote_access_outside_address {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_outside_nexthop>
 
   # Parameters: IP address
@@ -921,7 +921,7 @@ sub l2tp_remote_access_outside_nexthop {
 }
 
 # Method ===============================================================
-#
+
 =item B<l2tp_remote_access_server_ip_pool>
 
   # Parameters: start => IP_ADDRESS
@@ -943,7 +943,7 @@ sub l2tp_remote_access_server_ip_pool {
 
 
 # Method ===============================================================
-#
+
 =item B<local_key>
 
   # Parameters: path to file on local system containing RSA key
@@ -957,7 +957,7 @@ sub local_key {
 }
 
 # Method ===============================================================
-#
+
 =item B<rsa_key>
 
   # Parameters:

@@ -76,7 +76,7 @@ sub new {
 
 
 # Method ===============================================================
-#
+
 =item B<as_json>
 
   # Returns   : OpenVPN interface configuration as formatted JSON string.
@@ -111,7 +111,7 @@ sub _strip_undef {
 
 
 # Method ===============================================================
-#
+
 =item B<get_payload>
 
   # Returns   : OpenVpn interface configuration as JSON for
@@ -139,7 +139,7 @@ sub get_payload {
 
 
 # Method ===============================================================
-#
+
 =item B<description>
 
 Set or retrieve the description for this OpenVPN connection
@@ -152,7 +152,7 @@ sub description {
 
 
 # Method ===============================================================
-#
+
 =item B<mode>
 
 Set or retrieve the mode for this OpenVPN connection
@@ -165,7 +165,7 @@ sub mode {
 
 
 # Method ===============================================================
-#
+
 =item B<shared_secret_key_file>
 
 Set or retrieve the path to the pre-shared secret file for connection
@@ -179,7 +179,7 @@ sub shared_secret_key_file {
 
 
 # Method ===============================================================
-#
+
 =item B<local_address>
 
 Set or retrieve the local IP address for this OpenVPN connection
@@ -192,7 +192,7 @@ sub local_address {
 
 
 # Method ===============================================================
-#
+
 =item B<remote_address>
 
 Set or retrieve the remote IP address for this OpenVPN connection
@@ -205,7 +205,7 @@ sub remote_address {
 
 
 # Method ===============================================================
-#
+
 =item B<remote_host>
 
 Retrieve the remote_host list, or add an IP address to it
@@ -220,7 +220,7 @@ sub remote_host {
 
 
 # Method ===============================================================
-#
+
 =item B<tls_role>
 
 Set or retrieve TLS role for this OpenVPN connection
@@ -235,7 +235,7 @@ sub tls_role {
 
 
 # Method ===============================================================
-#
+
 =item B<tls_dh_file>
 
 Set or retrieve path to Diffie-Helman parameters file for this OpenVPN connection
@@ -250,7 +250,7 @@ sub tls_dh_file {
 
 
 # Method ===============================================================
-#
+
 =item B<tls_ca_cert_file>
 
 Set or retrieve path to CA certificate file
@@ -265,7 +265,7 @@ sub tls_ca_cert_file {
 
 
 # Method ===============================================================
-#
+
 =item B<tls_cert_file>
 
 Set or retrieve path to certificate file for this OpenVPN connection
@@ -280,7 +280,7 @@ sub tls_cert_file {
 
 
 # Method ===============================================================
-#
+
 =item B<tls_crl_file>
 
 Set or retrieve path to certificate revocation list
@@ -295,7 +295,7 @@ sub tls_crl_file {
 
 
 # Method ===============================================================
-#
+
 =item B<tls_key_file>
 
 Set or retrieve path to certificate key

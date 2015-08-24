@@ -144,7 +144,7 @@ use Brocade::BSC::Status qw(:constants);
 =cut
 
 # Method ===============================================================
-#
+
 =item B<get_schemas>
 
   # Returns   : array ref - YANG schemas supported by node
@@ -157,7 +157,7 @@ sub get_schemas {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_schema>
 
   # Returns   : requested YANG schema as formatted JSON
@@ -171,7 +171,7 @@ sub get_schema {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_cfg>
 
   # Returns   : BSC::Status
@@ -187,16 +187,16 @@ sub get_cfg {
     my $resp = $self->ctrl_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = decode_json($resp->content);
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $config);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_firewalls_cfg>
 
   # Returns   : BSC::Status
@@ -213,19 +213,19 @@ sub get_firewalls_cfg {
     my $resp = $self->ctrl_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     elsif ($resp->code == HTTP_NOT_FOUND) {
-	$status->code($BSC_DATA_NOT_FOUND)
+	$status->_code($BSC_DATA_NOT_FOUND)
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $config);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_firewall_instance_cfg>
 
   # Parameters: name of firewall instance
@@ -246,16 +246,16 @@ sub get_firewall_instance_cfg {
     my $resp = $self->ctrl_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $config);
 }
 
 # Method ===============================================================
-#
+
 =item B<create_firewall_instance>
 
 Create empty firewall instance on VR5600
@@ -273,7 +273,7 @@ sub create_firewall_instance {
     my $payload = $fwInstance->get_payload();
 
     my $resp = $self->ctrl_req('POST', $urlpath, $payload, \%headers);
-    $resp->is_success or $status->http_err($resp);
+    $resp->is_success or $status->_http_err($resp);
 
     return $status;
 }
@@ -283,21 +283,21 @@ sub create_firewall_instance {
 # Parameters: 
 # Returns   : 
 #
-sub add_firewall_instance_rule {
-    die "XXX";
-}
+# sub add_firewall_instance_rule {
+#     die "XXX";
+# }
 
 # Method ===============================================================
 # 
 # Parameters: 
 # Returns   : 
 #
-sub update_firewall_instance_rule {
-    die "XXX";
-}
+# sub update_firewall_instance_rule {
+#     die "XXX";
+# }
 
 # Method ===============================================================
-#
+
 =item B<delete_firewall_instance>
 
   # Parameters: name of instance to delete
@@ -310,26 +310,26 @@ sub delete_firewall_instance {
     my $status = new Brocade::BSC::Status;
 
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
-        . $fwInstance->get_url_extension()
+        . $fwInstance->_get_url_extension()
         . "/name/";
-    my @rules = $fwInstance->get_rules();
+    my @rules = $fwInstance->_get_rules();
 
     foreach my $rule (@rules) {
         my $rule_url = $urlpath . $rule->get_name();
         my $resp = $self->ctrl_req('DELETE', $rule_url);
         if ($resp->code != HTTP_OK) {
-            $status->http_err($resp);
+            $status->_http_err($resp);
             last;
         }
         else {
-            $status->code($BSC_OK);
+            $status->_code($BSC_OK);
         }
     }
     return $status;
 }
 
 # Method ===============================================================
-#
+
 =item B<set_dataplane_interface_firewall>
 
   # Parameters: ifName (required) - dataplane interface to which to apply
@@ -353,15 +353,15 @@ sub set_dataplane_interface_firewall {
     $params{outFw} and $fw->add_out_item($params{outFw});
 
     my $payload = $fw->get_payload();
-    $urlpath .= $fw->get_url_extension();
+    $urlpath .= $fw->_get_url_extension();
 
     my $resp = $self->ctrl_req('PUT', $urlpath, $payload, \%headers);
-    $resp->code == HTTP_OK or $status->http_err($resp);
+    $resp->code == HTTP_OK or $status->_http_err($resp);
     return $status;
 }
 
 # Method ===============================================================
-#
+
 =item B<delete_dataplane_interface_firewall>
 
   # Parameters: ifName (required) - interface from which to clear firewall rules
@@ -377,12 +377,12 @@ sub delete_dataplane_interface_firewall {
         . "vyatta-interfaces:interfaces/vyatta-interfaces-dataplane:dataplane"
         . "/$ifName/vyatta-security-firewall:firewall/";
     my $resp = $self->ctrl_req('DELETE', $urlpath);
-    $resp->code == HTTP_OK or $status->http_err($resp);
+    $resp->code == HTTP_OK or $status->_http_err($resp);
     return $status;
 }
 
 # Method ===============================================================
-#
+
 =item B<get_interfaces_list>
 
   # Returns   : BSC::Status
@@ -405,7 +405,7 @@ sub get_interfaces_list {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_interfaces_cfg>
 
   # Returns   : BSC::Status
@@ -423,16 +423,16 @@ sub get_interfaces_cfg {
     my $resp = $self->ctrl_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $config);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_dataplane_interfaces_list>
 
   # Returns   : BSC::Status
@@ -448,20 +448,20 @@ sub get_dataplane_interfaces_list {
 
     ($status, $dpifcfg) = $self->get_interfaces_cfg();
     if (! $dpifcfg) {
-        $status->code($BSC_DATA_NOT_FOUND);
+        $status->_code($BSC_DATA_NOT_FOUND);
     }
     else {
         $iflist = decode_json($dpifcfg)->{interfaces}->{'vyatta-interfaces-dataplane:dataplane'};
         foreach my $interface (@$iflist) {
             push @dpiflist, $interface->{tagnode};
         }
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     return ($status, @dpiflist);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_dataplane_interfaces_cfg>
 
   # Returns   : BSC::Status
@@ -484,7 +484,7 @@ sub get_dataplane_interfaces_cfg {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_dataplane_interface_cfg>
 
   # Parameters: name of interface
@@ -504,16 +504,16 @@ sub get_dataplane_interface_cfg {
     my $resp = $self->ctrl_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         $cfg = $resp->content;
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $cfg);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_loopback_interfaces_list>
 
   # Returns   : BSC::Status
@@ -526,19 +526,19 @@ sub get_loopback_interfaces_list {
 
     my ($status, $lbifcfg) = $self->get_loopback_interfaces_cfg();
     if (! $lbifcfg) {
-        $status->code($BSC_DATA_NOT_FOUND);
+        $status->_code($BSC_DATA_NOT_FOUND);
     }
     else {
         foreach (@$lbifcfg) {
             push @lbiflist, $_->{tagnode};
         }
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     return ($status, \@lbiflist);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_loopback_interfaces_cfg>
 
   # Returns   : BSC::Status
@@ -561,7 +561,7 @@ sub get_loopback_interfaces_cfg {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_loopback_interface_cfg>
 
   # Parameters: name of interface
@@ -581,10 +581,10 @@ sub get_loopback_interface_cfg {
     my $resp = $self->ctrl_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         $config = $resp->content;
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
 
     return ($status, $config);
@@ -592,7 +592,7 @@ sub get_loopback_interface_cfg {
 
 
 # Method ===============================================================
-#
+
 =item B<set_vpn_cfg>
 
   # Parameters: BSC::Node::NC::Vrouter::VPN
@@ -607,13 +607,13 @@ sub set_vpn_cfg {
     my %headers = ('content-type' => 'application/yang.data+json');
 
     my $resp = $self->ctrl_req('POST', $urlpath, $vpn->get_payload(), \%headers);
-    $resp->is_success or $status->http_err($resp);
+    $resp->is_success or $status->_http_err($resp);
     return $status;
 }
 
 
 # Method ===============================================================
-#
+
 =item B<get_vpn_cfg>
 
   # Returns   : BSC::Status
@@ -630,13 +630,13 @@ sub get_vpn_cfg {
     my $resp = $self->ctrl_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
 	$config = $resp->content;
-	$status->code($BSC_OK);
+	$status->_code($BSC_OK);
     }
     elsif ($resp->code == HTTP_NOT_FOUND) {
-	$status->code($BSC_DATA_NOT_FOUND);
+	$status->_code($BSC_DATA_NOT_FOUND);
     }
     else {
-	$status->http_err($resp);
+	$status->_http_err($resp);
     }
 
     return ($status, $config);
@@ -644,7 +644,7 @@ sub get_vpn_cfg {
 
 
 # Method ===============================================================
-#
+
 =item B<delete_vpn_cfg>
 
   # Parameters: none - deletes all vpn configuration
@@ -658,13 +658,13 @@ sub delete_vpn_cfg {
     my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
 	. "vyatta-security:security/vyatta-security-vpn-ipsec:vpn";
     my $resp = $self->ctrl_req('DELETE', $urlpath);
-    $resp->is_success() or $status->http_err($resp);
+    $resp->is_success() or $status->_http_err($resp);
     return $status;
 }
 
 
 # Method ===============================================================
-#
+
 =item B<set_openvpn_interface_cfg>
 
   # Parameters:
@@ -679,13 +679,13 @@ sub set_openvpn_interface_cfg {
 
     my $resp = $self->ctrl_req('POST', $urlpath,
                                $ovpn_ifcfg->get_payload, \%headers);
-    $resp->is_success or $status->http_err($resp);
+    $resp->is_success or $status->_http_err($resp);
     return $status;
 }
 
 
 # Method ===============================================================
-#
+
 =item B<get_openvpn_interface_cfg>
 
   # Parameters:
@@ -703,20 +703,20 @@ sub get_openvpn_interface_cfg {
     my $resp = $self->ctrl_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
 	$config = $resp->content;
-	$status->code($BSC_OK);
+	$status->_code($BSC_OK);
     }
     elsif ($resp->code == HTTP_NOT_FOUND) {
-	$status->code($BSC_DATA_NOT_FOUND);
+	$status->_code($BSC_DATA_NOT_FOUND);
     }
     else {
-	$status->http_err($resp);
+	$status->_http_err($resp);
     }
     return ($status, $config);
 }
 
 
 # Method ===============================================================
-#
+
 =item B<get_openvpn_interfaces_cfg>
 
   # Parameters:
@@ -733,14 +733,14 @@ sub get_openvpn_interfaces_cfg {
     if ($status->ok) {
         ($config =~ /$ovpn_tag/) and
             $ovpn_ifcfg = decode_json($config)->{'interfaces'}->{$ovpn_tag} or
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
     }
     return ($status, $ovpn_ifcfg);
 }
 
 
 # Method ===============================================================
-#
+
 =item B<delete_openvpn_interface_cfg>
 
   # Parameters: interface name for openvpn if; e.g. vtun0
@@ -755,13 +755,13 @@ sub delete_openvpn_interface_cfg {
         . "vyatta-interfaces-openvpn:openvpn/$ovpn_ifname";
 
     my $resp = $self->ctrl_req('DELETE', $urlpath);
-    $resp->is_success() or $status->http_err($resp);
+    $resp->is_success() or $status->_http_err($resp);
     return $status;
 }
 
 
 # Method ===============================================================
-#
+
 =item B<set_protocols_static_route_cfg>
 
   # Parameters: BSC::Node::NC::Vrouter::StaticRoute to set
@@ -778,13 +778,13 @@ sub set_protocols_static_route_cfg {
 
     my $resp = $self->ctrl_req('POST', $urlpath,
                                $route->get_payload, \%headers);
-    $resp->is_success() or $status->http_err($resp);
+    $resp->is_success() or $status->_http_err($resp);
     return $status;
 }
 
 
 # Method ===============================================================
-#
+
 =item B<get_protocols_cfg>
 
   # Parameters: model, opt, on which to filter
@@ -803,20 +803,20 @@ sub get_protocols_cfg {
     my $resp = $self->ctrl_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
 	$config = $resp->content;
-	$status->code($BSC_OK);
+	$status->_code($BSC_OK);
     }
     elsif ($resp->code == HTTP_NOT_FOUND) {
-	$status->code($BSC_DATA_NOT_FOUND);
+	$status->_code($BSC_DATA_NOT_FOUND);
     }
     else {
-	$status->http_err($resp);
+	$status->_http_err($resp);
     }
     return ($status, $config);
 }
 
 
 # Method ===============================================================
-#
+
 =item B<delete_protocols_cfg>
 
   # Parameters: model, opt, on which to filter for deletion
@@ -831,13 +831,13 @@ sub delete_protocols_cfg {
     defined $model and $urlpath .= "/$model";
 
     my $resp = $self->ctrl_req('DELETE', $urlpath);
-    $resp->is_success() or $status->http_err($resp);
+    $resp->is_success() or $status->_http_err($resp);
     return $status;
 }
 
 
 # Method ===============================================================
-#
+
 =item B<get_protocols_static_cfg>
 
   # Returns   : BSC::Status
@@ -851,7 +851,7 @@ sub get_protocols_static_cfg {
 
 
 # Method ===============================================================
-#
+
 =item B<delete_protocols_static_cfg>
 
   # Returns   : BSC::Status
@@ -864,7 +864,7 @@ sub delete_protocols_static_cfg {
 
 
 # Method ===============================================================
-#
+
 =item B<get_protocols_static_interface_route_cfg>
 
   # Parameters: subnet for which to get route
@@ -881,7 +881,7 @@ sub get_protocols_static_interface_route_cfg {
 
 
 # Method ===============================================================
-#
+
 =item B<delete_protocols_static_interface_route_cfg>
 
   # Parameters: subnet for route to delete

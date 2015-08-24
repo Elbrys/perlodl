@@ -60,10 +60,15 @@ sub new {
 
 
 # Method ===============================================================
-#             order
-# Parameters: retrieve or set the 'order' attribute
-# Returns   : 'order' value
-#
+
+=over 4
+
+=item B<order>
+
+  # Parameters: retrieve or set the 'order' attribute
+  # Returns   : 'order' value
+
+=cut
 sub order {
     my ($self, $order) = @_;
     $self->{order} = (@_ == 2) ? $order : $self->{order};
@@ -72,6 +77,8 @@ sub order {
 
 # Module ===============================================================
 1;
+
+=back
 
 =head1 SUBCLASSES
 

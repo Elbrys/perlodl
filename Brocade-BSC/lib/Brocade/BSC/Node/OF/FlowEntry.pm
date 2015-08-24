@@ -241,7 +241,7 @@ sub new {
 }
 
 # Method ===============================================================
-#
+
 =item B<as_json>
 
   # Returns   : FlowEntry as formatted JSON string.
@@ -268,7 +268,7 @@ sub _strip_undef {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_payload>
 
   # Returns   : FlowEntry as formatted for transmission to controller.
@@ -293,12 +293,12 @@ sub get_payload {
 
 
 # Method ===============================================================
-#             as_oxm
+#             _as_oxm
 # Parameters: none
 # Returns   : FlowEntry as formatted for transmission to controller
 #
 no strict 'refs';
-sub as_oxm {
+sub _as_oxm {
     my $self = shift;
 
     my $oxm = "";
@@ -320,7 +320,7 @@ sub as_oxm {
         }
     }
     if (defined $self->{match}) {
-        $oxm .= " matchs={" . $self->{match}->as_oxm . "}";
+        $oxm .= " matchs={" . $self->{match}->_as_oxm . "}";
     }
     if (defined $self->{instructions}) {
         $oxm .= " actions={";
@@ -328,7 +328,7 @@ sub as_oxm {
             my $action_ct = 0;
             foreach my $action (@{$instr->{apply_actions}->{action}}) {
                 $action_ct++ and $oxm .= q(,);
-                $oxm .= $action->as_oxm();
+                $oxm .= $action->_as_oxm();
                 print ref $action . "  <<<\n";
             }
         }
@@ -343,7 +343,7 @@ use strict 'refs';
 #             accessors
 # Parameters: none for gets; value to set for sets
 # Returns   : FlowEntry value
-#
+
 =item B<table_id>
 
 Set or retrieve the FlowEntry table id.
@@ -353,6 +353,7 @@ sub table_id {
     my ($self, $table_id) = @_;
     $self->{table_id} = (2 == @_) ? $table_id : $self->{table_id};
 }
+
 =item B<flow_name>
 
 Set or retrieve the FlowEntry name.
@@ -362,6 +363,7 @@ sub flow_name {
     my ($self, $flow_name) = @_;
     $self->{flow_name} = (2 == @_) ? $flow_name : $self->{flow_name};
 }
+
 =item B<id>
 
 Set or retrieve the FlowEntry ID.
@@ -371,6 +373,7 @@ sub id {
     my ($self, $id) = @_;
     $self->{id} = (2 == @_) ? $id : $self->{id};
 }
+
 =item B<install_hw>
 
 Set or retrieve the FlowEntry installHw flag.  This is used to force
@@ -389,6 +392,7 @@ sub install_hw {
     my ($self, $install_hw) = @_;
     $self->{installHw} = (2 == @_) ? $install_hw : $self->{installHw};
 }
+
 =item B<priority>
 
 Set or retrieve the FlowEntry priority.
@@ -398,6 +402,7 @@ sub priority {
     my ($self, $priority) = @_;
     $self->{priority} = (2 == @_) ? $priority : $self->{priority};
 }
+
 =item B<hard_timeout>
 
 Set or retrieve the FlowEntry hard timeout: max time before discarding
@@ -408,6 +413,7 @@ sub hard_timeout {
     my ($self, $timeout) = @_;
     $self->{hard_timeout} = (2 == @_) ? $timeout : $self->{hard_timeout};
 }
+
 =item B<idle_timeout>
 
 Set or retrieve the FlowEntry idle timeout: idle time before discarding
@@ -418,6 +424,7 @@ sub idle_timeout {
     my ($self, $timeout) = @_;
     $self->{idle_timeout} = (2 == @_) ? $timeout : $self->{idle_timeout};
 }
+
 =item B<cookie>
 
 Set or retrieve the FlowEntry cookie.
@@ -427,6 +434,7 @@ sub cookie {
     my ($self, $cookie) = @_;
     $self->{cookie} = (2 == @_) ? $cookie : $self->{cookie};
 }
+
 =item B<cookie_mask>
 
 Set or retrieve the FlowEntry cookie mask.
@@ -436,6 +444,7 @@ sub cookie_mask {
     my ($self, $mask) = @_;
     $self->{cookie_mask} = (2 == @_) ? $mask : $self->{cookie_mask};
 }
+
 =item B<strict>
 
 Set or retrieve the FlowEntry I<strict> flag.

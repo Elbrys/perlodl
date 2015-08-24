@@ -96,7 +96,7 @@ sub new {
 }
 
 # Method ===============================================================
-#
+
 =item B<as_json>
 
   # Returns   : Returns pretty-printed JSON string representing netconf node.
@@ -110,7 +110,7 @@ sub as_json {
 
 
 # Method ===============================================================
-#
+
 =item B<ctrl_req>
 
   # Parameters: $method (string, req) HTTP verb

@@ -127,7 +127,7 @@ sub get_name {
 package Brocade::BSC::Node::NC::Vrouter::Firewall;
 
 # Method ===============================================================
-#
+
 =item B<new>
 
   # Returns   : empty BSC::Node::NC::Vrouter::Firewall object
@@ -142,7 +142,7 @@ sub new {
 }
 
 # Method ===============================================================
-#
+
 =item B<as_json>
 
   # Returns   : pretty-printed JSON string representing Firewall object.
@@ -160,7 +160,7 @@ sub as_json {
 # Parameters: name of new firewall group
 # Returns   : array including new group
 #           :
-sub add_group {
+sub _add_group {
     my $self = shift;
     my $name = shift;
 
@@ -173,7 +173,7 @@ sub add_group {
 # Parameters: name of firewall group
 # Returns   : 
 #
-sub get_group {
+sub _get_group {
     my $self = shift;
     my $name = shift;
 
@@ -187,7 +187,7 @@ sub get_group {
 }
 
 # Method ===============================================================
-#
+
 =item B<add_rule>
 
   # Parameters: name - firewall group to which to add rule
@@ -201,7 +201,7 @@ sub add_rule {
     my $rule_id    = shift;
 
     my $rule = new Brocade::BSC::Node::NC::Vrouter::Firewall::Rule($rule_id, @_);
-    my $group = $self->get_group($group_name);
+    my $group = $self->_get_group($group_name);
     push @{$group->{rule}}, $rule;
 }
 
@@ -210,7 +210,7 @@ sub add_rule {
 # Parameters: 
 # Returns   : 
 #
-sub get_rule {
+sub ___get_rule {
     my $self = shift;
 
     # XXX
@@ -221,14 +221,14 @@ sub get_rule {
 # Parameters: 
 # Returns   : 
 #
-sub get_rules {
+sub _get_rules {
     my $self = shift;
 
     return @{ $self->{name} };
 }
 
 # Method ===============================================================
-#
+
 =item B<get_payload>
 
   # Returns   : firewall configuration formatted as JSON appropriate
@@ -252,7 +252,7 @@ sub get_payload {
 # Parameters: 
 # Returns   : 
 #
-sub get_url_extension {
+sub _get_url_extension {
     my $self = shift;
 
     return "vyatta-security:security/vyatta-security-firewall:firewall";

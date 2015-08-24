@@ -75,7 +75,7 @@ sub new {
 
 
 # Method ===============================================================
-#
+
 =item B<as_json>
 
   # Returns   : static route configuration as formatted JSON string.
@@ -110,7 +110,7 @@ sub _strip_undef {
 
 
 # Method ===============================================================
-#
+
 =item B<get_payload>
 
   # Returns   : OpenVpn interface configuration as JSON for
@@ -188,7 +188,7 @@ sub _find_nh_interface {
 
 
 # Method ===============================================================
-#
+
 =item B<interface_route>
 
 Add a static route for the specified subnet.
@@ -205,7 +205,7 @@ sub interface_route {
 
 
 # Method ===============================================================
-#
+
 =item B<interface_route_next_hop_interface>
 
 Specify interface on subnet containing next hop device for this route

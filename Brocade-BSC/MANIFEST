@@ -52,10 +52,10 @@ MANIFEST			This list of files
 README
 LICENSE
 t/00-load.t
+t/05-manifest.t
+t/06-pod.t
+t/07-pod-coverage.t
 t/b00-copyright.t
 t/s10-bsc.t
 t/s50-vr5600.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
 xt/boilerplate.t

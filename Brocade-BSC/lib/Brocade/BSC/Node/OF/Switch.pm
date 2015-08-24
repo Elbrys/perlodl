@@ -74,7 +74,7 @@ sub new {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_switch_info>
 
   # Returns   : BSC::Status
@@ -93,17 +93,17 @@ sub get_switch_info {
             $resp->content =~ /\"flow-node-inventory:$_\":\"([^"]*)\"/
                 && ($node_info{$_} = $1);
         } qw(manufacturer serial-number software hardware description);
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, \%node_info);
 }
 
 
 # Method ===============================================================
-#
+
 =item B<get_features_info>
 
   # Returns   : BSC::Status
@@ -122,17 +122,17 @@ sub get_features_info {
         ($resp->content =~ /\"flow-node-inventory:switch-features\":(\{[^\}]+\}),/)
             && (($features = $1) =~ s/flow-node-inventory:flow-feature-capability-//g);
         $feature_info_ref = decode_json($features);
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $feature_info_ref);
 }
 
 
 # Method ===============================================================
-#
+
 =item B<get_ports_list>
 
   # Returns   : BSC::Status
@@ -149,10 +149,10 @@ sub get_ports_list {
     if (HTTP_OK == $resp->code) {
         my $node_connector_json = ($resp->content =~ /$RE{balanced}{-keep}{-begin => "\"node-connector\":\["}{-end => "]"}/ && $1);
         @port_list = ($node_connector_json =~ /\"flow-node-inventory:port-number\":\"([0-9a-zA-Z]+)\"/g);
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, \@port_list);
 }
@@ -163,17 +163,17 @@ sub get_ports_list {
 # Parameters: portnum
 # Returns   :
 #
-sub get_port_brief_info {
-    my $self = shift;
-    my $portnum = shift;
-    my $status = new Brocade::BSC::Status;
+# sub get_port_brief_info {
+#     my $self = shift;
+#     my $portnum = shift;
+#     my $status = new Brocade::BSC::Status;
 
-    die "XXX";
-}
+#     die "XXX";
+# }
 
 
 # Method ===============================================================
-#
+
 =item B<get_ports_brief_info>
 
   # Returns   : BSC::Status
@@ -202,17 +202,17 @@ sub get_ports_brief_info {
                 uc($connector->{'flow-node-inventory:current-feature'});
             push @ports_info, $port_info;
         }
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, \@ports_info);
 }
 
 
 # Method ===============================================================
-#
+
 =item B<get_port_detail_info>
 
   # Parameters: port number
@@ -233,21 +233,21 @@ sub get_port_detail_info {
         my $node_connector = decode_json($resp->content);
         if (ref($node_connector->{'node-connector'}[0]) eq "HASH") {
             ($port_info_ref = $node_connector->{'node-connector'}[0]);
-            $status->code($BSC_OK);
+            $status->_code($BSC_OK);
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $port_info_ref);
 }
 
 
 # Method ===============================================================
-#
+
 =item B<add_modify_flow>
 
   # Parameters: flow_entry
@@ -266,17 +266,17 @@ sub add_modify_flow {
             . "/flow/" . $flow_entry->id();
         my $resp = $self->ctrl_req('PUT', $urlpath, $payload, \%headers);
 
-        ($resp->code == HTTP_OK) or $status->http_err($resp);
+        ($resp->code == HTTP_OK) or $status->_http_err($resp);
     }
     else {
-        $status->code($BSC_MALFORMED_DATA);
+        $status->_code($BSC_MALFORMED_DATA);
     }
     return $status;
 }
 
 
 # Method ===============================================================
-#
+
 =item B<delete_flow>
 
   # Parameters: table_id
@@ -291,13 +291,13 @@ sub delete_flow {
     my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
         . "/table/$table_id/flow/$flow_id";
     my $resp = $self->ctrl_req('DELETE', $urlpath);
-    $resp->code == HTTP_OK or $status->http_err($resp);
+    $resp->code == HTTP_OK or $status->_http_err($resp);
     return $status;
 }
 
 
 # Method ===============================================================
-#
+
 =item B<delete_flows>
 
   # Parameters: table_id - to be cleared of all flows
@@ -317,7 +317,7 @@ sub delete_flows {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_configured_flow>
 
   # Parameters: flow table_id
@@ -337,18 +337,17 @@ sub get_configured_flow {
 
     if (HTTP_OK == $resp->code) {
         $flow = $resp->content;
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $flow);
 }
 
-# return array ref -> flow hashes
 # Method ===============================================================
 #
-#=item B<get_flows>
+#=item B<_get_flows>
 #
 #  # Parameters: table_id
 #  #           : operational: boolean (1 => oper, 0 => config)
@@ -356,7 +355,7 @@ sub get_configured_flow {
 #  #           : ref to flows from table
 #
 #=cut ===================================================================
-sub get_flows {
+sub _get_flows {
     my ($self, $table_id, $operational) = @_;
     $operational //= 1;
     my $status = new Brocade::BSC::Status;
@@ -371,29 +370,29 @@ sub get_flows {
     if (HTTP_OK == $resp->code) {
         # XXX at least pretend to sanity check structure/existence
         $flows = decode_json($resp->content)->{'flow-node-inventory:table'}[0]->{flow};
-        $status->code( defined $flows ? $BSC_OK : $BSC_DATA_NOT_FOUND );
+        $status->_code( defined $flows ? $BSC_OK : $BSC_DATA_NOT_FOUND );
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $flows);
 }
 
 # Method ===============================================================
 #
-#=item B<get_FlowEntries>
+#=item B<_get_FlowEntries>
 #
 #  # Parameters: table_id
 #  #           : operational: boolean (1 => oper, 0 => config)
 #  # Returns   : array ref - ::Node::OF::FlowEntry objects
 #
 #=cut ===================================================================
-sub get_FlowEntries {
+sub _get_FlowEntries {
     my ($self, $table_id, $operational) = @_;
     $operational //= 1;
     my @FlowEntries = ();
 
-    my ($status, $flows) = $self->get_flows($table_id, $operational);
+    my ($status, $flows) = $self->_get_flows($table_id, $operational);
     if ($status->ok) {
         foreach (@$flows) {
             my $flowentry = new Brocade::BSC::Node::OF::FlowEntry(href => $_);
@@ -404,7 +403,7 @@ sub get_FlowEntries {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_operational_FlowEntries>
 
   # Parameters: table_id  - select table to retrieve
@@ -413,11 +412,11 @@ sub get_FlowEntries {
 =cut ===================================================================
 sub get_operational_FlowEntries {
     my ($self, $table_id) = @_;
-    return $self->get_FlowEntries($table_id, 1);
+    return $self->_get_FlowEntries($table_id, 1);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_configured_FlowEntries>
 
   # Parameters: table_id  - select table to retrieve
@@ -426,11 +425,11 @@ sub get_operational_FlowEntries {
 =cut ===================================================================
 sub get_configured_FlowEntries {
     my ($self, $table_id) = @_;
-    return $self->get_FlowEntries($table_id, 0);
+    return $self->_get_FlowEntries($table_id, 0);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_configured_FlowEntry>
 
   # Parameters: table_id

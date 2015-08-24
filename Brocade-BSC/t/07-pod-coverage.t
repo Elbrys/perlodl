@@ -9,7 +9,7 @@ unless ( $ENV{RELEASE_TESTING} ) {
 }
 
 # disable
-plan skip_all => "disable pod-coverage until extended, too many false positives";
+# plan skip_all => "disable pod-coverage until extended, too many false positives";
     
 # Ensure a recent version of Test::Pod::Coverage
 my $min_tpc = 1.08;
@@ -24,4 +24,19 @@ eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
 
-all_pod_coverage_ok();
+
+my @modules;
+for my $module (all_modules()) {
+    # modules which intentionally have no POD.  :::Action.pm contains all
+    #   documentation for :::Action::*.pm
+    next if $module =~ /Brocade::BSC::Node::OF::Action::/;
+    push @modules, $module;
+}
+plan skip_all => "No modules to test" unless @modules;
+
+plan tests => scalar @modules;
+
+for my $module (sort @modules) {
+    pod_coverage_ok($module);
+}
+

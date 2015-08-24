@@ -56,11 +56,11 @@ sub new {
 
 
 # Method ===============================================================
-#             as_oxm
+#             _as_oxm
 # Parameters: none
 # Returns   : this, as formatted for transmission to controller
 #
-sub as_oxm {
+sub _as_oxm {
     my $self = shift;
 
     return sprintf("push_mpls=0x%x", $self->eth_type());

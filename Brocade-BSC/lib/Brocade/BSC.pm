@@ -34,7 +34,7 @@ Brocade::BSC - Configure and query the Brocade SDN controller.
 
 =head1 VERSION
 
-Version 1.0.4
+Version 1.0.5
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ return value.
 
 =cut
 
-use version; our $VERSION = qv("v1.0.4");
+use version; our $VERSION = qv("v1.0.5");
 
 use strict;
 use warnings;
@@ -159,7 +159,7 @@ sub _http_req {
 }
 
 # Method ===============================================================
-#
+
 =item B<as_json>
 
   # Returns pretty-printed JSON string representing BSC object.
@@ -172,7 +172,7 @@ sub as_json {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_nodes_operational_list>
 
   # Returns   : BSC::Status
@@ -190,27 +190,27 @@ sub get_nodes_operational_list {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status->code($BSC_DATA_NOT_FOUND);
+                $status->_code($BSC_DATA_NOT_FOUND);
             }
             else {
                 foreach (@$nodes) {
                     push @nodeNames, $_->{id};
                 }
-                $status->code($BSC_OK);
+                $status->_code($BSC_OK);
             }
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, \@nodeNames);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_node_info>
 
   # Parameter : node name (string, required)
@@ -229,17 +229,17 @@ sub get_node_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"node\"/) {
             $node_info = decode_json($resp->content)->{node};
-            $status->code($node_info ? $BSC_OK : $BSC_DATA_NOT_FOUND);
+            $status->_code($node_info ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $node_info);
 }
 
 # Method ===============================================================
-#
+
 =item B<check_node_config_status>
 
   # Parameter : node name (string, required)
@@ -253,13 +253,13 @@ sub check_node_config_status {
 
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/$node";
     my $resp = $self->_http_req('GET', $urlpath);
-    $status->code(($resp->code == HTTP_OK)
+    $status->_code(($resp->code == HTTP_OK)
         ? $BSC_NODE_CONFIGURED : $BSC_NODE_NOT_FOUND);
     return $status;
 }
 
 # Method ===============================================================
-#
+
 =item B<check_node_conn_status>
 
   # Parameter : node name (string, required)
@@ -272,11 +272,11 @@ sub check_node_conn_status {
     my $status = new Brocade::BSC::Status;
     ($status, my $nodeStatus) = $self->get_all_nodes_conn_status();
     if ($status->ok) {
-        $status->code($BSC_NODE_NOT_FOUND);
+        $status->_code($BSC_NODE_NOT_FOUND);
         foreach (@$nodeStatus) {
             if ($_->{id} eq $node) {
-                $status->code($_->{connected} ? $BSC_NODE_CONNECTED
-                                              : $BSC_NODE_DISCONNECTED);
+                $status->_code($_->{connected} ? $BSC_NODE_CONNECTED
+                                               : $BSC_NODE_DISCONNECTED);
                 last;
             }
         }
@@ -285,7 +285,7 @@ sub check_node_conn_status {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_all_nodes_in_config>
 
   # Returns   : BSC::Status
@@ -303,27 +303,27 @@ sub get_all_nodes_in_config {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status->code($BSC_DATA_NOT_FOUND);
+                $status->_code($BSC_DATA_NOT_FOUND);
             }
             else {
                 foreach (@$nodes) {
                     push @nodeNames, $_->{id};
                 }
-                $status->code($BSC_OK);
+                $status->_code($BSC_OK);
             }
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, \@nodeNames);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_all_nodes_conn_status>
 
   # Returns   : BSC::Status
@@ -350,7 +350,7 @@ sub get_all_nodes_conn_status {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status->code($BSC_DATA_NOT_FOUND);
+                $status->_code($BSC_DATA_NOT_FOUND);
             }
             else {
                 foreach (@$nodes) {
@@ -363,21 +363,21 @@ sub get_all_nodes_conn_status {
                     push @nodeStatus, {'id' => $_->{id},
                                        'connected' => $connected}
                 }
-                $status->code($BSC_OK);
+                $status->_code($BSC_OK);
             }
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, \@nodeStatus);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_netconf_nodes_in_config>
 
   # Returns   : BSC::Status
@@ -394,8 +394,8 @@ sub get_netconf_nodes_in_config {
 }
 
 # Method ===============================================================
-#
-=item B<get_all_nodes_conn_status>
+
+=item B<get_netconf_nodes_conn_status>
 
   # Returns   : BSC::Status
   #           : reference to array of hashes:
@@ -414,7 +414,7 @@ sub get_netconf_nodes_conn_status {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_schemas>
 
   # Parameters: node name (string, required)
@@ -434,20 +434,20 @@ sub get_schemas {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"schemas\"/) {
             $schemas = decode_json($resp->content)->{schemas}->{schema};
-            $status->code($schemas ? $BSC_OK : $BSC_DATA_NOT_FOUND);
+            $status->_code($schemas ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $schemas);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_schema>
 
   # Parameters: node name
@@ -478,16 +478,16 @@ sub get_schema {
         assert   ($xmltree_ref->[1][2][1]    eq 'data');
         assert   ($xmltree_ref->[1][2][2][1] == 0);
         $schema = $xmltree_ref->[1][2][2][2];
-        $status->code($BSC_OK);
+        $status->_code($BSC_OK);
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $schema);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_netconf_operations>
 
   # Parameters: node name
@@ -506,20 +506,20 @@ sub get_netconf_operations {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"operations\"/) {
             $operations = decode_json($resp->content)->{operations};
-            $status->code($BSC_OK);
+            $status->_code($BSC_OK);
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $operations);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_all_modules_operational_state>
 
   # Returns   : BSC::Status
@@ -539,20 +539,20 @@ sub get_all_modules_operational_state {
             my $json = $resp->content;
             $json =~ s/\\\n//g;
             $modules = decode_json($json)->{modules}->{module};
-            $status->code($modules ? $BSC_OK : $BSC_DATA_NOT_FOUND);
+            $status->_code($modules ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $modules);
 }
 
 # Method ===============================================================
-# 
+
 =item B<get_module_operational_state>
 
   # Parameter : module type
@@ -572,20 +572,20 @@ sub get_module_operational_state {
     if ($resp->code == HTTP_OK ) {
         if ($resp->content =~ /\"module\"/) {
             $module = decode_json($resp->content)->{module};
-            $status->code($module ? $BSC_OK : $BSC_DATA_NOT_FOUND);
+            $status->_code($module ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $module);
 }
 
 # Method ===============================================================
-# 
+
 =item B<get_sessions_info>
 
   # Parameters: node name
@@ -604,20 +604,20 @@ sub get_sessions_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"sessions\"/) {
             $sessions = decode_json($resp->content)->{sessions};
-            $status->code($sessions ? $BSC_OK : $BSC_DATA_NOT_FOUND);
+            $status->_code($sessions ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $sessions);
 }
 
 # Method ===============================================================
-# 
+
 =item B<get_streams_info>
 
   # Parameters:
@@ -635,20 +635,20 @@ sub get_streams_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"streams\"/) {
             $streams = decode_json($resp->content)->{streams};
-            $status->code($streams ? $BSC_OK : $BSC_DATA_NOT_FOUND);
+            $status->_code($streams ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $streams);
 }
 
 # Method ===============================================================
-# 
+
 =item B<get_service_providers_info>
 
   # Parameters:
@@ -666,20 +666,20 @@ sub get_service_providers_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"services\"/) {
             $service = decode_json($resp->content)->{services}->{service};
-            $status->code($service ? $BSC_OK : $BSC_DATA_NOT_FOUND);
+            $status->_code($service ? $BSC_OK : $BSC_DATA_NOT_FOUND);
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $service);
 }
 
 # Method ===============================================================
-#
+
 =item B<get_service_provider_info>
 
   # Parameters: node name
@@ -699,20 +699,20 @@ sub get_service_provider_info {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"service\"/) {
             $service = decode_json($resp->content)->{service};
-            $status->code($BSC_OK);
+            $status->_code($BSC_OK);
         }
         else {
-            $status->code($BSC_DATA_NOT_FOUND);
+            $status->_code($BSC_DATA_NOT_FOUND);
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, $service);
 }
 
 # Method ===============================================================
-#
+
 =item B<add_netconf_node>
 
 Add a mount point on controller for specified node.
@@ -762,12 +762,12 @@ sub add_netconf_node {
 END_XML
 
     my $resp = $self->_http_req('POST', $urlpath, $xmlPayload, \%headers);
-    $resp->is_success or $status->http_err($resp);
+    $resp->is_success or $status->_http_err($resp);
     return $status;
 }
 
 # Method ===============================================================
-#
+
 =item B<delete_netconf_node>
 
   # Parameters: node name
@@ -785,7 +785,7 @@ sub delete_netconf_node {
         . $node->{name};
 
     my $resp = $self->_http_req('DELETE', $urlpath);
-    $resp->is_success or $status->http_err($resp);
+    $resp->is_success or $status->_http_err($resp);
     return $status;
 }
 
@@ -798,15 +798,15 @@ sub delete_netconf_node {
 #   #           :
 #
 # =cut
-sub modify_netconf_node_in_config {
-    my $self = shift;
-    my $node = shift;
+# sub modify_netconf_node_in_config {
+#     my $self = shift;
+#     my $node = shift;
 
-    die "XXX";
-}
+#     die "XXX";
+# }
 
 # Method ===============================================================
-#
+
 =item B<get_ext_mount_config_urlpath>
 
   # Parameters: node name
@@ -822,7 +822,7 @@ sub get_ext_mount_config_urlpath {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_ext_mount_operational_urlpath>
 
   # Parameters: node name
@@ -838,7 +838,7 @@ sub get_ext_mount_operational_urlpath {
 }
 
 # Method ===============================================================
-# 
+
 =item B<get_node_operational_urlpath>
 
   # Parameters: node name
@@ -853,7 +853,7 @@ sub get_node_operational_urlpath {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_node_config_urlpath>
 
   # Parameters: node name
@@ -868,7 +868,7 @@ sub get_node_config_urlpath {
 }
 
 # Method ===============================================================
-#
+
 =item B<get_openflow_nodes_operational_list>
 
   # Returns   : BSC::Status
@@ -886,10 +886,10 @@ sub get_openflow_nodes_operational_list {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
             if (! $nodes) {
-                $status->code($BSC_DATA_NOT_FOUND);
+                $status->_code($BSC_DATA_NOT_FOUND);
             }
             else {
-                $status->code($BSC_OK);
+                $status->_code($BSC_OK);
                 foreach (@$nodes) {
                     $_->{id} =~ /^(openflow:[0-9]*)/ && push @nodelist, $1;
                 }
@@ -897,7 +897,7 @@ sub get_openflow_nodes_operational_list {
         }
     }
     else {
-        $status->http_err($resp);
+        $status->_http_err($resp);
     }
     return ($status, \@nodelist);
 }
