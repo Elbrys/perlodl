@@ -6,3 +6,5 @@ perl:
   - "5.8"
 before_install:
   - cd Brocade-BSC
+before_script:
+  - RELEASE_TESTING=1
