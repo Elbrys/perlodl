@@ -48,12 +48,12 @@ return value.
 
 =cut
 
+package Brocade::BSC;
+
 use version; our $VERSION = qv("v1.0.5");
 
 use strict;
 use warnings;
-
-package Brocade::BSC;
 
 use Brocade::BSC::Status qw(:constants);
 
