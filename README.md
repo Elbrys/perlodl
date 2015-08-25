@@ -1,10 +1,8 @@
 # perlodl
+
 Perl library and samples for working with OpenDaylight controller's RESTCONF API.
 
-+ perl port of elbrys/PyDevODL
++ perl port of https://github.com/Elbrys/pydevodl
 
-+ working repository; no installer.  Add /path/to/BVC to $PERL5LIB
-    or command line.
+[![Build Status](https://travis-ci.org/Elbrys/perlodl.svg)](https://travis-ci.org/Elbrys/perlodl)
 
-+ unlike PyDevODL, sample demos do not have hardcoded config files
-  $ ./demo-foo -c cfg.yml
