@@ -8,3 +8,4 @@ before_install:
   - cd Brocade-BSC
 env:
   - RELEASE_TESTING=1
+  - CHECK_DEMOS=1

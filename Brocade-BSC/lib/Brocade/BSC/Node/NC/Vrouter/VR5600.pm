@@ -89,12 +89,12 @@ sub add_out_item {
 }
 
 # Method ===============================================================
-#             get_url_extenstion: provide suffix for configuring *this*
+#             _get_url_extenstion: provide suffix for configuring *this*
 #                                 firewall; must be appended to config urlpath
 # Parameters: none
 # Returns   : url suffix
 #
-sub get_url_extension {
+sub _get_url_extension {
     my $self = shift;
 
     return "vyatta-interfaces:interfaces/vyatta-interfaces-dataplane:"
@@ -183,7 +183,7 @@ sub get_cfg {
     my $status = new Brocade::BSC::Status;
     my $config = undef;
 
-    my $url = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my $url = $self->_nc_config_urlpath;
     my $resp = $self->ctrl_req('GET', $url);
     if ($resp->code == HTTP_OK) {
         $config = decode_json($resp->content);
@@ -208,7 +208,7 @@ sub get_firewalls_cfg {
     my $status = new Brocade::BSC::Status;
     my $config = undef;
 
-    my $url = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my $url = $self->_nc_config_urlpath;
     $url .= "vyatta-security:security/vyatta-security-firewall:firewall";
     my $resp = $self->ctrl_req('GET', $url);
     if ($resp->code == HTTP_OK) {
@@ -240,7 +240,7 @@ sub get_firewall_instance_cfg {
     my $status = new Brocade::BSC::Status;
     my $config = undef;
 
-    my $url = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my $url = $self->_nc_config_urlpath;
     $url .= "vyatta-security:security/vyatta-security-firewall:firewall/name/"
         . $instance;
     my $resp = $self->ctrl_req('GET', $url);
@@ -268,7 +268,7 @@ sub create_firewall_instance {
     my $fwInstance = shift;
     my $status = new Brocade::BSC::Status($BSC_OK);
 
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my $urlpath = $self->_nc_config_urlpath;
     my %headers = ('content-type'=>'application/yang.data+json');
     my $payload = $fwInstance->get_payload();
 
@@ -309,7 +309,7 @@ sub delete_firewall_instance {
     my $fwInstance = shift;
     my $status = new Brocade::BSC::Status;
 
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
         . $fwInstance->_get_url_extension()
         . "/name/";
     my @rules = $fwInstance->_get_rules();
@@ -344,7 +344,7 @@ sub set_dataplane_interface_firewall {
     my $status = new Brocade::BSC::Status($BSC_OK);
 
     my %headers = ('content-type' => 'application/yang.data+json');
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my $urlpath = $self->_nc_config_urlpath;
 
     $params{ifName} or die "missing req'd parameter \$ifName";
     my $fw = new Brocade::BSC::Node::NC::Vrouter::VR5600::DataplaneInterfaceFirewall($params{ifName});
@@ -373,7 +373,7 @@ sub delete_dataplane_interface_firewall {
 
     my $status = new Brocade::BSC::Status($BSC_OK);
 
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
         . "vyatta-interfaces:interfaces/vyatta-interfaces-dataplane:dataplane"
         . "/$ifName/vyatta-security-firewall:firewall/";
     my $resp = $self->ctrl_req('DELETE', $urlpath);
@@ -417,7 +417,7 @@ sub get_interfaces_cfg {
     my $status = new Brocade::BSC::Status;
     my $config = undef;
 
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my $urlpath = $self->_nc_config_urlpath;
     $urlpath .= "vyatta-interfaces:interfaces";
 
     my $resp = $self->ctrl_req('GET', $urlpath);
@@ -498,7 +498,7 @@ sub get_dataplane_interface_cfg {
     my $status = new Brocade::BSC::Status;
     my $cfg = undef;
 
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
         . "vyatta-interfaces:interfaces/vyatta-interfaces-dataplane:dataplane/"
         . $ifname;
     my $resp = $self->ctrl_req('GET', $urlpath);
@@ -575,7 +575,7 @@ sub get_loopback_interface_cfg {
     my $status = new Brocade::BSC::Status($BSC_OK);
     my $config = undef;
 
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
         . "vyatta-interfaces:interfaces/vyatta-interfaces-loopback:loopback/"
         . $ifName;
     my $resp = $self->ctrl_req('GET', $urlpath);
@@ -603,7 +603,7 @@ sub set_vpn_cfg {
     my ($self, $vpn) = @_;
     my $status = new Brocade::BSC::Status($BSC_OK);
 
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my $urlpath = $self->_nc_config_urlpath;
     my %headers = ('content-type' => 'application/yang.data+json');
 
     my $resp = $self->ctrl_req('POST', $urlpath, $vpn->get_payload(), \%headers);
@@ -625,7 +625,7 @@ sub get_vpn_cfg {
     my $status = new Brocade::BSC::Status;
     my $config = undef;
     
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
 	. "vyatta-security:security/vyatta-security-vpn-ipsec:vpn";
     my $resp = $self->ctrl_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
@@ -655,7 +655,7 @@ sub delete_vpn_cfg {
     my $self = shift;
     my $status = new Brocade::BSC::Status($BSC_OK);
 
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
 	. "vyatta-security:security/vyatta-security-vpn-ipsec:vpn";
     my $resp = $self->ctrl_req('DELETE', $urlpath);
     $resp->is_success() or $status->_http_err($resp);
@@ -675,7 +675,7 @@ sub set_openvpn_interface_cfg {
     my ($self, $ovpn_ifcfg) = @_;
     my $status = new Brocade::BSC::Status($BSC_OK);
     my %headers = ('content-type' => 'application/yang.data+json');
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my $urlpath = $self->_nc_config_urlpath;
 
     my $resp = $self->ctrl_req('POST', $urlpath,
                                $ovpn_ifcfg->get_payload, \%headers);
@@ -696,7 +696,7 @@ sub get_openvpn_interface_cfg {
     my ($self, $ovpn_ifname) = @_;
     my $status = new Brocade::BSC::Status;
     my $config = undef;
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
         . "vyatta-interfaces:interfaces/"
         . "vyatta-interfaces-openvpn:openvpn/$ovpn_ifname";
 
@@ -750,7 +750,7 @@ sub get_openvpn_interfaces_cfg {
 sub delete_openvpn_interface_cfg {
     my ($self, $ovpn_ifname) = @_;
     my $status = new Brocade::BSC::Status($BSC_OK);
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
         . "vyatta-interfaces:interfaces/"
         . "vyatta-interfaces-openvpn:openvpn/$ovpn_ifname";
 
@@ -774,7 +774,7 @@ sub set_protocols_static_route_cfg {
     my ($self, $route) = @_;
     my $status = new Brocade::BSC::Status($BSC_OK);
     my %headers = ('content-type' => 'application/yang.data+json');
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name});
+    my $urlpath = $self->_nc_config_urlpath;
 
     my $resp = $self->ctrl_req('POST', $urlpath,
                                $route->get_payload, \%headers);
@@ -796,7 +796,7 @@ sub get_protocols_cfg {
     my ($self, $model) = @_;
     my $status = new Brocade::BSC::Status;
     my $config = undef;
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
         . "vyatta-protocols:protocols";
     defined $model and $urlpath .= "/$model";
 
@@ -826,7 +826,7 @@ sub get_protocols_cfg {
 sub delete_protocols_cfg {
     my ($self, $model) = @_;
     my $status = new Brocade::BSC::Status($BSC_OK);
-    my $urlpath = $self->{ctrl}->get_ext_mount_config_urlpath($self->{name})
+    my $urlpath = $self->_nc_config_urlpath
         . "vyatta-protocols:protocols";
     defined $model and $urlpath .= "/$model";
 

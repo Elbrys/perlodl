@@ -86,7 +86,7 @@ sub get_switch_info {
     my $status = new Brocade::BSC::Status;
     my %node_info = ();
 
-    my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
+    my $urlpath = $self->_oper_urlpath;
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
         map {
@@ -115,7 +115,7 @@ sub get_features_info {
     my $status = new Brocade::BSC::Status;
     my $feature_info_ref = undef;
 
-    my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
+    my $urlpath = $self->_oper_urlpath;
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
         my $features = undef;
@@ -144,7 +144,7 @@ sub get_ports_list {
     my $status = new Brocade::BSC::Status;
     my @port_list = ();
 
-    my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
+    my $urlpath = $self->_oper_urlpath;
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
         my $node_connector_json = ($resp->content =~ /$RE{balanced}{-keep}{-begin => "\"node-connector\":\["}{-end => "]"}/ && $1);
@@ -185,7 +185,7 @@ sub get_ports_brief_info {
     my $status = new Brocade::BSC::Status;
     my @ports_info = ();
 
-    my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name});
+    my $urlpath = $self->_oper_urlpath;
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
         my $node_connector_json = ($resp->content =~ /$RE{balanced}{-keep}{-begin => "\"node-connector\":\["}{-end => "]"}/ && $1);
@@ -226,7 +226,7 @@ sub get_port_detail_info {
     my $status = new Brocade::BSC::Status;
     my $port_info_ref;
 
-    my $urlpath = $self->{ctrl}->get_node_operational_urlpath($self->{name})
+    my $urlpath = $self->_oper_urlpath
         . "/node-connector/$self->{name}:$portnum";
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
@@ -261,7 +261,7 @@ sub add_modify_flow {
     if($flow_entry->isa("Brocade::BSC::Node::OF::FlowEntry")) {
         my %headers = ('content-type' => 'application/yang.data+json');
         my $payload = $flow_entry->get_payload();
-        my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
+        my $urlpath = $self->_config_urlpath
             . "/table/" . $flow_entry->table_id()
             . "/flow/" . $flow_entry->id();
         my $resp = $self->ctrl_req('PUT', $urlpath, $payload, \%headers);
@@ -288,7 +288,7 @@ sub delete_flow {
     my ($self, $table_id, $flow_id) = @_;
     my $status = new Brocade::BSC::Status($BSC_OK);
 
-    my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
+    my $urlpath = $self->_config_urlpath
         . "/table/$table_id/flow/$flow_id";
     my $resp = $self->ctrl_req('DELETE', $urlpath);
     $resp->code == HTTP_OK or $status->_http_err($resp);
@@ -331,7 +331,7 @@ sub get_configured_flow {
     my $status = new Brocade::BSC::Status;
     my $flow = undef;
 
-    my $urlpath = $self->{ctrl}->get_node_config_urlpath($self->{name})
+    my $urlpath = $self->_config_urlpath
         . "/table/$table_id/flow/$flow_id";
     my $resp = $self->ctrl_req('GET', $urlpath);
 
@@ -362,8 +362,8 @@ sub _get_flows {
     my $flows = undef;
 
     my $urlpath = $operational
-        ? $self->{ctrl}->get_node_operational_urlpath($self->{name})
-        : $self->{ctrl}->get_node_config_urlpath($self->{name});
+        ? $self->_oper_urlpath
+        : $self->_config_urlpath;
     $urlpath .= "/flow-node-inventory:table/$table_id";
 
     my $resp = $self->ctrl_req('GET', $urlpath);

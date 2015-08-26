@@ -806,14 +806,13 @@ sub delete_netconf_node {
 # }
 
 # Method ===============================================================
-
-=item B<get_ext_mount_config_urlpath>
-
-  # Parameters: node name
-  # Returns   : base restconf URL for configuration of mounted netconf node
-
-=cut
-sub get_ext_mount_config_urlpath {
+#
+# =item B<_get_ext_mount_config_urlpath>
+#
+# Parameters: node name
+# Returns   : base restconf URL for configuration of mounted netconf node
+#
+sub _get_ext_mount_config_urlpath {
     my $self = shift;
     my $node = shift;
 
@@ -822,14 +821,13 @@ sub get_ext_mount_config_urlpath {
 }
 
 # Method ===============================================================
-
-=item B<get_ext_mount_operational_urlpath>
-
-  # Parameters: node name
-  # Returns   : base restconf URL for operational status of mounted netconf node
-
-=cut
-sub get_ext_mount_operational_urlpath {
+#
+# =item B<_get_ext_mount_operational_urlpath>
+#
+# Parameters: node name
+# Returns   : base restconf URL for operational status of mounted netconf node
+#
+sub _get_ext_mount_operational_urlpath {
     my $self = shift;
     my $node = shift;
 
@@ -838,14 +836,13 @@ sub get_ext_mount_operational_urlpath {
 }
 
 # Method ===============================================================
-
-=item B<get_node_operational_urlpath>
-
-  # Parameters: node name
-  # Returns   : base restconf URL for node, operational status
-
-=cut
-sub get_node_operational_urlpath {
+#
+# =item B<_get_node_operational_urlpath>
+#
+# Parameters: node name
+# Returns   : base restconf URL for node, operational status
+#
+sub _get_node_operational_urlpath {
     my $self = shift;
     my $node = shift;
 
@@ -853,14 +850,13 @@ sub get_node_operational_urlpath {
 }
 
 # Method ===============================================================
-
-=item B<get_node_config_urlpath>
-
-  # Parameters: node name
-  # Returns   : base restconf URL for node, configuration
-
-=cut
-sub get_node_config_urlpath {
+#
+# =item B<_get_node_config_urlpath>
+#
+# Parameters: node name
+# Returns   : base restconf URL for node, configuration
+#
+sub _get_node_config_urlpath {
     my $self = shift;
     my $node = shift;
 

@@ -96,13 +96,34 @@ foreach my $file (@files) {
 
 sub _brocade_files {
     my @files;
+    # lib/.../*.pm
     File::Find::find({
         wanted => sub { my ($vol, $path, $file) = File::Spec->splitpath($_);
                         -f $_ &&
-                            $file =~ /(.*\.p[lm]$)|(^[bs][0-9][0-9]-.*\.t$)/ &&
+                            $file =~ /.*\.pm$/ &&
                             push @files, $_; },
         no_chdir => 1,
         },
-        $searchroot);
+        'lib');
+    # t/b##-*.t t/s##-*.t
+    File::Find::find({
+        wanted => sub { my ($vol, $path, $file) = File::Spec->splitpath($_);
+                        -f $_ &&
+                            $file =~ /^[bs][0-9][0-9]-.*\.t$/ &&
+                            push @files, $_; },
+        no_chdir => 1,
+        },
+        't');
+    # ../.../*.pl
+    if ($ENV{CHECK_DEMOS}) {
+        File::Find::find({
+            wanted => sub { my ($vol, $path, $file) = File::Spec->splitpath($_);
+                            -f $_ &&
+                                $file =~ /.*\.pl$/ &&
+                                push @files, $_; },
+            no_chdir => 1,
+            },
+            '..');
+    }
     return @files;
 }

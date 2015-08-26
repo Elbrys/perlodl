@@ -126,6 +126,45 @@ sub ctrl_req {
     return $self->{ctrl}->_http_req(@_);
 }
 
+# Method ===============================================================
+#
+# _config_urlpath : return base urlpath for node configuration
+#
+sub _config_urlpath {
+    my $self = shift;
+    return $self->{ctrl}->_get_node_config_urlpath($self->{name});
+}
+
+
+# Method ===============================================================
+#
+# _oper_urlpath : return base urlpath for node operational status
+#
+sub _oper_urlpath {
+    my $self = shift;
+    return $self->{ctrl}->_get_node_operational_urlpath($self->{name});
+}
+
+
+# Method ===============================================================
+#
+# _nc_config_urlpath : return base urlpath for NETCONF node configuration
+#
+sub _nc_config_urlpath {
+    my $self = shift;
+    return $self->{ctrl}->_get_ext_mount_config_urlpath($self->{name});
+}
+
+
+# Method ===============================================================
+#
+# _nc_oper_urlpath : return base urlpath for NETCONF node operational status
+#
+sub _nc_oper_urlpath {
+    my $self = shift;
+    return $self->{ctrl}->_get_ext_mount_operational_urlpath($self->{name});
+}
+
 # Module ===============================================================
 1;
 

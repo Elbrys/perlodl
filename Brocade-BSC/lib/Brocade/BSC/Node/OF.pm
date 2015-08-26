@@ -78,25 +78,6 @@ sub new {
     my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
-
-    # my $class = shift;
-    # my %params = @_;
-
-    # my $yamlcfg = undef;
-    # if ($params{cfgfile} && ( -e $params{cfgfile})) {
-    #     $yamlcfg = YAML::LoadFile($params{cfgfile});
-    # }
-    # my $self = {
-    #     ctrl => '',
-    #     name => ''
-    # };
-    # if ($yamlcfg) {
-    #     $yamlcfg->{nodeName}
-    #         && ($self->{name} = $yamlcfg->{nodeName});
-    # }
-    # map { $params{$_} && ($self->{$_} = $params{$_}) }
-    #     qw(ctrl name);
-    # bless ($self, $class);
 }
 
 # Module ===============================================================
