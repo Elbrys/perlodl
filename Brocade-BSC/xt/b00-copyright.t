@@ -35,13 +35,6 @@ use strict;
 use warnings;
 use Test::More;
 
-unless ( $ENV{RELEASE_TESTING} ) {
-    plan( skip_all => "Author tests not required for installation" );
-}
-# $ENV{RELEASE_TESTING} should be set on dev/test machines only
-# check project files above the release directory
-my $searchroot = '..';
-
 require File::Find;
 require File::Spec;
 
@@ -115,15 +108,14 @@ sub _brocade_files {
         },
         't');
     # ../.../*.pl
-    if ($ENV{CHECK_DEMOS}) {
-        File::Find::find({
-            wanted => sub { my ($vol, $path, $file) = File::Spec->splitpath($_);
-                            -f $_ &&
-                                $file =~ /.*\.pl$/ &&
-                                push @files, $_; },
-            no_chdir => 1,
-            },
-            '..');
-    }
+    File::Find::find({
+        wanted => sub { my ($vol, $path, $file) = File::Spec->splitpath($_);
+                        -f $_ &&
+                            $file =~ /.*\.pl$/ &&
+                            push @files, $_; },
+        no_chdir => 1,
+        },
+        '..');
+
     return @files;
 }
