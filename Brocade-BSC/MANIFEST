@@ -58,3 +58,5 @@ xt/05-manifest.t
 xt/06-pod.t
 xt/07-pod-coverage.t
 xt/b00-copyright.t
+xt/b10-of-samples.t
+xt/of-yml.txt
