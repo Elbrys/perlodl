@@ -39,16 +39,15 @@ controlled by a Brocade::BSC controller.
 
 =cut
 
+package Brocade::BSC::Node::NC::Vrouter::StaticRoute;
+
 use strict;
 use warnings;
 
-use Data::Walk;
+use parent qw(Brocade::BSC::Node);
 use JSON -convert_blessed_universally;
 
-package Brocade::BSC::Node::NC::Vrouter::StaticRoute;
 
-use parent qw(Clone);
-use Scalar::Util qw(reftype);
 
 # Constructor ==========================================================
 #
@@ -88,27 +87,6 @@ sub as_json {
 }
 
 
-# Subroutine ===========================================================
-#             _strip_undef: remove all keys with undefined value from hash,
-#                           and any empty subtrees
-# Parameters: none.  use as arg to Data::Walk::walk
-# Returns   : irrelevant
-#
-sub _strip_undef {
-    if ((defined reftype $_) and (reftype $_ eq ref {})) {
-        while (my ($key, $value) = each %$_) {
-            defined $value or delete $_->{$key};
-            if( ref $_->{$key} eq ref {} ) {
-                delete $_->{$key} if keys %{$_->{$key}} == 0;
-            }
-            elsif( ref $_->{$key} eq ref [] ) {
-                delete $_->{$key} if @{$_->{$key}} == 0;
-            }
-        }
-    }
-}
-
-
 # Method ===============================================================
 
 =item B<get_payload>
@@ -120,14 +98,9 @@ sub _strip_undef {
 sub get_payload {
     my $self = shift;
 
-    my $json = new JSON->canonical->allow_blessed->convert_blessed;
-    my $clone = $self->clone();
-
-    Data::Walk::walkdepth(\&_strip_undef, $clone);
-
     my $payload = '{"vyatta-protocols:protocols":'
         . '{"vyatta-protocols-static:static":['
-        . $json->encode($clone)
+        . $self->_stripped_json
         . ']}}';
     $payload =~ s/_/-/g;
 

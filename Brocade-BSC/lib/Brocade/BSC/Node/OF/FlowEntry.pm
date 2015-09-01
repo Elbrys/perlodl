@@ -43,9 +43,8 @@ package Brocade::BSC::Node::OF::FlowEntry;
 use strict;
 use warnings;
 
+use parent qw(Brocade::BSC::Node);
 use Brocade::BSC::Node::OF::Match;
-
-use Data::Walk;
 use JSON -convert_blessed_universally;
 
 
@@ -254,19 +253,6 @@ sub as_json {
 }
 
 
-# Subroutine ===========================================================
-#             _strip_undef: remove all keys with undefined value from hash
-# Parameters: none.  use as arg to Data::Walk::walk
-# Returns   : irrelevant
-#
-sub _strip_undef {
-    if ("HASH" eq ref) {
-        while (my ($key, $value) = each %$_) {
-            defined $value or delete $_->{$key};
-        }
-    }
-}
-
 # Method ===============================================================
 
 =item B<get_payload>
@@ -277,12 +263,8 @@ sub _strip_undef {
 sub get_payload {
     my $self = shift;
 
-    # hack clone
-    my $clone = decode_json($self->as_json());
-    Data::Walk::walk(\&_strip_undef, $clone);
-
     my $payload = q({"flow-node-inventory:flow":)
-        . JSON->new->canonical->encode($clone)
+        . $self->_stripped_json
         . q(});
     $payload =~ s/_/-/g;
     $payload =~ s/table-id/table_id/g;

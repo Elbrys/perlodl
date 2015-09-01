@@ -45,6 +45,9 @@ package Brocade::BSC::Node;
 use strict;
 use warnings;
 
+use parent qw(Clone);
+use Scalar::Util qw(reftype);
+use Data::Walk;
 use YAML;
 use JSON -convert_blessed_universally;
 
@@ -106,6 +109,44 @@ sub as_json {
     my $self = shift;
     my $json = new JSON->canonical->allow_blessed->convert_blessed;
     return $json->pretty->encode($self);
+}
+
+
+# Subroutine ===========================================================
+#             _strip_undef: remove all keys with undefined value from hash,
+#                           and any empty subtrees
+# Parameters: none.  use as arg to Data::Walk::walk
+# Returns   : irrelevant
+#
+sub _strip_undef {
+    if ((defined reftype $_) and (reftype $_ eq ref {})) {
+        while (my ($key, $value) = each %$_) {
+            defined $value or delete $_->{$key};
+            if( ref $_->{$key} eq ref {} ) {
+                delete $_->{$key} if keys %{$_->{$key}} == 0;
+            }
+            elsif( ref $_->{$key} eq ref [] ) {
+                delete $_->{$key} if @{$_->{$key}} == 0;
+            }
+        }
+    }
+}
+
+
+# Subroutine ===========================================================
+#             _stripped_json: self as json, stripped of any
+#                             undefined values or empty hashes.
+# Parameters: none
+# Returns   : json representation of self
+#
+sub _stripped_json {
+    my $self = shift;
+
+    my $json = new JSON->canonical;
+    my $clone = $self->clone();
+
+    Data::Walk::walkdepth(\&_strip_undef, $clone);
+    return $json->allow_blessed->convert_blessed->encode($clone);
 }
 
 

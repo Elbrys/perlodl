@@ -275,7 +275,7 @@ print "<<< Set OpenFlow flows on the Controller\n\n";
 print "<<< Flows to be configured:\n\n";
 @flow_entries = sort { $a->{priority} <=> $b->{priority} } @flow_entries;
 foreach $flow_entry (@flow_entries) {
-    print $flow_entry->as_oxm . "\n";
+    print $flow_entry->_as_oxm . "\n";
 }
 
 foreach $flow_entry (@flow_entries) {
@@ -284,7 +284,7 @@ foreach $flow_entry (@flow_entries) {
     if (not $status->ok) {
         $ofswitch->delete_flows($table_id);
         print "!!! Demo terminated, failed to add flow:\n";
-        print $flow_entry->as_oxm . "\n";
+        print $flow_entry->_as_oxm . "\n";
         die   "Failure reason: ${\$status->msg}\n";
     }
 }
@@ -300,7 +300,7 @@ $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
 @flow_entries = sort { $a->{priority} <=> $b->{priority} } @$flow_entries_ref;
 foreach $flow_entry (@flow_entries) {
-    print $flow_entry->as_oxm . "\n";
+    print $flow_entry->_as_oxm . "\n";
 }
 print "\n";
 
@@ -311,11 +311,11 @@ foreach my $ii ($flow_id_base .. $flow_id-1) {
     if (not $status->ok) {
         $ofswitch->delete_flows($table_id);
         print "!!! Demo terminated, failed to add flow:\n";
-        print $flow_entry->as_oxm . "\n";
+        print $flow_entry->_as_oxm . "\n";
         die   "Failure reason: ${\$status->msg}\n";
     }
     print " [Flow ID '$ii']\n";
-    print $flow_entry->as_oxm . "\n";
+    print $flow_entry->_as_oxm . "\n";
 }
 print "\n";
 
