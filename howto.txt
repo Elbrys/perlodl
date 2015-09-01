@@ -9,7 +9,10 @@
         version.
 3.  ensure sanity tests pass.  cd to Brocade-BSC and
 
-$ RELEASE_TESTING=1 prove -l
+$ prove -l t xt
+
+3a. to run sample demo scripts, create .yml files in the xt directory
+    per the script output prior to running 'prove'.
 
 4.  create release.  cd to Brocade-BSC and
 
@@ -28,8 +31,8 @@ $ cpan-upload Brocade-BSC-${VERSION}.tar.gz
 #
 
 + cd to Brocade-BSC
-$ RELEASE_TESTING=1 prove -l
+$ prove -l xt
 
 --or--
 
-$ RELEASE_TESTING=1 perl -T t/b00-copyright.t
+$ perl -T xt/b00-copyright.t
