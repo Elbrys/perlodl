@@ -6,6 +6,5 @@ perl:
   - "5.10"
 before_install:
   - cd Brocade-BSC
-env:
-  - RELEASE_TESTING=1
-  - CHECK_DEMOS=1
+script:
+  - perl Makefile.PL && make test && prove -l xt
