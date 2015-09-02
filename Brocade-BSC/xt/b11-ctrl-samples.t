@@ -42,12 +42,22 @@ my $Test = Test::Builder->new;
 my $cfgfile = 'xt/bsc.yml';
 my @demos = _ctrl_demos();
 
+# To run this test, create a file in the xt directory named ctrl.yml
+# containing parameters for your local topology.  Example:
+#
+### # Controller specification
+### ctrlIpAddr: "172.22.19.67"
+### ctrlPortNum: "8181"
+### ctrlUname: 'admin'
+### ctrlPswd:  'admin'
+
 -f $cfgfile or plan skip_all => "create $cfgfile to run ctrl_demo tests";
 
 $Test->plan( tests => scalar @demos );
 
 $ENV{PATH} = "/bin:/usr/bin";
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+$ENV{PERL5LIB} = "$ENV{PWD}/lib";
 
 foreach my $demo (@demos) {
     $demo =~ /[279]/ && $Test->skip('TODO: fix ctrl_demo2/7/9') && next;
@@ -58,7 +68,6 @@ foreach my $demo (@demos) {
     my $ok = (0 == system( "$demo -c $cfgfile" ));
     $Test->ok ($ok, $demo);
 }
-
 
 sub _ctrl_demos {
     my @demos;

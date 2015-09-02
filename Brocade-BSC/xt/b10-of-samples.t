@@ -42,12 +42,25 @@ my $Test = Test::Builder->new;
 my $cfgfile = 'xt/of.yml';
 my @demos = _oflow_demos();
 
--f $cfgfile or plan skip_all => "create xt/of.yml to run oflow demo tests";
+# To run this test, create a file in the xt directory named of.yml
+# containing parameters for your local topology.  Example:
+#
+### # Controller specification
+### ctrlIpAddr: "172.22.19.67"
+### ctrlPortNum: "8181"
+### ctrlUname: 'admin'
+### ctrlPswd:  'admin'
+###
+### # OpenflowNode specification
+### nodeName: "openflow:1"
+
+-f $cfgfile or plan skip_all => "create $cfgfile to run oflow demo tests";
 
 $Test->plan( tests => scalar @demos );
 
 $ENV{PATH} = "/bin:/usr/bin";
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+$ENV{PERL5LIB} = "$ENV{PWD}/lib";
 
 foreach my $demo (@demos) {
     $demo =~ /12/ && $Test->skip('TODO: fix demo12') && next;
