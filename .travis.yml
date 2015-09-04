@@ -6,8 +6,5 @@ perl:
   - "5.10"
 before_install:
   - cd Brocade-BSC
-install:
-  - cpanm --quiet --installdeps --notest Test::Perl::Critic
-  - cpanm --quiet --installdeps --notest .
 script:
   - perl Makefile.PL && make test && prove -l xt
