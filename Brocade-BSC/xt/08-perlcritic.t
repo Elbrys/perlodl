@@ -13,6 +13,9 @@ if ( $EVAL_ERROR ) {
     plan skip_all => $msg;
 }
 
-# my $rcfile = File::Spec->catfile( 't', 'perlcriticrc' );
+if ( $^V lt 'v5.14.0' ) {
+    plan skip_all => 'test requires perl 5.14 or higher';
+}
+
 Test::Perl::Critic->import( -profile => 'xt/perlcriticrc' );
 all_critic_ok();

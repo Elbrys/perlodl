@@ -19,9 +19,6 @@ WriteMakefile(
         'Test::More'          => 0,
         'Test::CheckManifest' => 0.9,
     },
-    TEST_REQUIRES => {
-        'Test::Perl::Critic' => 0,
-    },
     PREREQ_PM => {
         'strict'         => 0,
         'warnings'       => 0,
