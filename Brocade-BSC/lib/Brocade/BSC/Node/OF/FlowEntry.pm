@@ -279,7 +279,7 @@ sub get_payload {
 # Parameters: none
 # Returns   : FlowEntry as formatted for transmission to controller
 #
-no strict 'refs';
+no strict 'refs';  ## no critic
 sub _as_oxm {
     my $self = shift;
 

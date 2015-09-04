@@ -50,10 +50,10 @@ return value.
 
 package Brocade::BSC;
 
-use version; our $VERSION = qv("v1.0.5");
-
 use strict;
 use warnings;
+
+use version; our $VERSION = qv("v1.0.5");
 
 use Brocade::BSC::Status qw(:constants);
 
@@ -99,7 +99,7 @@ Returns new I<Brocade::BSC> object.
 
 =cut
 sub new {
-    my $caller = shift;
+    my $class  = shift;
     my %params = @_;
 
     my $yamlcfg;
@@ -127,7 +127,7 @@ sub new {
     }
     map { $params{$_} && ($self->{$_} = $params{$_}) }
         qw(ipAddr portNum adminName adminPassword timeout);
-    bless $self;
+    bless ($self, $class);
 }    
 
 # Method ===============================================================

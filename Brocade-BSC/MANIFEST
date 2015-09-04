@@ -57,7 +57,8 @@ t/s50-vr5600.t
 xt/05-manifest.t
 xt/06-pod.t
 xt/07-pod-coverage.t
+xt/08-perlcritic.t
 xt/b00-copyright.t
 xt/b10-of-samples.t
 xt/b11-ctrl-samples.t
-
+xt/perlcriticrc

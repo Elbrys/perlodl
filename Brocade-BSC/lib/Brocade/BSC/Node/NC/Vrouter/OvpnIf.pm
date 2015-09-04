@@ -200,7 +200,7 @@ Set or retrieve TLS role for this OpenVPN connection
 =cut ===================================================================
 sub tls_role {
     my ($self, $role) = @_;
-    return undef if (1 == @_) and not defined $self->{tls};
+    return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     $self->{tls}->{role} = (2 == @_) ? $role : $self->{tls}->{role};
 }
@@ -215,7 +215,7 @@ Set or retrieve path to Diffie-Helman parameters file for this OpenVPN connectio
 =cut ===================================================================
 sub tls_dh_file {
     my ($self, $path) = @_;
-    return undef if (1 == @_) and not defined $self->{tls};
+    return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     $self->{tls}->{dh_file} = (2 == @_) ? $path : $self->{tls}->{dh_file};
 }
@@ -230,7 +230,7 @@ Set or retrieve path to CA certificate file
 =cut ===================================================================
 sub tls_ca_cert_file {
     my ($self, $path) = @_;
-    return undef if (1 == @_) and not defined $self->{tls};
+    return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     $self->{tls}->{ca_cert_file} = (2 == @_) ? $path : $self->{tls}->{ca_cert_file};
 }
@@ -245,7 +245,7 @@ Set or retrieve path to certificate file for this OpenVPN connection
 =cut ===================================================================
 sub tls_cert_file {
     my ($self, $path) = @_;
-    return undef if (1 == @_) and not defined $self->{tls};
+    return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     $self->{tls}->{cert_file} = (2 == @_) ? $path : $self->{tls}->{cert_file};
 }
@@ -260,7 +260,7 @@ Set or retrieve path to certificate revocation list
 =cut ===================================================================
 sub tls_crl_file {
     my ($self, $path) = @_;
-    return undef if (1 == @_) and not defined $self->{tls};
+    return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     $self->{tls}->{crl_file} = (2 == @_) ? $path : $self->{tls}->{crl_file};
 }
@@ -275,7 +275,7 @@ Set or retrieve path to certificate key
 =cut ===================================================================
 sub tls_key_file {
     my ($self, $path) = @_;
-    return undef if (1 == @_) and not defined $self->{tls};
+    return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     $self->{tls}->{key_file} = (2 == @_) ? $path : $self->{tls}->{key_file};
 }

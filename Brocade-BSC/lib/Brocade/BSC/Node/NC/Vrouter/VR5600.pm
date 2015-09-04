@@ -47,7 +47,7 @@ use warnings;
 #
 #
 # ======================================================================
-package Brocade::BSC::Node::NC::Vrouter::VR5600::DataplaneInterfaceFirewall;
+package Brocade::BSC::Node::NC::Vrouter::VR5600::DataplaneInterfaceFirewall; ## no critic
 
 # Constructor ==========================================================
 # Parameters: interface name

@@ -183,7 +183,7 @@ sub _get_group {
             return $groupref;
         }
     }
-    return undef;
+    return;
 }
 
 # Method ===============================================================

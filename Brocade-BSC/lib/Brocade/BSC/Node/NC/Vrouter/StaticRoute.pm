@@ -144,8 +144,8 @@ sub _find_nh_interface {
     my %params = @_;
     my $nexthop = undef;
 
-    $params{ifname} or return undef;
-    my $route = $params{route} or return undef;
+    $params{ifname} or return;
+    my $route = $params{route} or return;
     defined $route->{next_hop_interface} or
         $route->{next_hop_interface} = [];
     foreach my $nh (@{$route->{next_hop_interface}}) {

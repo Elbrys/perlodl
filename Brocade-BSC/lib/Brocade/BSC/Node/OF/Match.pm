@@ -520,7 +520,7 @@ sub new {
 # Parameters: none
 # Returns   : FlowEntry formatted as Node::OF eXtensible Match
 #
-no strict 'refs';
+no strict 'refs';   ## no critic
 sub _as_oxm {
     my $self = shift;
 
