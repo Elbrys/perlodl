@@ -66,7 +66,7 @@ foreach my $demo (@demos) {
     $demo =~ /12/ && $Test->skip('TODO: fix demo12') && next;
     $demo =~ /21/ && $Test->skip('TODO: fix demo21') && next;
     # untaint *cough*
-    $demo =~ m[(../sampleopenflow/demos/demo\d+.pl$)]g && ($demo = $1);
+    $demo =~ m[(../samples/openflow/demos/demo\d+.pl$)]g && ($demo = $1);
     my $ok = (0 == system ("$demo -c xt/of.yml"));
     $Test->ok($ok, $demo);
 }
@@ -82,7 +82,7 @@ sub _oflow_demos {
             },
             no_chdir => 1,
         },
-        '../sampleopenflow/demos'
+        '../samples/openflow/demos'
     );
 
     return @demos;

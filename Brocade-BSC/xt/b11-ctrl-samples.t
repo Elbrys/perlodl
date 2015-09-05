@@ -64,7 +64,7 @@ foreach my $demo (@demos) {
     $demo =~ /ctrl_demo10/ && $Test->skip('TODO: fix ctrl_demo10')    && next;
     $demo =~ /ctrl_demo11/ && $Test->skip('TODO: fix ctrl_demo11')    && next;
     # untaint *cough*
-    $demo =~ m[(../samplenetconf/demos/ctrl_demo\d+.pl$)]g && ($demo = $1);
+    $demo =~ m[(../samples/netconf/demos/ctrl_demo\d+.pl$)]g && ($demo = $1);
     my $ok = (0 == system ("$demo -c $cfgfile"));
     $Test->ok($ok, $demo);
 }
@@ -79,7 +79,7 @@ sub _ctrl_demos {
             },
             no_chdir => 1,
         },
-        '../samplenetconf/demos'
+        '../samples/netconf/demos'
     );
 
     return @demos;
