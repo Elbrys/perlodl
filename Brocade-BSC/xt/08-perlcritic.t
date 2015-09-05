@@ -13,5 +13,10 @@ if ( $EVAL_ERROR ) {
     plan skip_all => $msg;
 }
 
-Test::Perl::Critic->import( -profile => 'xt/perlcriticrc' );
+if ($^V lt 'v5.20.0') {
+    plan skip_all => 'perlcritic only run on most recent perl in matrix';
+}
+
+my $rcfile = File::Spec->catfile ('xt', 'perlcriticrc');
+Test::Perl::Critic->import ( -profile => $rcfile );
 all_critic_ok();
