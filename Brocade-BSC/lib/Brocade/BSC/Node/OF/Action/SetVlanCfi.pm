@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetVlanCfi object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -53,7 +53,7 @@ sub new {
 sub vlan_cfi {
     my ($self, $vlan_cfi) = @_;
     return $self->{set_vlan_cfi_action}->{'vlan-cfi'} =
-        (2 == @_) ? $vlan_cfi : $self->{set_vlan_cfi_action}->{'vlan-cfi'};
+      (2 == @_) ? $vlan_cfi : $self->{set_vlan_cfi_action}->{'vlan-cfi'};
 }
 
 

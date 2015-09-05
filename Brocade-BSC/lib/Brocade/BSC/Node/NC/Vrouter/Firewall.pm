@@ -51,7 +51,7 @@ our @EXPORT_OK = qw(Firewall);
 use JSON -convert_blessed_universally;
 
 #---------------------------------------------------------------------------
-# 
+#
 #---------------------------------------------------------------------------
 package Brocade::BSC::Node::NC::Vrouter::Firewall::Rule;
 
@@ -66,9 +66,9 @@ sub new {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
+#
+# Parameters:
+# Returns   :
 #
 sub add_action {
     my ($self, $action) = @_;
@@ -77,9 +77,9 @@ sub add_action {
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
+#
+# Parameters:
+# Returns   :
 #
 sub get_name {
     my $self = @_;
@@ -88,7 +88,7 @@ sub get_name {
 }
 
 #---------------------------------------------------------------------------
-# 
+#
 #---------------------------------------------------------------------------
 package Brocade::BSC::Node::NC::Vrouter::Firewall::Group;
 
@@ -97,15 +97,14 @@ sub new {
 
     my $self = {
         tagnode => $tagnode,
-        rule => []
-    };
+        rule    => []};
     return bless ($self, $class);
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
+#
+# Parameters:
+# Returns   :
 #
 sub get_name {
     my $self = @_;
@@ -130,11 +129,10 @@ package Brocade::BSC::Node::NC::Vrouter::Firewall;
   # Returns   : empty BSC::Node::NC::Vrouter::Firewall object
 
 =cut ===================================================================
+
 sub new {
     my $class = @_;
-    my $self = {
-        name => []
-    };
+    my $self = {name => []};
     return bless ($self, $class);
 }
 
@@ -145,6 +143,7 @@ sub new {
   # Returns   : pretty-printed JSON string representing Firewall object.
 
 =cut ===================================================================
+
 sub as_json {
     my $self = @_;
 
@@ -166,15 +165,15 @@ sub _add_group {
 }
 
 # Method ===============================================================
-# 
+#
 # Parameters: name of firewall group
-# Returns   : 
+# Returns   :
 #
 sub _get_group {
     my ($self, $name) = @_;
 
     my @groups = $self->{name};
-    foreach my $groupref (@{ $self->{name} }) {
+    foreach my $groupref (@{$self->{name}}) {
         if ($groupref->{tagnode} eq $name) {
             return $groupref;
         }
@@ -191,35 +190,37 @@ sub _get_group {
   # Returns   :
 
 =cut ===================================================================
+
 sub add_rule {
     my ($self, $group_name, $rule_id, %attributes) = @_;
 
-    my $rule = Brocade::BSC::Node::NC::Vrouter::Firewall::Rule->new($rule_id, %attributes);
+    my $rule = Brocade::BSC::Node::NC::Vrouter::Firewall::Rule->new($rule_id,
+        %attributes);
     my $group = $self->_get_group($group_name);
     push @{$group->{rule}}, $rule;
     return @{$group->{rule}};
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
+#
+# Parameters:
+# Returns   :
 #
 #sub ___get_rule {
 #    my $self = shift;
 #
-    # XXX
+# XXX
 #}
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
+#
+# Parameters:
+# Returns   :
 #
 sub _get_rules {
     my $self = @_;
 
-    return @{ $self->{name} };
+    return @{$self->{name}};
 }
 
 # Method ===============================================================
@@ -230,22 +231,24 @@ sub _get_rules {
   #               for POST to BSC controller.
 
 =cut ===================================================================
+
 sub get_payload {
     my $self = @_;
 
     my $json = JSON->new->canonical->allow_blessed->convert_blessed;
-    my $payload = '{"vyatta-security:security":{"vyatta-security-firewall:firewall":'
-        . $json->encode($self)
-        . '}}';
+    my $payload =
+      '{"vyatta-security:security":{"vyatta-security-firewall:firewall":'
+      . $json->encode($self) . '}}';
     $payload =~ s/"src_addr":"([0-9\.]*)"/"source":{"address":"$1"}/g;
-    $payload =~ s/"typename":"([a-zA-Z0-9]+)"/"icmp":{"type-name":"$1"},"protocol":"icmp"/g;
+    $payload =~
+s/"typename":"([a-zA-Z0-9]+)"/"icmp":{"type-name":"$1"},"protocol":"icmp"/g;
     return $payload;
 }
 
 # Method ===============================================================
-# 
-# Parameters: 
-# Returns   : 
+#
+# Parameters:
+# Returns   :
 #
 sub _get_url_extension {
     my $self = @_;

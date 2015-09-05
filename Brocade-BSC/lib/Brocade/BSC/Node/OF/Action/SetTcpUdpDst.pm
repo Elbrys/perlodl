@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetTcpUdpDst object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -53,7 +53,7 @@ sub new {
 sub port {
     my ($self, $port) = @_;
     return $self->{set_tp_dst_action}->{port} =
-        (2 == @_) ? $port : $self->{set_tp_dst_action}->{port};
+      (2 == @_) ? $port : $self->{set_tp_dst_action}->{port};
 }
 
 

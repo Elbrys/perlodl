@@ -57,6 +57,7 @@ use JSON -convert_blessed_universally;
 
 # Constructor ==========================================================
 #
+
 =over 4
 
 =item B<new>
@@ -77,20 +78,21 @@ values from argument hash, if present, or YAML configuration file.
 
 Returns new I<Brocade::BSC::Node> object.
 =cut
+
 sub new {
     my ($class, %params) = @_;
 
     my $yamlcfg;
-    if ($params{cfgfile} && ( -e $params{cfgfile})) {
+    if ($params{cfgfile} && (-e $params{cfgfile})) {
         $yamlcfg = YAML::LoadFile($params{cfgfile});
     }
     my $self = {
-        ctrl          => $params{ctrl},
-        name          => ''
+        ctrl => $params{ctrl},
+        name => ''
     };
     if ($yamlcfg) {
         $yamlcfg->{nodeName}
-            && ($self->{name} = $yamlcfg->{nodeName});
+          && ($self->{name} = $yamlcfg->{nodeName});
     }
     $params{name} && ($self->{name} = $params{name});
 
@@ -104,6 +106,7 @@ sub new {
   # Returns   : Returns pretty-printed JSON string representing node.
 
 =cut
+
 sub as_json {
     my $self = shift;
     my $json = JSON->new->canonical->allow_blessed->convert_blessed;
@@ -121,15 +124,15 @@ sub _strip_undef {
     if ((defined reftype $_) and (reftype $_ eq ref {})) {
         while (my ($key, $value) = each %$_) {
             defined $value or delete $_->{$key};
-            if( ref $_->{$key} eq ref {} ) {
+            if (ref $_->{$key} eq ref {}) {
                 delete $_->{$key} if keys %{$_->{$key}} == 0;
             }
-            elsif( ref $_->{$key} eq ref [] ) {
+            elsif (ref $_->{$key} eq ref []) {
                 delete $_->{$key} if @{$_->{$key}} == 0;
             }
         }
     }
-    return; # perlcritic
+    return;    # perlcritic
 }
 
 
@@ -142,7 +145,7 @@ sub _strip_undef {
 sub _stripped_json {
     my $self = shift;
 
-    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
+    my $json  = JSON->new->canonical->allow_blessed->convert_blessed;
     my $clone = $self->clone();
 
     Data::Walk::walkdepth(\&_strip_undef, $clone);
@@ -161,6 +164,7 @@ sub _stripped_json {
   # Returns   : HTTP::Response
 
 =cut
+
 sub ctrl_req {
     my ($self, @http_args) = @_;
 

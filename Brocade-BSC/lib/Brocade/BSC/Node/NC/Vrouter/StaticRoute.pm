@@ -48,9 +48,8 @@ use parent qw(Brocade::BSC::Node);
 use JSON -convert_blessed_universally;
 
 
-
 # Constructor ==========================================================
-#
+
 =over 4
 
 =item B<new>
@@ -58,6 +57,7 @@ use JSON -convert_blessed_universally;
 Creates and returns a new I<Brocade::BSC::Node::NC::Vrouter::StaticRoute> object.
 
 =cut
+
 sub new {
     my $class = shift;
 
@@ -80,6 +80,7 @@ sub new {
   # Returns   : static route configuration as formatted JSON string.
 
 =cut ===================================================================
+
 sub as_json {
     my $self = shift;
     my $json = JSON->new->canonical->allow_blessed->convert_blessed;
@@ -95,13 +96,14 @@ sub as_json {
                 posting to controller.
 
 =cut ===================================================================
+
 sub get_payload {
     my $self = shift;
 
-    my $payload = '{"vyatta-protocols:protocols":'
-        . '{"vyatta-protocols-static:static":['
-        . $self->_stripped_json
-        . ']}}';
+    my $payload =
+        '{"vyatta-protocols:protocols":'
+      . '{"vyatta-protocols-static:static":['
+      . $self->_stripped_json . ']}}';
     $payload =~ s/_/-/g;
 
     return $payload;
@@ -141,13 +143,13 @@ sub _find_interface_route {
 #
 # ======================================================================
 sub _find_nh_interface {
-    my %params = @_;
+    my %params  = @_;
     my $nexthop = undef;
 
     $params{ifname} or return;
     my $route = $params{route} or return;
-    defined $route->{next_hop_interface} or
-        $route->{next_hop_interface} = [];
+    defined $route->{next_hop_interface}
+      or $route->{next_hop_interface} = [];
     foreach my $nh (@{$route->{next_hop_interface}}) {
         $nexthop = $nh;
         last if ($nexthop->{tagnode} eq $params{ifname});
@@ -170,10 +172,13 @@ Add a static route for the specified subnet.
   # Returns   : hashref - route
 
 =cut ===================================================================
+
 sub interface_route {
     my ($self, $subnet) = @_;
-    my $route = $self->_find_interface_route(create => 1,
-                                             subnet => $subnet);
+    my $route = $self->_find_interface_route(
+        create => 1,
+        subnet => $subnet
+    );
     return $route;
 }
 
@@ -193,18 +198,20 @@ Specify interface on subnet containing next hop device for this route
                 posting to controller.
 
 =cut ===================================================================
+
 sub interface_route_next_hop_interface {
     my ($self, %params) = @_;
-    my $route = $self->_find_interface_route(create => 1,
-                                             subnet => $params{subnet});
-    my $nhif = _find_nh_interface(create => 1,
-                                  route  => $route,
-                                  ifname => $params{ifname});
-    $params{disable} && ($nhif->{disable} = '');
+    my $route = $self->_find_interface_route(
+        create => 1,
+        subnet => $params{subnet});
+    my $nhif = _find_nh_interface(
+        create => 1,
+        route  => $route,
+        ifname => $params{ifname});
+    $params{disable}  && ($nhif->{disable}  = '');
     $params{distance} && ($nhif->{distance} = $params{distance});
     return $nhif;
 }
-
 
 
 # Module ===============================================================

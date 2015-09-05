@@ -54,6 +54,7 @@ use YAML;
 
 # Constructor ==========================================================
 #
+
 =over 4
 
 =item B<new>
@@ -74,6 +75,7 @@ values from argument hash, if present, or YAML configuration file.
 
 Returns new I<Brocade::BSC::Node::OF> object.
 =cut
+
 sub new {
     my ($class, %params) = @_;
 

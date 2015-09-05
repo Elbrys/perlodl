@@ -54,6 +54,7 @@ use YAML;
 
 # Constructor ==========================================================
 #
+
 =over 4
 
 =item B<new>
@@ -84,34 +85,35 @@ values from argument hash, if present, or YAML configuration file.
 
 Returns new I<Brocade::BSC::Node::NC> object.
 =cut
+
 sub new {
     my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
 
     my $yamlcfg = undef;
-    if ($params{cfgfile} && ( -e $params{cfgfile})) {
+    if ($params{cfgfile} && (-e $params{cfgfile})) {
         $yamlcfg = YAML::LoadFile($params{cfgfile});
     }
     # Netconf-specific defaults
-    $self->{ipAddr} = '';
-    $self->{portNum} = 830;
-    $self->{tcpOnly} = 0;
-    $self->{adminName} = 'admin';
+    $self->{ipAddr}        = '';
+    $self->{portNum}       = 830;
+    $self->{tcpOnly}       = 0;
+    $self->{adminName}     = 'admin';
     $self->{adminPassword} = 'admin';
 
     if ($yamlcfg) {
         $yamlcfg->{nodeIpAddr}
-            && ($self->{ipAddr} = $yamlcfg->{nodeIpAddr});
+          && ($self->{ipAddr} = $yamlcfg->{nodeIpAddr});
         $yamlcfg->{nodePortNum}
-            && ($self->{portNum} = $yamlcfg->{nodePortNum});
+          && ($self->{portNum} = $yamlcfg->{nodePortNum});
         $yamlcfg->{nodeUname}
-            && ($self->{adminName} = $yamlcfg->{nodeUname});
+          && ($self->{adminName} = $yamlcfg->{nodeUname});
         $yamlcfg->{nodePswd}
-            && ($self->{adminPassword} = $yamlcfg->{nodePswd});
+          && ($self->{adminPassword} = $yamlcfg->{nodePswd});
     }
     map { $params{$_} && ($self->{$_} = $params{$_}) }
-        qw(ipAddr portNum tcpOnly adminName adminPassword);
+      qw(ipAddr portNum tcpOnly adminName adminPassword);
 
     return $self;
 }

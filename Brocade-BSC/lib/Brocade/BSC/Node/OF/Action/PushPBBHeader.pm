@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::PushPBBHeader object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -53,7 +53,7 @@ sub new {
 sub eth_type {
     my ($self, $eth_type) = @_;
     return $self->{push_pbb_action}->{'ethernet-type'} =
-        (2 == @_) ? $eth_type : $self->{push_pbb_action}->{'ethernet-type'};
+      (2 == @_) ? $eth_type : $self->{push_pbb_action}->{'ethernet-type'};
 }
 
 

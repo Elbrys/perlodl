@@ -70,6 +70,7 @@ use Carp::Assert;
 
 # Constructor ==========================================================
 #
+
 =over 4
 
 =item B<new>
@@ -98,11 +99,12 @@ from argument hash, if present, or YAML configuration file.
 Returns new I<Brocade::BSC> object.
 
 =cut
+
 sub new {
     my ($class, %params) = @_;
 
     my $yamlcfg;
-    if ($params{cfgfile} && ( -e $params{cfgfile})) {
+    if ($params{cfgfile} && (-e $params{cfgfile})) {
         $yamlcfg = YAML::LoadFile($params{cfgfile});
     }
     my $self = {
@@ -114,20 +116,20 @@ sub new {
     };
     if ($yamlcfg) {
         $yamlcfg->{ctrlIpAddr}
-            && ($self->{ipAddr} = $yamlcfg->{ctrlIpAddr});
+          && ($self->{ipAddr} = $yamlcfg->{ctrlIpAddr});
         $yamlcfg->{ctrlPortNum}
-            && ($self->{portNum} = $yamlcfg->{ctrlPortNum});
+          && ($self->{portNum} = $yamlcfg->{ctrlPortNum});
         $yamlcfg->{ctrlUname}
-            && ($self->{adminName} = $yamlcfg->{ctrlUname});
+          && ($self->{adminName} = $yamlcfg->{ctrlUname});
         $yamlcfg->{ctrlPswd}
-            && ($self->{adminPassword} = $yamlcfg->{ctrlPswd});
+          && ($self->{adminPassword} = $yamlcfg->{ctrlPswd});
         $yamlcfg->{timeout}
-            && ($self->{timeout} = $yamlcfg->{timeout});
+          && ($self->{timeout} = $yamlcfg->{timeout});
     }
     map { $params{$_} && ($self->{$_} = $params{$_}) }
-        qw(ipAddr portNum adminName adminPassword timeout);
+      qw(ipAddr portNum adminName adminPassword timeout);
     return bless ($self, $class);
-}    
+}
 
 # Method ===============================================================
 # _http_req : semi-private; send HTTP request to BSC Controller
@@ -142,10 +144,10 @@ sub _http_req {
     my %headers = $headerref ? %$headerref : ();
 
     my $url = "http://$$self{ipAddr}:$$self{portNum}$urlpath";
-    my $ua = LWP::UserAgent->new;
+    my $ua  = LWP::UserAgent->new;
     $ua->timeout($self->{timeout});
     my $req = HTTP::Request->new($method => $url);
-    while (my($header, $value) = each %headers) {
+    while (my ($header, $value) = each %headers) {
         $req->header($header => $value);
     }
     if ($data) {
@@ -163,6 +165,7 @@ sub _http_req {
   # Returns pretty-printed JSON string representing BSC object.
 
 =cut
+
 sub as_json {
     my $self = shift;
     my $json = JSON->new->canonical->allow_blessed->convert_blessed;
@@ -177,17 +180,18 @@ sub as_json {
   #           : reference to an array of node names
 
 =cut
+
 sub get_nodes_operational_list {
-    my $self = shift;
+    my $self      = shift;
     my @nodeNames = ();
-    my $status = Brocade::BSC::Status->new;
-    my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
+    my $status    = Brocade::BSC::Status->new;
+    my $urlpath   = "/restconf/operational/opendaylight-inventory:nodes";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
-            if (! $nodes) {
+            if (!$nodes) {
                 $status->_code($BSC_DATA_NOT_FOUND);
             }
             else {
@@ -216,11 +220,13 @@ sub get_nodes_operational_list {
   #           : array reference containing node info
 
 =cut
+
 sub get_node_info {
     my ($self, $node) = @_;
     my $node_info = undef;
-    my $status = Brocade::BSC::Status->new;
-    my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/$node";
+    my $status    = Brocade::BSC::Status->new;
+    my $urlpath =
+      "/restconf/operational/opendaylight-inventory:nodes/node/$node";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
@@ -243,14 +249,18 @@ sub get_node_info {
   # Returns   : BSC::Status - NODE_CONFIGURED or NODE_NOT_FOUND
 
 =cut
+
 sub check_node_config_status {
     my ($self, $node) = @_;
     my $status = Brocade::BSC::Status->new;
 
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/$node";
     my $resp = $self->_http_req('GET', $urlpath);
-    $status->_code(($resp->code == HTTP_OK)
-        ? $BSC_NODE_CONFIGURED : $BSC_NODE_NOT_FOUND);
+    $status->_code(
+        ($resp->code == HTTP_OK)
+        ? $BSC_NODE_CONFIGURED
+        : $BSC_NODE_NOT_FOUND
+    );
     return $status;
 }
 
@@ -262,6 +272,7 @@ sub check_node_config_status {
   # Returns   : BSC::Status - NODE_CONNECTED or NODE_DISCONNECTED
 
 =cut
+
 sub check_node_conn_status {
     my ($self, $node) = @_;
     my $status = Brocade::BSC::Status->new;
@@ -270,8 +281,11 @@ sub check_node_conn_status {
         $status->_code($BSC_NODE_NOT_FOUND);
         foreach (@$nodeStatus) {
             if ($_->{id} eq $node) {
-                $status->_code($_->{connected} ? $BSC_NODE_CONNECTED
-                                               : $BSC_NODE_DISCONNECTED);
+                $status->_code(
+                      $_->{connected}
+                    ? $BSC_NODE_CONNECTED
+                    : $BSC_NODE_DISCONNECTED
+                );
                 last;
             }
         }
@@ -287,17 +301,18 @@ sub check_node_conn_status {
   #           : array reference - list of node identifiers
 
 =cut
+
 sub get_all_nodes_in_config {
-    my $self = shift;
+    my $self      = shift;
     my @nodeNames = ();
-    my $status = Brocade::BSC::Status->new;
-    my $urlpath = "/restconf/config/opendaylight-inventory:nodes";
+    my $status    = Brocade::BSC::Status->new;
+    my $urlpath   = "/restconf/config/opendaylight-inventory:nodes";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
-            if (! $nodes) {
+            if (!$nodes) {
                 $status->_code($BSC_DATA_NOT_FOUND);
             }
             else {
@@ -327,6 +342,7 @@ sub get_all_nodes_in_config {
   #               connected => boolean }
 
 =cut
+
 #
 # Openflow devices on the Controller are always prefixed with "openflow:"
 # Since Openflow devices initiate communication with the Controller, and
@@ -334,17 +350,17 @@ sub get_all_nodes_in_config {
 # operational inventory are shown as connected.
 #
 sub get_all_nodes_conn_status {
-    my $self = shift;
+    my $self       = shift;
     my @nodeStatus = ();
-    my $status = Brocade::BSC::Status->new;
-    my $connected = undef;
-    my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
+    my $status     = Brocade::BSC::Status->new;
+    my $connected  = undef;
+    my $urlpath    = "/restconf/operational/opendaylight-inventory:nodes";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
-            if (! $nodes) {
+            if (!$nodes) {
                 $status->_code($BSC_DATA_NOT_FOUND);
             }
             else {
@@ -355,8 +371,11 @@ sub get_all_nodes_conn_status {
                     else {
                         $connected = $_->{"netconf-node-inventory:connected"};
                     }
-                    push @nodeStatus, {'id' => $_->{id},
-                                       'connected' => $connected}
+                    push @nodeStatus,
+                      {
+                        'id'        => $_->{id},
+                        'connected' => $connected
+                      };
                 }
                 $status->_code($BSC_OK);
             }
@@ -379,8 +398,9 @@ sub get_all_nodes_conn_status {
   #           : array reference - list of node identifiers
 
 =cut
+
 sub get_netconf_nodes_in_config {
-    my $self = shift;
+    my $self          = shift;
     my @netconf_nodes = undef;
 
     my ($status, $nodelist_ref) = $self->get_all_nodes_in_config();
@@ -398,13 +418,14 @@ sub get_netconf_nodes_in_config {
   #               connected => boolean }
 
 =cut
+
 sub get_netconf_nodes_conn_status {
-    my $self = shift;
+    my $self          = shift;
     my @netconf_nodes = undef;
 
     my ($status, $nodestatus_ref) = $self->get_all_nodes_conn_status();
-    $status->ok and
-        @netconf_nodes = grep { $_->{id} !~ /^openflow:/ } @$nodestatus_ref;
+    $status->ok
+      and @netconf_nodes = grep { $_->{id} !~ /^openflow:/ } @$nodestatus_ref;
     return ($status, \@netconf_nodes);
 }
 
@@ -417,12 +438,13 @@ sub get_netconf_nodes_conn_status {
   #           : array reference - supported schemas on node
 
 =cut
+
 sub get_schemas {
     my ($self, $node) = @_;
     my $schemas = undef;
-    my $status = Brocade::BSC::Status->new;
+    my $status  = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/"
-        . "$node/yang-ext:mount/ietf-netconf-monitoring:netconf-state/schemas";
+      . "$node/yang-ext:mount/ietf-netconf-monitoring:netconf-state/schemas";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
@@ -451,25 +473,29 @@ sub get_schemas {
   #           : requested YANG schema as formatted JSON
 
 =cut
+
 sub get_schema {
     my ($self, $node, $schemaId, $schemaVersion) = @_;
     my $status = Brocade::BSC::Status->new;
     my $schema = undef;
 
     my $urlpath = "/restconf/operations/opendaylight-inventory:nodes"
-        . "/node/$node/yang-ext:mount/ietf-netconf-monitoring:get-schema";
+      . "/node/$node/yang-ext:mount/ietf-netconf-monitoring:get-schema";
     my $payload = qq({"input":{"identifier":"$schemaId","version":)
-        . qq("$schemaVersion","format":"yang"}});
-    my %headers = ('content-type'=>'application/yang.data+json',
-                   'accept'=>'text/json, text/html, application/xml, */*');
+      . qq("$schemaVersion","format":"yang"}});
+    my %headers = (
+        'content-type' => 'application/yang.data+json',
+        'accept'       => 'text/json, text/html, application/xml, */*'
+    );
 
     my $resp = $self->_http_req('POST', $urlpath, $payload, \%headers);
     if ($resp->code == HTTP_OK) {
-        my $xmltree_ref = XML::Parser->new(Style => 'Tree')->parse($resp->content);
-        assert   ($xmltree_ref->[0]          eq 'get-schema');
-        assert   ($xmltree_ref->[1][1]       eq 'output');
-        assert   ($xmltree_ref->[1][2][1]    eq 'data');
-        assert   ($xmltree_ref->[1][2][2][1] == 0);
+        my $xmltree_ref =
+          XML::Parser->new(Style => 'Tree')->parse($resp->content);
+        assert($xmltree_ref->[0] eq 'get-schema');
+        assert($xmltree_ref->[1][1] eq 'output');
+        assert($xmltree_ref->[1][2][1] eq 'data');
+        assert($xmltree_ref->[1][2][2][1] == 0);
         $schema = $xmltree_ref->[1][2][2][2];
         $status->_code($BSC_OK);
     }
@@ -488,11 +514,13 @@ sub get_schema {
   #           : hash reference - operations supported by specified node
 
 =cut
+
 sub get_netconf_operations {
     my ($self, $node) = @_;
     my $operations = undef;
-    my $status = Brocade::BSC::Status->new;
-    my $urlpath = "/restconf/operations/opendaylight-inventory:nodes/node/$node/yang-ext:mount/";
+    my $status     = Brocade::BSC::Status->new;
+    my $urlpath =
+"/restconf/operations/opendaylight-inventory:nodes/node/$node/yang-ext:mount/";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
@@ -518,12 +546,14 @@ sub get_netconf_operations {
   #           : array reference - hashes of module state
 
 =cut
+
 sub get_all_modules_operational_state {
-    my $self = shift;
+    my $self    = shift;
     my $modules = undef;
-    my $status = Brocade::BSC::Status->new;
-    my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
-    
+    my $status  = Brocade::BSC::Status->new;
+    my $urlpath =
+"/restconf/operational/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
+
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"modules\"/) {
@@ -553,14 +583,16 @@ sub get_all_modules_operational_state {
   #           : array reference - hash of module state
 
 =cut
+
 sub get_module_operational_state {
     my ($self, $moduleType, $moduleName) = @_;
     my $module = undef;
     my $status = Brocade::BSC::Status->new;
-    my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules/module/$moduleType/$moduleName";
+    my $urlpath =
+"/restconf/operational/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules/module/$moduleType/$moduleName";
 
     my $resp = $self->_http_req('GET', $urlpath);
-    if ($resp->code == HTTP_OK ) {
+    if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"module\"/) {
             $module = decode_json($resp->content)->{module};
             $status->_code($module ? $BSC_OK : $BSC_DATA_NOT_FOUND);
@@ -584,11 +616,13 @@ sub get_module_operational_state {
   #           : hash reference - session listing on specified node
 
 =cut
+
 sub get_sessions_info {
     my ($self, $node) = @_;
     my $sessions = undef;
-    my $status = Brocade::BSC::Status->new;
-    my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/$node/yang-ext:mount/ietf-netconf-monitoring:netconf-state/sessions";
+    my $status   = Brocade::BSC::Status->new;
+    my $urlpath =
+"/restconf/operational/opendaylight-inventory:nodes/node/$node/yang-ext:mount/ietf-netconf-monitoring:netconf-state/sessions";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
@@ -615,10 +649,11 @@ sub get_sessions_info {
   #           : hash reference - streams info
 
 =cut
+
 sub get_streams_info {
-    my $self = shift;
+    my $self    = shift;
     my $streams = undef;
-    my $status = Brocade::BSC::Status->new;
+    my $status  = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/streams";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -646,11 +681,13 @@ sub get_streams_info {
   #           : array reference ~ name/provider pairs
 
 =cut
+
 sub get_service_providers_info {
-    my $self = shift;
+    my $self    = shift;
     my $service = undef;
-    my $status = Brocade::BSC::Status->new;
-    my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:services";
+    my $status  = Brocade::BSC::Status->new;
+    my $urlpath =
+"/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:services";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
@@ -677,12 +714,13 @@ sub get_service_providers_info {
   #           : array reference ~ name/provider pairs
 
 =cut
+
 sub get_service_provider_info {
     my ($self, $name) = @_;
     my $service = undef;
-    my $status = Brocade::BSC::Status->new;
+    my $status  = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node"
-        . "/controller-config/yang-ext:mount/config:services/service/$name";
+      . "/controller-config/yang-ext:mount/config:services/service/$name";
 
     my $resp = $self->_http_req('GET', $urlpath);
     if ($resp->code == HTTP_OK) {
@@ -710,13 +748,17 @@ Add a mount point on controller for specified node.
   # Returns   : BSC::Status
 
 =cut
+
 sub add_netconf_node {
     my ($self, $node) = @_;
     my $status = Brocade::BSC::Status->new($BSC_OK);
 
-    my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
-    my %headers = ('content-type' => 'application/xml',
-                   'accept' => 'application/xml');
+    my $urlpath =
+"/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
+    my %headers = (
+        'content-type' => 'application/xml',
+        'accept'       => 'application/xml'
+    );
     my $xmlPayload = <<END_XML;
         <module xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
           <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">prefix:sal-netconf-connector</type>
@@ -763,13 +805,15 @@ END_XML
   #           :
 
 =cut
+
 sub delete_netconf_node {
     my ($self, $node) = @_;
     my $status = Brocade::BSC::Status->new($BSC_OK);
-    my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node"
-        . "/controller-config/yang-ext:mount/config:modules/module"
-        . "/odl-sal-netconf-connector-cfg:sal-netconf-connector/"
-        . $node->{name};
+    my $urlpath =
+        "/restconf/config/opendaylight-inventory:nodes/node"
+      . "/controller-config/yang-ext:mount/config:modules/module"
+      . "/odl-sal-netconf-connector-cfg:sal-netconf-connector/"
+      . $node->{name};
 
     my $resp = $self->_http_req('DELETE', $urlpath);
     $resp->is_success or $status->_http_err($resp);
@@ -803,7 +847,7 @@ sub _get_ext_mount_config_urlpath {
     my ($self, $node) = @_;
 
     return "/restconf/config/opendaylight-inventory:nodes/node/"
-        . "$node/yang-ext:mount/";
+      . "$node/yang-ext:mount/";
 }
 
 # Method ===============================================================
@@ -817,7 +861,7 @@ sub _get_ext_mount_operational_urlpath {
     my ($self, $node) = @_;
 
     return "/restconf/operational/opendaylight-inventory:nodes/node/"
-        . "$node/yang-ext:mount/";
+      . "$node/yang-ext:mount/";
 }
 
 # Method ===============================================================
@@ -854,9 +898,10 @@ sub _get_node_config_urlpath {
   #           : array reference - node names
 
 =cut
+
 sub get_openflow_nodes_operational_list {
-    my $self = shift;
-    my $status = Brocade::BSC::Status->new;
+    my $self     = shift;
+    my $status   = Brocade::BSC::Status->new;
     my @nodelist = ();
 
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
@@ -864,7 +909,7 @@ sub get_openflow_nodes_operational_list {
     if ($resp->code == HTTP_OK) {
         if ($resp->content =~ /\"nodes\"/) {
             my $nodes = decode_json($resp->content)->{nodes}->{node};
-            if (! $nodes) {
+            if (!$nodes) {
                 $status->_code($BSC_DATA_NOT_FOUND);
             }
             else {

@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::PopMplsHeader object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -72,7 +72,7 @@ sub _as_oxm {
 sub eth_type {
     my ($self, $eth_type) = @_;
     return $self->{pop_mpls_action}->{'ethernet-type'} =
-        (2 == @_) ? $eth_type : $self->{pop_mpls_action}->{'ethernet-type'};
+      (2 == @_) ? $eth_type : $self->{pop_mpls_action}->{'ethernet-type'};
 }
 
 

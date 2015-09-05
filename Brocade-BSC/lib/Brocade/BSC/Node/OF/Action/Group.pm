@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::Group object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -54,12 +54,13 @@ sub new {
 sub group {
     my ($self, $group) = @_;
     return $self->{group_action}->{group} =
-        (2 == @_) ? $group : $self->{group_action}->{group};
+      (2 == @_) ? $group : $self->{group_action}->{group};
 }
+
 sub group_id {
     my ($self, $group_id) = @_;
     return $self->{group_action}->{group_id} =
-        (2 == @_) ? $group_id : $self->{group_action}->{group_id};
+      (2 == @_) ? $group_id : $self->{group_action}->{group_id};
 }
 
 

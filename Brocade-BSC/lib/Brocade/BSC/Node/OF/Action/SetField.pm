@@ -38,22 +38,25 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetField object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
-    $self->{set_field}->{'vlan_match'} = undef;
+    $self->{set_field}->{'vlan_match'}            = undef;
     $self->{set_field}->{'protocol_match_fields'} = undef;
     bless ($self, $class);
     if ($params{href}) {
         while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'protocol_match_fields') {
-                $self->{set_field}->{$key} = Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new(href => $value);
+                $self->{set_field}->{$key} =
+                  Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new(
+                    href => $value);
             }
             elsif ($key eq 'vlan_match') {
-                $self->{set_field}->{$key} = Brocade::BSC::Node::OF::Match::Vlan->new(href => $value);
+                $self->{set_field}->{$key} =
+                  Brocade::BSC::Node::OF::Match::Vlan->new(href => $value);
             }
         }
     }
@@ -71,8 +74,8 @@ sub _as_oxm {
 
     my $oxm = "";
     $oxm .= "set_mpls_label=" . $self->mpls_label if $self->mpls_label;
-    $oxm .= q(,) if length($oxm);
-    $oxm .= "set_vlan_vid=" . $self->vlan_id if $self->vlan_id;
+    $oxm .= q(,)                                  if length ($oxm);
+    $oxm .= "set_vlan_vid=" . $self->vlan_id      if $self->vlan_id;
     return $oxm;
 }
 
@@ -81,23 +84,28 @@ sub _as_oxm {
 #             accessors
 sub vlan_id {
     my ($self, $vid) = @_;
-    my $value = undef;
+    my $value        = undef;
     my $match_exists = defined $self->{set_field}->{'vlan_match'};
 
     if (@_ == 2) {
-        $match_exists or $self->{set_field}->{'vlan_match'} = Brocade::BSC::Node::OF::Match::Vlan->new;
+        $match_exists
+          or $self->{set_field}->{'vlan_match'} =
+          Brocade::BSC::Node::OF::Match::Vlan->new;
         $self->{set_field}->{'vlan_match'}->vid($vid);
     }
     $match_exists and $value = $self->{set_field}->{'vlan_match'}->vid();
     return $value;
 }
+
 sub mpls_label {
     my ($self, $mpls_label) = @_;
     my $value = undef;
-    defined $self->{set_field}->{'protocol_match_fields'} or
-        $self->{set_field}->{'protocol_match_fields'} = Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new;
-    (2 == @_) and
-        $self->{set_field}->{'protocol_match_fields'}->mpls_label($mpls_label);
+    defined $self->{set_field}->{'protocol_match_fields'}
+      or $self->{set_field}->{'protocol_match_fields'} =
+      Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new;
+    (2 == @_)
+      and
+      $self->{set_field}->{'protocol_match_fields'}->mpls_label($mpls_label);
     return $self->{set_field}->{'protocol_match_fields'}->mpls_label();
 }
 

@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetNwTTL object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -53,7 +53,7 @@ sub new {
 sub ip_ttl {
     my ($self, $nw_ttl) = @_;
     return $self->{set_nw_ttl_action}->{'nw-ttl'} =
-        (2 == @_) ? $ip_ttl : $self->{set_nw_ttl_action}->{'nw-ttl'};
+      (2 == @_) ? $ip_ttl : $self->{set_nw_ttl_action}->{'nw-ttl'};
 }
 
 

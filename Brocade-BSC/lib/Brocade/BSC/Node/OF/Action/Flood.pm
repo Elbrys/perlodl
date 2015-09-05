@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::Flood object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 

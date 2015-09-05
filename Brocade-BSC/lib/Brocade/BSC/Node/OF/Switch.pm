@@ -49,7 +49,7 @@ use Brocade::BSC;
 use Brocade::BSC::Status qw(:constants);
 use Brocade::BSC::Node::OF::FlowEntry;
 
-use Regexp::Common;   # balanced paren matching
+use Regexp::Common;    # balanced paren matching
 use HTTP::Status qw(:constants :is status_message);
 use JSON -convert_blessed_universally;
 
@@ -59,6 +59,7 @@ use JSON -convert_blessed_universally;
 
 # Constructor ==========================================================
 #
+
 =over 4
 
 =item B<new>
@@ -67,6 +68,7 @@ Creates a new I<::OFSwitch> object and populates fields with values
 from argument hash, if present, or YAML configuration file.
 
 =cut ===================================================================
+
 sub new {
     my ($class, %params) = @_;
 
@@ -82,9 +84,10 @@ sub new {
   #           : hash ref with basic info on openflow switch
 
 =cut ===================================================================
+
 sub get_switch_info {
-    my $self = shift;
-    my $status = Brocade::BSC::Status->new;
+    my $self      = shift;
+    my $status    = Brocade::BSC::Status->new;
     my %node_info = ();
 
     my $urlpath = $self->_oper_urlpath;
@@ -92,7 +95,7 @@ sub get_switch_info {
     if (HTTP_OK == $resp->code) {
         map {
             $resp->content =~ /\"flow-node-inventory:$_\":\"([^"]*)\"/
-                && ($node_info{$_} = $1);
+              && ($node_info{$_} = $1);
         } qw(manufacturer serial-number software hardware description);
         $status->_code($BSC_OK);
     }
@@ -111,17 +114,20 @@ sub get_switch_info {
   #           : hash ref of 'switch-features'
 
 =cut ===================================================================
+
 sub get_features_info {
-    my $self = shift;
-    my $status = Brocade::BSC::Status->new;
+    my $self             = shift;
+    my $status           = Brocade::BSC::Status->new;
     my $feature_info_ref = undef;
 
     my $urlpath = $self->_oper_urlpath;
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
         my $features = undef;
-        ($resp->content =~ /\"flow-node-inventory:switch-features\":(\{[^\}]+\}),/)
-            && (($features = $1) =~ s/flow-node-inventory:flow-feature-capability-//g);
+        ($resp->content =~
+              /\"flow-node-inventory:switch-features\":(\{[^\}]+\}),/)
+          && (($features = $1) =~
+            s/flow-node-inventory:flow-feature-capability-//g);
         $feature_info_ref = decode_json($features);
         $status->_code($BSC_OK);
     }
@@ -140,16 +146,21 @@ sub get_features_info {
   #           : array ref - list of port numbers
 
 =cut ===================================================================
+
 sub get_ports_list {
-    my $self = shift;
-    my $status = Brocade::BSC::Status->new;
+    my $self      = shift;
+    my $status    = Brocade::BSC::Status->new;
     my @port_list = ();
 
     my $urlpath = $self->_oper_urlpath;
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
-        my $node_connector_json = ($resp->content =~ /$RE{balanced}{-keep}{-begin => "\"node-connector\":\["}{-end => "]"}/ && $1);
-        @port_list = ($node_connector_json =~ /\"flow-node-inventory:port-number\":\"([0-9a-zA-Z]+)\"/g);
+        my $node_connector_json =
+          ($resp->content =~
+/$RE{balanced}{-keep}{-begin => "\"node-connector\":\["}{-end => "]"}/
+              && $1);
+        @port_list = ($node_connector_json =~
+              /\"flow-node-inventory:port-number\":\"([0-9a-zA-Z]+)\"/g);
         $status->_code($BSC_OK);
     }
     else {
@@ -181,26 +192,31 @@ sub get_ports_list {
   #           : array ref - port info hashes
 
 =cut ===================================================================
+
 sub get_ports_brief_info {
-    my $self = shift;
-    my $status = Brocade::BSC::Status->new;
+    my $self       = shift;
+    my $status     = Brocade::BSC::Status->new;
     my @ports_info = ();
 
     my $urlpath = $self->_oper_urlpath;
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
-        my $node_connector_json = ($resp->content =~ /$RE{balanced}{-keep}{-begin => "\"node-connector\":\["}{-end => "]"}/ && $1);
+        my $node_connector_json =
+          ($resp->content =~
+/$RE{balanced}{-keep}{-begin => "\"node-connector\":\["}{-end => "]"}/
+              && $1);
         $node_connector_json =~ s/^\"node-connector\"://;
         my $connectors = decode_json($node_connector_json);
         foreach my $connector (@$connectors) {
             my $port_info = {};
             $port_info->{id} = $connector->{id};
-            $port_info->{number} =$connector->{'flow-node-inventory:port-number'};
+            $port_info->{number} =
+              $connector->{'flow-node-inventory:port-number'};
             $port_info->{name} = $connector->{'flow-node-inventory:name'};
             $port_info->{'MAC address'} =
-                $connector->{'flow-node-inventory:hardware-address'};
+              $connector->{'flow-node-inventory:hardware-address'};
             $port_info->{'current feature'} =
-                uc($connector->{'flow-node-inventory:current-feature'});
+              uc ($connector->{'flow-node-inventory:current-feature'});
             push @ports_info, $port_info;
         }
         $status->_code($BSC_OK);
@@ -221,18 +237,19 @@ sub get_ports_brief_info {
   #           : hash ref - port details
 
 =cut ===================================================================
+
 sub get_port_detail_info {
-    my $self = shift;
+    my $self    = shift;
     my $portnum = shift;
-    my $status = Brocade::BSC::Status->new;
+    my $status  = Brocade::BSC::Status->new;
     my $port_info_ref;
 
-    my $urlpath = $self->_oper_urlpath
-        . "/node-connector/$self->{name}:$portnum";
+    my $urlpath =
+      $self->_oper_urlpath . "/node-connector/$self->{name}:$portnum";
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
         my $node_connector = decode_json($resp->content);
-        if (ref($node_connector->{'node-connector'}[0]) eq "HASH") {
+        if (ref ($node_connector->{'node-connector'}[0]) eq "HASH") {
             ($port_info_ref = $node_connector->{'node-connector'}[0]);
             $status->_code($BSC_OK);
         }
@@ -255,16 +272,20 @@ sub get_port_detail_info {
   # Returns   : BSC::Status - success of operation
 
 =cut ===================================================================
+
 sub add_modify_flow {
     my ($self, $flow_entry) = @_;
     my $status = Brocade::BSC::Status->new($BSC_OK);
 
-    if($flow_entry->isa("Brocade::BSC::Node::OF::FlowEntry")) {
+    if ($flow_entry->isa("Brocade::BSC::Node::OF::FlowEntry")) {
         my %headers = ('content-type' => 'application/yang.data+json');
         my $payload = $flow_entry->get_payload();
-        my $urlpath = $self->_config_urlpath
-            . "/table/" . $flow_entry->table_id()
-            . "/flow/" . $flow_entry->id();
+        my $urlpath =
+            $self->_config_urlpath
+          . "/table/"
+          . $flow_entry->table_id()
+          . "/flow/"
+          . $flow_entry->id();
         my $resp = $self->ctrl_req('PUT', $urlpath, $payload, \%headers);
 
         ($resp->code == HTTP_OK) or $status->_http_err($resp);
@@ -285,12 +306,12 @@ sub add_modify_flow {
   # Returns   : BSC::Status - success of operation
 
 =cut ===================================================================
+
 sub delete_flow {
     my ($self, $table_id, $flow_id) = @_;
     my $status = Brocade::BSC::Status->new($BSC_OK);
 
-    my $urlpath = $self->_config_urlpath
-        . "/table/$table_id/flow/$flow_id";
+    my $urlpath = $self->_config_urlpath . "/table/$table_id/flow/$flow_id";
     my $resp = $self->ctrl_req('DELETE', $urlpath);
     $resp->code == HTTP_OK or $status->_http_err($resp);
     return $status;
@@ -305,10 +326,12 @@ sub delete_flow {
   # Returns   : BSC::Status - success of operation
 
 =cut ===================================================================
+
 sub delete_flows {
     my ($self, $table_id) = @_;
 
-    my ($status, $flow_entries) = $self->get_configured_FlowEntries($table_id);
+    my ($status, $flow_entries) =
+      $self->get_configured_FlowEntries($table_id);
     if ($status->ok) {
         foreach (@$flow_entries) {
             $self->delete_flow($table_id, $_->id);
@@ -327,13 +350,13 @@ sub delete_flows {
   #           : flow as JSON string
 
 =cut ===================================================================
+
 sub get_configured_flow {
     my ($self, $table_id, $flow_id) = @_;
     my $status = Brocade::BSC::Status->new;
-    my $flow = undef;
+    my $flow   = undef;
 
-    my $urlpath = $self->_config_urlpath
-        . "/table/$table_id/flow/$flow_id";
+    my $urlpath = $self->_config_urlpath . "/table/$table_id/flow/$flow_id";
     my $resp = $self->ctrl_req('GET', $urlpath);
 
     if (HTTP_OK == $resp->code) {
@@ -360,18 +383,21 @@ sub _get_flows {
     my ($self, $table_id, $operational) = @_;
     $operational //= 1;
     my $status = Brocade::BSC::Status->new;
-    my $flows = undef;
+    my $flows  = undef;
 
-    my $urlpath = $operational
-        ? $self->_oper_urlpath
-        : $self->_config_urlpath;
+    my $urlpath =
+        $operational
+      ? $self->_oper_urlpath
+      : $self->_config_urlpath;
     $urlpath .= "/flow-node-inventory:table/$table_id";
 
     my $resp = $self->ctrl_req('GET', $urlpath);
     if (HTTP_OK == $resp->code) {
+
         # XXX at least pretend to sanity check structure/existence
-        $flows = decode_json($resp->content)->{'flow-node-inventory:table'}[0]->{flow};
-        $status->_code( defined $flows ? $BSC_OK : $BSC_DATA_NOT_FOUND );
+        $flows = decode_json($resp->content)->{'flow-node-inventory:table'}[0]
+          ->{flow};
+        $status->_code(defined $flows ? $BSC_OK : $BSC_DATA_NOT_FOUND);
     }
     else {
         $status->_http_err($resp);
@@ -396,7 +422,8 @@ sub _get_FlowEntries {
     my ($status, $flows) = $self->_get_flows($table_id, $operational);
     if ($status->ok) {
         foreach (@$flows) {
-            my $flowentry = Brocade::BSC::Node::OF::FlowEntry->new(href => $_);
+            my $flowentry =
+              Brocade::BSC::Node::OF::FlowEntry->new(href => $_);
             push @FlowEntries, $flowentry;
         }
     }
@@ -411,6 +438,7 @@ sub _get_FlowEntries {
   # Returns   : array ref - operational FlowEntry objects
 
 =cut ===================================================================
+
 sub get_operational_FlowEntries {
     my ($self, $table_id) = @_;
     return $self->_get_FlowEntries($table_id, 1);
@@ -424,6 +452,7 @@ sub get_operational_FlowEntries {
   # Returns   : array ref - configured FlowEntry objects
 
 =cut ===================================================================
+
 sub get_configured_FlowEntries {
     my ($self, $table_id) = @_;
     return $self->_get_FlowEntries($table_id, 0);
@@ -439,12 +468,15 @@ sub get_configured_FlowEntries {
   #           : FlowEntry object for specified table and flow
 
 =cut ===================================================================
+
 sub get_configured_FlowEntry {
     my ($self, $table_id, $flow_id) = @_;
     my $flowentry = undef;
 
-    my ($status, $flow_json) = $self->get_configured_flow($table_id, $flow_id);
+    my ($status, $flow_json) =
+      $self->get_configured_flow($table_id, $flow_id);
     if ($status->ok) {
+
         # XXX sanity check structure/existence
         my $flow = decode_json($flow_json)->{'flow-node-inventory:flow'}[0];
         $flowentry = Brocade::BSC::Node::OF::FlowEntry->new(href => $flow);

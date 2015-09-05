@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetMplsTTL object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -53,7 +53,7 @@ sub new {
 sub mpls_ttl {
     my ($self, $mpls_ttl) = @_;
     return $self->{set_mpls_ttl_action}->{'mpls-ttl'} =
-        (2 == @_) ? $mpls_ttl : $self->{set_mpls_ttl_action}->{'mpls-ttl'};
+      (2 == @_) ? $mpls_ttl : $self->{set_mpls_ttl_action}->{'mpls-ttl'};
 }
 
 

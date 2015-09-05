@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetNwDst object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -53,7 +53,7 @@ sub new {
 sub ip_addr {
     my ($self, $ip_addr) = @_;
     return $self->{set_nw_dst_action}->{address} =
-        (2 == @_) ? $ip_addr : $self->{set_nw_dst_action}->{address};
+      (2 == @_) ? $ip_addr : $self->{set_nw_dst_action}->{address};
 }
 
 

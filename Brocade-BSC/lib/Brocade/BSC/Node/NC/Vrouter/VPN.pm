@@ -49,6 +49,7 @@ use parent qw(Brocade::BSC::Node);
 
 # Constructor ==========================================================
 #
+
 =over 4
 
 =item B<new>
@@ -56,6 +57,7 @@ use parent qw(Brocade::BSC::Node);
 Creates and returns a new I<Brocade::BSC::Node::NC::Vrouter::VPN> object.
 
 =cut
+
 sub new {
     my $class = shift;
 
@@ -69,11 +71,11 @@ sub new {
             nat_networks       => {
                 allowed_network => [],
             },
-            nat_traversal      => undef,
-            profile            => [],
-            site_to_site       => undef
+            nat_traversal => undef,
+            profile       => [],
+            site_to_site  => undef
         },
-        l2tp  => {
+        l2tp => {
             remote_access => {
                 authentication => {
                     local_users => {
@@ -84,7 +86,7 @@ sub new {
                 client_ip_pool => undef,
                 description    => undef,
                 dhcp_interface => undef,
-                dns_servers => {
+                dns_servers    => {
                     server_1 => undef,
                     server_2 => undef,
                 },
@@ -94,9 +96,9 @@ sub new {
                 },
                 ipsec_settings => {
                     authentication => {
-                        mode => undef,
+                        mode              => undef,
                         pre_shared_secret => undef,
-                        x509 => {
+                        x509              => {
                             ca_cert_file        => undef,
                             crl_file            => undef,
                             server_cert_file    => undef,
@@ -105,7 +107,7 @@ sub new {
                         },
                     },
                 },
-                mtu => undef,
+                mtu             => undef,
                 outside_address => undef,
                 outside_nexthop => undef,
                 server_ip_pool  => undef,
@@ -118,7 +120,7 @@ sub new {
             rsa_key_name => [],
         },
     };
-    
+
     return bless ($self, $class);
 }
 
@@ -130,6 +132,7 @@ sub new {
   # Returns   : VPN as formatted JSON string.
 
 =cut ===================================================================
+
 sub as_json {
     my $self = shift;
     my $json = JSON->new->canonical->allow_blessed->convert_blessed;
@@ -144,12 +147,13 @@ sub as_json {
   # Returns   : VPN configuration as JSON for posting to controller.
 
 =cut ===================================================================
+
 sub get_payload {
     my $self = shift;
 
-    my $payload = '{"vyatta-security:security":{"vyatta-security-vpn-ipsec:vpn":'
-        . $self->_stripped_json
-        . '}}';
+    my $payload =
+      '{"vyatta-security:security":{"vyatta-security-vpn-ipsec:vpn":'
+      . $self->_stripped_json . '}}';
     $payload =~ s/_/-/g;
 
     return $payload;
@@ -160,10 +164,10 @@ sub get_payload {
 #
 #item B<_find_ike_group>
 
-  # Parameters: group  => name of IKE group to find (or create)
-  #           : create => (boolean) - whether or not to create new group
-  #                                   if no matching group exists
-  # Returns   : group reference; undef if not found and no create
+# Parameters: group  => name of IKE group to find (or create)
+#           : create => (boolean) - whether or not to create new group
+#                                   if no matching group exists
+# Returns   : group reference; undef if not found and no create
 
 #cut ===================================================================
 sub _find_ike_group {
@@ -193,14 +197,16 @@ sub _find_ike_group {
   # Returns   : list of proposals
 
 =cut ===================================================================
+
 sub set_ipsec_ike_group_proposal {
     my ($self, %params) = @_;
 
     defined $params{group} or die "required parameter 'group'\n";
-    my $group = $self->_find_ike_group(grouptag => $params{group}, create => 1);
+    my $group =
+      $self->_find_ike_group(grouptag => $params{group}, create => 1);
     my $proposal = {};
     map { $params{$_} && ($proposal->{$_} = $params{$_}) }
-        qw(tagnode encryption hash dh_group);
+      qw(tagnode encryption hash dh_group);
     push @{$group->{proposal}}, $proposal;
     return @{$group->{proposal}};
 }
@@ -215,11 +221,13 @@ sub set_ipsec_ike_group_proposal {
   # Returns   : lifetime
 
 =cut ===================================================================
+
 sub set_ipsec_ike_group_lifetime {
     my ($self, %params) = @_;
 
     defined $params{group} or die "required parameter 'group'\n";
-    my $group = $self->_find_ike_group(grouptag => $params{group}, create => 1);
+    my $group =
+      $self->_find_ike_group(grouptag => $params{group}, create => 1);
     return $group->{lifetime} = $params{lifetime};
 }
 
@@ -228,10 +236,10 @@ sub set_ipsec_ike_group_lifetime {
 #
 #item B<_find_esp_group>
 
-  # Parameters: group  => name of ESP group to find (or create)
-  #           : create => (boolean) - whether or not to create new group
-  #                                   if no matching group exists
-  # Returns   : group reference; undef if not found and no create
+# Parameters: group  => name of ESP group to find (or create)
+#           : create => (boolean) - whether or not to create new group
+#                                   if no matching group exists
+# Returns   : group reference; undef if not found and no create
 
 #cut ===================================================================
 sub _find_esp_group {
@@ -260,14 +268,16 @@ sub _find_esp_group {
   # Returns   : list of proposals
 
 =cut ===================================================================
+
 sub set_ipsec_esp_group_proposal {
     my ($self, %params) = @_;
 
     defined $params{group} or die "required parameter 'group'\n";
-    my $group = $self->_find_esp_group(grouptag => $params{group}, create => 1);
+    my $group =
+      $self->_find_esp_group(grouptag => $params{group}, create => 1);
     my $proposal = {};
     map { $params{$_} && ($proposal->{$_} = $params{$_}) }
-        qw(tagnode encryption hash);
+      qw(tagnode encryption hash);
     push @{$group->{proposal}}, $proposal;
     return @{$group->{proposal}};
 }
@@ -282,11 +292,13 @@ sub set_ipsec_esp_group_proposal {
   # Returns   : lifetime
 
 =cut ===================================================================
+
 sub set_ipsec_esp_group_lifetime {
     my ($self, %params) = @_;
 
     defined $params{group} or die "required parameter 'group'\n";
-    my $group = $self->_find_esp_group(grouptag => $params{group}, create => 1);
+    my $group =
+      $self->_find_esp_group(grouptag => $params{group}, create => 1);
     return $group->{lifetime} = $params{lifetime};
 }
 
@@ -295,17 +307,17 @@ sub set_ipsec_esp_group_lifetime {
 #
 #item B<_find_site_site_peer>
 
-  # Parameters: peer  => identifier for vpn peer
-  #           : create => (boolean) - whether or not to create new peer
-  #                                   hash if no matching peer exists
-  # Returns   : peer reference; undef if not found and no create
+# Parameters: peer  => identifier for vpn peer
+#           : create => (boolean) - whether or not to create new peer
+#                                   hash if no matching peer exists
+# Returns   : peer reference; undef if not found and no create
 
 #cut ===================================================================
 sub _find_site_site_peer {
     my ($self, %params) = @_;
     my $peer = undef;
     $self->{ipsec}->{site_to_site}->{peer} = []
-        if not defined ($self->{ipsec}->{site_to_site});
+      if not defined ($self->{ipsec}->{site_to_site});
     foreach my $peernode (@{$self->{ipsec}->{site_to_site}->{peer}}) {
         $peer = $peernode;
         last if ($peer->{tagnode} eq $params{peertag});
@@ -326,6 +338,7 @@ sub _find_site_site_peer {
   #           : description
 
 =cut ===================================================================
+
 sub ipsec_site_site_peer_description {
     my ($self, $peertag, $description) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -341,6 +354,7 @@ sub ipsec_site_site_peer_description {
   #           : auth_mode
 
 =cut ===================================================================
+
 sub ipsec_site_site_peer_auth_mode {
     my ($self, $peertag, $auth_mode) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -356,6 +370,7 @@ sub ipsec_site_site_peer_auth_mode {
   #           : psk     => pre-shared secret key
 
 =cut ===================================================================
+
 sub ipsec_site_site_peer_auth_psk {
     my ($self, $peertag, $psk) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -371,6 +386,7 @@ sub ipsec_site_site_peer_auth_psk {
   #           : rsa_key_name
 
 =cut ==================================================================
+
 sub ipsec_site_site_peer_auth_rsa_key_name {
     my ($self, $peertag, $rsa_key_name) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -386,6 +402,7 @@ sub ipsec_site_site_peer_auth_rsa_key_name {
   #           : remote_id
 
 =cut ==================================================================
+
 sub ipsec_site_site_peer_auth_remote_id {
     my ($self, $peertag, $remote_id) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -401,6 +418,7 @@ sub ipsec_site_site_peer_auth_remote_id {
   #           : path to certificate authority certificate
 
 =cut ==================================================================
+
 sub ipsec_site_site_peer_auth_ca_cert_file {
     my ($self, $peertag, $ca_cert_file) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -414,6 +432,7 @@ sub ipsec_site_site_peer_auth_ca_cert_file {
   #           : path to server certificate
 
 =cut ==================================================================
+
 sub ipsec_site_site_peer_auth_srv_cert_file {
     my ($self, $peertag, $cert_file) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -427,6 +446,7 @@ sub ipsec_site_site_peer_auth_srv_cert_file {
   #           : path to key file for server certificate
 
 =cut ==================================================================
+
 sub ipsec_site_site_peer_auth_srv_key_file {
     my ($self, $peertag, $srv_key_file) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -440,6 +460,7 @@ sub ipsec_site_site_peer_auth_srv_key_file {
   #           : password for server cert key file
 
 =cut ==================================================================
+
 sub ipsec_site_site_peer_auth_srv_key_pswd {
     my ($self, $peertag, $srv_key_pswd) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -455,6 +476,7 @@ sub ipsec_site_site_peer_auth_srv_key_pswd {
   #           : esp_group => identifier for ESP group to use with this peer
 
 =cut ===================================================================
+
 sub ipsec_site_site_peer_dflt_esp_grp {
     my ($self, $peertag, $esp_group) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -470,6 +492,7 @@ sub ipsec_site_site_peer_dflt_esp_grp {
   #             ike_group => identifier for IKE group to use with this peer
 
 =cut ===================================================================
+
 sub ipsec_site_site_peer_ike_grp {
     my ($self, $peertag, $ike_group) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -486,6 +509,7 @@ sub ipsec_site_site_peer_ike_grp {
   #                              ipsec connection
 
 =cut ===================================================================
+
 sub ipsec_site_site_peer_local_addr {
     my ($self, $peertag, $local_address) = @_;
     my $peer = $self->_find_site_site_peer(peertag => $peertag, create => 1);
@@ -497,9 +521,9 @@ sub ipsec_site_site_peer_local_addr {
 #
 #item B<_find_create_tunnel>
 
-  # Parameters: peer  => identifier for vpn peer
-  #           : tunnel_id => identifier for tunnel
-  # Returns   : tunnel reference; undef if not found and no create
+# Parameters: peer  => identifier for vpn peer
+#           : tunnel_id => identifier for tunnel
+# Returns   : tunnel reference; undef if not found and no create
 
 #cut ===================================================================
 sub _find_create_tunnel {
@@ -527,10 +551,13 @@ sub _find_create_tunnel {
   #             subnet => local subnet routed via tunnel
 
 =cut ===================================================================
+
 sub ipsec_site_site_peer_tunnel_local_pfx {
     my ($self, %params) = @_;
-    my $peer = $self->_find_site_site_peer(peertag => $params{peer},
-                                           create => 1);
+    my $peer = $self->_find_site_site_peer(
+        peertag => $params{peer},
+        create  => 1
+    );
     my $tunnel = _find_create_tunnel($peer, $params{tunnel});
     return $tunnel->{local}->{prefix} = $params{subnet};
 }
@@ -545,10 +572,13 @@ sub ipsec_site_site_peer_tunnel_local_pfx {
   #             subnet => remote subnet routed via tunnel
 
 =cut ===================================================================
+
 sub ipsec_site_site_peer_tunnel_remote_pfx {
     my ($self, %params) = @_;
-    my $peer = $self->_find_site_site_peer(peertag => $params{peer},
-                                           create => 1);
+    my $peer = $self->_find_site_site_peer(
+        peertag => $params{peer},
+        create  => 1
+    );
     my $tunnel = _find_create_tunnel($peer, $params{tunnel});
     return $tunnel->{remote}->{prefix} = $params{subnet};
 }
@@ -564,11 +594,13 @@ sub ipsec_site_site_peer_tunnel_remote_pfx {
 Append a permitted IP subnet to list of permitted subnets.
 
 =cut ===================================================================
+
 sub nat_allow_network {
     my ($self, $subnet) = @_;
 
-    (2 == @_) and
-        push @{$self->{ipsec}->{nat_networks}->{allowed_network}}, {'tagnode' => $subnet};
+    (2 == @_)
+      and push @{$self->{ipsec}->{nat_networks}->{allowed_network}},
+      {'tagnode' => $subnet};
     return $self->{ipsec}->{nat_networks};
 }
 
@@ -582,14 +614,12 @@ sub nat_allow_network {
 Set or retrieve the NAT traversal flag.
 
 =cut ===================================================================
+
 sub nat_traversal {
     my ($self, $enable) = @_;
     (1 == @_) and return $self->{ipsec}->{nat_traversal};
     return $self->{ipsec}->{nat_traversal} = $enable ? "enable" : "disable";
 }
-
-
-
 
 
 # Method ===============================================================
@@ -602,11 +632,13 @@ sub nat_traversal {
 Append a user to list of authorized users.
 
 =cut ===================================================================
+
 sub l2tp_remote_access_user {
     my ($self, %params) = @_;
     if (defined $params{name} and defined $params{pswd}) {
-        push @{$self->{l2tp}->{remote_access}->{authentication}->{local_users}->{username}},
-            {'tagnode' => $params{name}, 'password' => $params{pswd}};
+        push @{$self->{l2tp}->{remote_access}->{authentication}->{local_users}
+              ->{username}},
+          {'tagnode' => $params{name}, 'password' => $params{pswd}};
     }
     return $self->{l2tp}->{remote_access}->{authentication}->{local_users};
 }
@@ -621,10 +653,13 @@ sub l2tp_remote_access_user {
 Set or retrieve authentication mode.
 
 =cut ===================================================================
+
 sub l2tp_remote_access_user_auth_mode {
     my ($self, $mode) = @_;
     return $self->{l2tp}->{remote_access}->{authentication}->{mode} =
-        (2 == @_) ? $mode : $self->{l2tp}->{remote_access}->{authentication}->{mode};
+      (2 == @_)
+      ? $mode
+      : $self->{l2tp}->{remote_access}->{authentication}->{mode};
 }
 
 # Method ===============================================================
@@ -638,13 +673,14 @@ Set or retrieve the IP address range that will be used for assigning
 addresses to remote VPN connected nodes.
 
 =cut ===================================================================
+
 sub l2tp_remote_access_client_ip_pool {
     my ($self, %params) = @_;
 
     (defined $params{start} and defined $params{end})
-        or return $self->{l2tp}->{remote_access}->{client_ip_pool};
+      or return $self->{l2tp}->{remote_access}->{client_ip_pool};
     return $self->{l2tp}->{remote_access}->{client_ip_pool} =
-        { 'start' => $params{start}, 'stop' => $params{end} };
+      {'start' => $params{start}, 'stop' => $params{end}};
 }
 
 # Method ===============================================================
@@ -657,10 +693,13 @@ sub l2tp_remote_access_client_ip_pool {
 Set or retrieve the VPN description.
 
 =cut ===================================================================
+
 sub l2tp_remote_access_description {
     my ($self, $description) = @_;
     return $self->{l2tp}->{remote_access}->{description} =
-        (2 == @_) ? $description : $self->{l2tp}->{remote_access}->{description};
+      (2 == @_)
+      ? $description
+      : $self->{l2tp}->{remote_access}->{description};
 }
 
 # Method ===============================================================
@@ -671,10 +710,11 @@ sub l2tp_remote_access_description {
   # Returns   :
 
 =cut ===================================================================
+
 sub l2tp_remote_access_dhcp_interface {
     my ($self, $if) = @_;
     return $self->{l2tp}->{remote_access}->{dhcp_interface} =
-        (2 == @_) ? $if : $self->{l2tp}->{remote_access}->{dhcp_interface};
+      (2 == @_) ? $if : $self->{l2tp}->{remote_access}->{dhcp_interface};
 }
 
 # Method ===============================================================
@@ -687,11 +727,13 @@ sub l2tp_remote_access_dhcp_interface {
 Set or retrieve primary DNS server IP address.
 
 =cut ===================================================================
+
 sub l2tp_remote_access_primary_dns_server {
     my ($self, $ipaddr) = @_;
     return $self->{l2tp}->{remote_access}->{dns_servers}->{server_1} =
-        (2 == @_) ? $ipaddr
-                  : $self->{l2tp}->{remote_access}->{dns_servers}->{server_1};
+      (2 == @_)
+      ? $ipaddr
+      : $self->{l2tp}->{remote_access}->{dns_servers}->{server_1};
 }
 
 # Method ===============================================================
@@ -704,11 +746,13 @@ sub l2tp_remote_access_primary_dns_server {
 Set or retrieve secondary DNS server IP address.
 
 =cut ===================================================================
+
 sub l2tp_remote_access_secondary_dns_server {
     my ($self, $ipaddr) = @_;
     return $self->{l2tp}->{remote_access}->{dns_servers}->{server_2} =
-        (2 == @_) ? $ipaddr 
-                  : $self->{l2tp}->{remote_access}->{dns_servers}->{server_2};
+      (2 == @_)
+      ? $ipaddr
+      : $self->{l2tp}->{remote_access}->{dns_servers}->{server_2};
 }
 
 # Method ===============================================================
@@ -721,11 +765,13 @@ sub l2tp_remote_access_secondary_dns_server {
 Set or retrieve primary WINS server IP address.
 
 =cut ===================================================================
+
 sub l2tp_remote_access_primary_wins_server {
     my ($self, $ipaddr) = @_;
     return $self->{l2tp}->{remote_access}->{wins_servers}->{server_1} =
-        (2 == @_) ? $ipaddr
-                  : $self->{l2tp}->{remote_access}->{wins_servers}->{server_1};
+      (2 == @_)
+      ? $ipaddr
+      : $self->{l2tp}->{remote_access}->{wins_servers}->{server_1};
 }
 
 # Method ===============================================================
@@ -738,11 +784,13 @@ sub l2tp_remote_access_primary_wins_server {
 Set or retrieve secondary WINS server IP address.
 
 =cut ===================================================================
+
 sub l2tp_remote_access_secondary_wins_server {
     my ($self, $ipaddr) = @_;
     return $self->{l2tp}->{remote_access}->{wins_servers}->{server_2} =
-        (2 == @_) ? $ipaddr
-                  : $self->{l2tp}->{remote_access}->{wins_servers}->{server_2};
+      (2 == @_)
+      ? $ipaddr
+      : $self->{l2tp}->{remote_access}->{wins_servers}->{server_2};
 }
 
 
@@ -754,11 +802,15 @@ sub l2tp_remote_access_secondary_wins_server {
   # Returns   : current mode
 
 =cut ==================================================================
+
 sub l2tp_remote_access_ipsec_auth_mode {
     my ($self, $mode) = @_;
-    return $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}->{mode} =
-        (2 == @_) ? $mode
-                  : $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}->{mode};
+    return $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}
+      ->{mode} =
+      (2 == @_)
+      ? $mode
+      : $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}
+      ->{mode};
 }
 
 
@@ -770,11 +822,15 @@ sub l2tp_remote_access_ipsec_auth_mode {
   # Returns   : psk
 
 =cut ==================================================================
+
 sub l2tp_remote_access_ipsec_auth_psk {
     my ($self, $psk) = @_;
-    return $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}->{pre_shared_secret} =
-        (2 == @_) ? $psk
-                  : $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}->{pre_shared_secret};
+    return $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}
+      ->{pre_shared_secret} =
+      (2 == @_)
+      ? $psk
+      : $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}
+      ->{pre_shared_secret};
 }
 
 
@@ -787,9 +843,12 @@ sub l2tp_remote_access_ipsec_auth_psk {
   # Returns   : file path
 
 =cut ==================================================================
+
 sub l2tp_remote_access_ipsec_auth_ca_cert_file {
     my ($self, $path) = @_;
-    my $x509 = $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}->{x509};
+    my $x509 =
+      $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}
+      ->{x509};
     return $x509->{ca_cert_file} = (2 == @_) ? $path : $x509->{ca_cert_file};
 }
 
@@ -803,9 +862,12 @@ sub l2tp_remote_access_ipsec_auth_ca_cert_file {
   # Returns   : file path
 
 =cut ==================================================================
+
 sub l2tp_remote_access_ipsec_auth_crl_file {
     my ($self, $path) = @_;
-    my $x509 = $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}->{x509};
+    my $x509 =
+      $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}
+      ->{x509};
     return $x509->{crl_file} = (2 == @_) ? $path : $x509->{crl_file};
 }
 
@@ -818,10 +880,14 @@ sub l2tp_remote_access_ipsec_auth_crl_file {
   # Returns   : file path
 
 =cut ==================================================================
+
 sub l2tp_remote_access_ipsec_auth_srv_cert_file {
     my ($self, $path) = @_;
-    my $x509 = $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}->{x509};
-    return $x509->{server_cert_file} = (2 == @_) ? $path : $x509->{server_cert_file};
+    my $x509 =
+      $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}
+      ->{x509};
+    return $x509->{server_cert_file} =
+      (2 == @_) ? $path : $x509->{server_cert_file};
 }
 
 
@@ -833,10 +899,14 @@ sub l2tp_remote_access_ipsec_auth_srv_cert_file {
   # Returns   : file path
 
 =cut ==================================================================
+
 sub l2tp_remote_access_ipsec_auth_srv_key_file {
     my ($self, $path) = @_;
-    my $x509 = $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}->{x509};
-    return $x509->{server_key_file} = (2 == @_) ? $path : $x509->{server_key_file};
+    my $x509 =
+      $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}
+      ->{x509};
+    return $x509->{server_key_file} =
+      (2 == @_) ? $path : $x509->{server_key_file};
 }
 
 
@@ -848,10 +918,14 @@ sub l2tp_remote_access_ipsec_auth_srv_key_file {
   # Returns   : file path
 
 =cut ==================================================================
+
 sub l2tp_remote_access_ipsec_auth_srv_key_pswd {
     my ($self, $path) = @_;
-    my $x509 = $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}->{x509};
-    return $x509->{server_key_password} = (2 == @_) ? $path : $x509->{server_key_password};
+    my $x509 =
+      $self->{l2tp}->{remote_access}->{ipsec_settings}->{authentication}
+      ->{x509};
+    return $x509->{server_key_password} =
+      (2 == @_) ? $path : $x509->{server_key_password};
 }
 
 
@@ -863,10 +937,11 @@ sub l2tp_remote_access_ipsec_auth_srv_key_pswd {
   # Returns   : current MTU
 
 =cut ===================================================================
+
 sub l2tp_remote_access_mtu {
     my ($self, $mtu) = @_;
     return $self->{l2tp}->{remote_access}->{mtu} =
-        (2 == @_) ? $mtu : $self->{l2tp}->{remote_access}->{mtu};
+      (2 == @_) ? $mtu : $self->{l2tp}->{remote_access}->{mtu};
 }
 
 # Method ===============================================================
@@ -877,10 +952,11 @@ sub l2tp_remote_access_mtu {
   # Returns   : current l2tp external IP address
 
 =cut ===================================================================
+
 sub l2tp_remote_access_outside_address {
     my ($self, $ipaddr) = @_;
     return $self->{l2tp}->{remote_access}->{outside_address} =
-        (2 == @_) ? $ipaddr : $self->{l2tp}->{remote_access}->{outside_address};
+      (2 == @_) ? $ipaddr : $self->{l2tp}->{remote_access}->{outside_address};
 }
 
 # Method ===============================================================
@@ -891,10 +967,11 @@ sub l2tp_remote_access_outside_address {
   # Returns   : current l2tp gateway address
 
 =cut ===================================================================
+
 sub l2tp_remote_access_outside_nexthop {
     my ($self, $ipaddr) = @_;
     return $self->{l2tp}->{remote_access}->{outside_nexthop} =
-        (2 == @_) ? $ipaddr : $self->{l2tp}->{remote_access}->{outside_nexthop};
+      (2 == @_) ? $ipaddr : $self->{l2tp}->{remote_access}->{outside_nexthop};
 }
 
 # Method ===============================================================
@@ -906,17 +983,15 @@ sub l2tp_remote_access_outside_nexthop {
   # Returns   :
 
 =cut ===================================================================
+
 sub l2tp_remote_access_server_ip_pool {
     my ($self, %params) = @_;
 
     (defined $params{start} and defined $params{end})
-        or return $self->{l2tp}->{remote_access}->{server_ip_pool};
+      or return $self->{l2tp}->{remote_access}->{server_ip_pool};
     return $self->{l2tp}->{remote_access}->{server_ip_pool} =
-        { 'start' => $params{start}, 'stop' => $params{end} };
+      {'start' => $params{start}, 'stop' => $params{end}};
 }
-
-
-
 
 
 # Method ===============================================================
@@ -927,10 +1002,11 @@ sub l2tp_remote_access_server_ip_pool {
   # Returns   : current path
 
 =cut ===================================================================
+
 sub local_key {
     my ($self, $keyfile) = @_;
     return $self->{rsa_keys}->{local_key}->{file} =
-        (2 == @_) ? $keyfile : $self->{rsa_keys}->{local_key}->{file};
+      (2 == @_) ? $keyfile : $self->{rsa_keys}->{local_key}->{file};
 }
 
 # Method ===============================================================
@@ -941,12 +1017,13 @@ sub local_key {
   # Returns   :
 
 =cut ===================================================================
+
 sub rsa_key {
     my ($self, %params) = @_;
 
     if (defined $params{name} and defined $params{value}) {
         push @{$self->{rsa_keys}->{rsa_key_name}},
-            {'tagnode' => $params{name}, 'rsa_key' => $params{value}};
+          {'tagnode' => $params{name}, 'rsa_key' => $params{value}};
     }
     return $self->{rsa_keys}->{rsa_key_name};
 }

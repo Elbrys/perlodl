@@ -49,7 +49,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: order (optional)
 # Returns   : Brocade::BSC::Node::OF::Action object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -69,6 +69,7 @@ sub new {
   # Returns   : 'order' value
 
 =cut
+
 sub order {
     my ($self, $order) = @_;
     return $self->{order} = (@_ == 2) ? $order : $self->{order};

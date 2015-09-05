@@ -1,8 +1,15 @@
-#
--i=4                # indent 4, default
--l=78               # line length
--nsfs               # no spaces before semicolons in for() loops
-#-fpsc=40        # side comments indented to column 40 or right
-#-ndws               # no delete whitespace
-#                    # (e.g., don't change indentation of side comments)
--mbl=2              # maximum number of consecutive blank lines
+# perltidy
+--indent-columns=4              # default
+--maximum-line-length=78
+--nospace-for-semicolon         # inside for( ; ; )
+--maximum-consecutive-blank-lines=2
+--nocuddled-else                # default
+--stack-opening-tokens
+--stack-closing-tokens
+--paren-tightness=2
+--square-bracket-tightness=2
+--brace-tightness=2
+--block-brace-tightness=0       # default
+--space-keyword-paren
+--noblanks-before-comments
+--trim-pod                      # trailing whitespace in pod blocks

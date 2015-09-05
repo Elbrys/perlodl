@@ -6,4 +6,9 @@ severity = stern
 [TestingAndDebugging::ProhibitNoStrict]
 allow = refs
 
+[CodeLayout::RequireTidyCode]
+# RequireTidyCode defaults to being applied only at 'brutal'
+severity = stern
+perltidyrc = xt/perltidyrc
+
 [-Modules::ProhibitMultiplePackages]

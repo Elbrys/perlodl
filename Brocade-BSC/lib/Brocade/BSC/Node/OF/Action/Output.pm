@@ -40,13 +40,13 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::Output object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{output_action}->{'output_node_connector'} = $params{port};
-    $self->{output_action}->{'max_length'} = $params{max_len};
+    $self->{output_action}->{'max_length'}            = $params{max_len};
     bless ($self, $class);
     if ($params{href}) {
         while (my ($key, $value) = each %{$params{href}}) {
@@ -67,10 +67,10 @@ sub _as_oxm {
     my $self = shift;
 
     my $port = $self->outport();
-    assert ($port);
+    assert($port);
     my $maxlen = $self->max_len();
-    my $oxm = "output=$port";
-    $oxm .= ":$maxlen" if defined($maxlen);
+    my $oxm    = "output=$port";
+    $oxm .= ":$maxlen" if defined ($maxlen);
     return $oxm;
 }
 
@@ -80,12 +80,13 @@ sub _as_oxm {
 sub outport {
     my ($self, $port) = @_;
     return $self->{output_action}->{'output_node_connector'} =
-        (2 == @_) ? $port : $self->{output_action}->{'output_node_connector'};
+      (2 == @_) ? $port : $self->{output_action}->{'output_node_connector'};
 }
+
 sub max_len {
     my ($self, $max_len) = @_;
     return $self->{output_action}->{'max_length'} =
-        (2 == @_) ? $max_len : $self->{output_action}->{'max_length'};
+      (2 == @_) ? $max_len : $self->{output_action}->{'max_length'};
 }
 
 

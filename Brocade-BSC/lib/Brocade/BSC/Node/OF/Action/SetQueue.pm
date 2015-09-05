@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetQueue object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -54,12 +54,13 @@ sub new {
 sub queue {
     my ($self, $queue) = @_;
     return $self->{set_queue_action}->{queue} =
-        (2 == @_) ? $queue : $self->{set_queue_action}->{queue};
+      (2 == @_) ? $queue : $self->{set_queue_action}->{queue};
 }
+
 sub queue_id {
     my ($self, $queue_id) = @_;
     return $self->{set_queue_action}->{queue_id} =
-        (2 == @_) ? $queue_id : $self->{set_queue_action}->{queue_id};
+      (2 == @_) ? $queue_id : $self->{set_queue_action}->{queue_id};
 }
 
 

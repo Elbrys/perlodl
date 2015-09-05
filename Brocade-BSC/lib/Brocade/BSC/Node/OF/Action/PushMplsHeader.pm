@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::PushMplsHeader object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -63,7 +63,7 @@ sub new {
 sub _as_oxm {
     my $self = shift;
 
-    return sprintf("push_mpls=0x%x", $self->eth_type());
+    return sprintf ("push_mpls=0x%x", $self->eth_type());
 }
 
 
@@ -72,7 +72,7 @@ sub _as_oxm {
 sub eth_type {
     my ($self, $eth_type) = @_;
     return $self->{push_mpls_action}->{'ethernet-type'} =
-        (2 == @_) ? $eth_type : $self->{push_mpls_action}->{'ethernet-type'};
+      (2 == @_) ? $eth_type : $self->{push_mpls_action}->{'ethernet-type'};
 }
 
 

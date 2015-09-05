@@ -50,6 +50,7 @@ use JSON -convert_blessed_universally;
 
 # Constructor ==========================================================
 #
+
 =over 4
 
 =item B<new>
@@ -57,17 +58,18 @@ use JSON -convert_blessed_universally;
 Creates and returns a new I<Brocade::BSC::Node::NC::Vrouter::OvpnIf> object.
 
 =cut
+
 sub new {
     my ($class, $name) = @_;
 
     my $self = {
         tagnode => $name,
-#
-#         description => undef,
-#         hash => undef,          # md5, sha1, sha256, sha512
-#         disable => undef,
-#         server => undef
-#
+        #
+        #         description => undef,
+        #         hash => undef,          # md5, sha1, sha256, sha512
+        #         disable => undef,
+        #         server => undef
+        #
     };
     return bless ($self, $class);
 }
@@ -80,6 +82,7 @@ sub new {
   # Returns   : OpenVPN interface configuration as formatted JSON string.
 
 =cut ===================================================================
+
 sub as_json {
     my $self = @_;
     my $json = JSON->new->canonical->allow_blessed->convert_blessed;
@@ -95,19 +98,18 @@ sub as_json {
                 posting to controller.
 
 =cut ===================================================================
+
 sub get_payload {
     my $self = @_;
 
-    my $payload = '{"vyatta-interfaces:interfaces":'
-        . '{"vyatta-interfaces-openvpn:openvpn":['
-        . $self->_stripped_json
-        . ']}}';
+    my $payload =
+        '{"vyatta-interfaces:interfaces":'
+      . '{"vyatta-interfaces-openvpn:openvpn":['
+      . $self->_stripped_json . ']}}';
     $payload =~ s/_/-/g;
 
     return $payload;
 }
-
-
 
 
 # Method ===============================================================
@@ -117,9 +119,11 @@ sub get_payload {
 Set or retrieve the description for this OpenVPN connection
 
 =cut ===================================================================
+
 sub description {
     my ($self, $description) = @_;
-    return $self->{description} = (2 == @_) ? $description : $self->{description};
+    return $self->{description} =
+      (2 == @_) ? $description : $self->{description};
 }
 
 
@@ -130,6 +134,7 @@ sub description {
 Set or retrieve the mode for this OpenVPN connection
 
 =cut ===================================================================
+
 sub mode {
     my ($self, $mode) = @_;
     return $self->{mode} = (2 == @_) ? $mode : $self->{mode};
@@ -143,10 +148,11 @@ sub mode {
 Set or retrieve the path to the pre-shared secret file for connection
 
 =cut ===================================================================
+
 sub shared_secret_key_file {
     my ($self, $path) = @_;
     return $self->{shared_secret_key_file} =
-        (2 == @_) ? $path : $self->{shared_secret_key_file};
+      (2 == @_) ? $path : $self->{shared_secret_key_file};
 }
 
 
@@ -157,9 +163,11 @@ sub shared_secret_key_file {
 Set or retrieve the local IP address for this OpenVPN connection
 
 =cut ===================================================================
+
 sub local_address {
     my ($self, $addr) = @_;
-    return $self->{local_address} = (2 == @_) ? $addr : $self->{local_address};
+    return $self->{local_address} =
+      (2 == @_) ? $addr : $self->{local_address};
 }
 
 
@@ -170,9 +178,11 @@ sub local_address {
 Set or retrieve the remote IP address for this OpenVPN connection
 
 =cut ===================================================================
+
 sub remote_address {
     my ($self, $addr) = @_;
-    return $self->{remote_address} = (2 == @_) ? $addr : $self->{remote_address};
+    return $self->{remote_address} =
+      (2 == @_) ? $addr : $self->{remote_address};
 }
 
 
@@ -183,6 +193,7 @@ sub remote_address {
 Retrieve the remote_host list, or add an IP address to it
 
 =cut ===================================================================
+
 sub remote_host {
     my ($self, $addr) = @_;
     $self->{remote_host} = [] if not defined $self->{remote_host};
@@ -198,6 +209,7 @@ sub remote_host {
 Set or retrieve TLS role for this OpenVPN connection
 
 =cut ===================================================================
+
 sub tls_role {
     my ($self, $role) = @_;
     return if (1 == @_) and not defined $self->{tls};
@@ -213,12 +225,13 @@ sub tls_role {
 Set or retrieve path to Diffie-Helman parameters file for this OpenVPN connection
 
 =cut ===================================================================
+
 sub tls_dh_file {
     my ($self, $path) = @_;
     return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     return $self->{tls}->{dh_file} =
-        (2 == @_) ? $path : $self->{tls}->{dh_file};
+      (2 == @_) ? $path : $self->{tls}->{dh_file};
 }
 
 
@@ -229,12 +242,13 @@ sub tls_dh_file {
 Set or retrieve path to CA certificate file
 
 =cut ===================================================================
+
 sub tls_ca_cert_file {
     my ($self, $path) = @_;
     return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     return $self->{tls}->{ca_cert_file} =
-        (2 == @_) ? $path : $self->{tls}->{ca_cert_file};
+      (2 == @_) ? $path : $self->{tls}->{ca_cert_file};
 }
 
 
@@ -245,12 +259,13 @@ sub tls_ca_cert_file {
 Set or retrieve path to certificate file for this OpenVPN connection
 
 =cut ===================================================================
+
 sub tls_cert_file {
     my ($self, $path) = @_;
     return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     return $self->{tls}->{cert_file} =
-        (2 == @_) ? $path : $self->{tls}->{cert_file};
+      (2 == @_) ? $path : $self->{tls}->{cert_file};
 }
 
 
@@ -261,12 +276,13 @@ sub tls_cert_file {
 Set or retrieve path to certificate revocation list
 
 =cut ===================================================================
+
 sub tls_crl_file {
     my ($self, $path) = @_;
     return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     return $self->{tls}->{crl_file} =
-        (2 == @_) ? $path : $self->{tls}->{crl_file};
+      (2 == @_) ? $path : $self->{tls}->{crl_file};
 }
 
 
@@ -277,12 +293,13 @@ sub tls_crl_file {
 Set or retrieve path to certificate key
 
 =cut ===================================================================
+
 sub tls_key_file {
     my ($self, $path) = @_;
     return if (1 == @_) and not defined $self->{tls};
     $self->{tls} = {} if not defined $self->{tls};
     return $self->{tls}->{key_file} =
-        (2 == @_) ? $path : $self->{tls}->{key_file};
+      (2 == @_) ? $path : $self->{tls}->{key_file};
 }
 
 

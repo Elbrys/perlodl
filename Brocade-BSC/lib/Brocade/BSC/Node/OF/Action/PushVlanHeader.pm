@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::PushVlanHeader object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -67,7 +67,7 @@ sub new {
 sub _as_oxm {
     my $self = shift;
 
-    return sprintf("push_vlan=0x%x", $self->eth_type());
+    return sprintf ("push_vlan=0x%x", $self->eth_type());
 }
 
 
@@ -76,27 +76,31 @@ sub _as_oxm {
 sub eth_type {
     my ($self, $eth_type) = @_;
     return $self->{push_vlan_action}->{ethernet_type} =
-        (2 == @_) ? $eth_type : $self->{push_vlan_action}->{ethernet_type};
+      (2 == @_) ? $eth_type : $self->{push_vlan_action}->{ethernet_type};
 }
+
 sub tag {
     my ($self, $tag) = @_;
     return $self->{push_vlan_action}->{tag} =
-        (2 == @_) ? $tag : $self->{push_vlan_action}->{tag};
+      (2 == @_) ? $tag : $self->{push_vlan_action}->{tag};
 }
+
 sub pcp {
     my ($self, $pcp) = @_;
     return $self->{push_vlan_action}->{pcp} =
-        (2 == @_) ? $pcp : $self->{push_vlan_action}->{pcp};
+      (2 == @_) ? $pcp : $self->{push_vlan_action}->{pcp};
 }
+
 sub cfi {
     my ($self, $cfi) = @_;
     return $self->{push_vlan_action}->{cfi} =
-        (2 == @_) ? $cfi : $self->{push_vlan_action}->{cfi};
+      (2 == @_) ? $cfi : $self->{push_vlan_action}->{cfi};
 }
+
 sub vid {
     my ($self, $vid) = @_;
     return $self->{push_vlan_action}->{vlan_id} =
-        (2 == @_) ? $vid : $self->{push_vlan_action}->{vlan_id};
+      (2 == @_) ? $vid : $self->{push_vlan_action}->{vlan_id};
 }
 
 

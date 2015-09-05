@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetVlanId object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -53,7 +53,7 @@ sub new {
 sub vid {
     my ($self, $vid) = @_;
     return $self->{set_vlan_id_action}->{'vlan-id'} =
-        (2 == @_) ? $vid : $self->{set_vlan_id_action}->{'vlan-id'};
+      (2 == @_) ? $vid : $self->{set_vlan_id_action}->{'vlan-id'};
 }
 
 

@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetVlanPCP object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -53,7 +53,7 @@ sub new {
 sub vlan_pcp {
     my ($self, $vlan_pcp) = @_;
     return $self->{set_vlan_pcp_action}->{'vlan-pcp'} =
-        (2 == @_) ? $vlan_pcp : $self->{set_vlan_pcp_action}->{'vlan-pcp'};
+      (2 == @_) ? $vlan_pcp : $self->{set_vlan_pcp_action}->{'vlan-pcp'};
 }
 
 

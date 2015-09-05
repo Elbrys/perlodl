@@ -38,7 +38,7 @@ use warnings;
 # Constructor ==========================================================
 # Parameters: none
 # Returns   : Brocade::BSC::Node::OF::Action::SetDlSrc object
-# 
+#
 sub new {
     my ($class, %params) = @_;
 
@@ -53,7 +53,7 @@ sub new {
 sub mac_addr {
     my ($self, $mac_addr) = @_;
     return $self->{set_dl_src_action}->{address} =
-        (2 == @_) ? $mac_addr : $self->{set_dl_src_action}->{address};
+      (2 == @_) ? $mac_addr : $self->{set_dl_src_action}->{address};
 }
 
 
