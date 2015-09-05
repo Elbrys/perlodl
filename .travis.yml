@@ -5,8 +5,8 @@ perl:
   - "5.14"
   - "5.10"
 before_install:
-  - [ $(perl -e 'print $^V' | cut -d'.' -f2) -ge 20 ] && cpanm --quiet --installdeps --notest Test::Perl::Critic
-  - [ $(perl -e 'print $^V' | cut -d'.' -f2) -ge 20 ] && cpanm --quiet --notest Test::Perl::Critic
+  - "[ $(perl -e 'print $^V' | cut -d'.' -f2) -ge 20 ] && cpanm --quiet --installdeps --notest Test::Perl::Critic"
+  - "[ $(perl -e 'print $^V' | cut -d'.' -f2) -ge 20 ] && cpanm --quiet --notest Test::Perl::Critic"
   - cd Brocade-BSC
 script:
   - perl Makefile.PL && make test && prove -l xt
