@@ -1,4 +1,4 @@
-# perlcritic
+# perlcritic rc
 
 # [5: 'gentle', 'stern', 'harsh', 'cruel', 'brutal']
 severity = stern
