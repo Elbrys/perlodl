@@ -45,7 +45,7 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 

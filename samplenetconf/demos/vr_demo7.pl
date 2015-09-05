@@ -39,13 +39,13 @@ use Brocade::BSC::Node::NC::Vrouter::VR5600;
 use Brocade::BSC::Node::NC::Vrouter::Firewall;
 
 my $configfile = "";
-my $status = undef;
-my $fwcfg = undef;
-my $ifcfg = undef;
-my $http_resp = undef;
+my $status     = undef;
+my $fwcfg      = undef;
+my $ifcfg      = undef;
+my $http_resp  = undef;
 
-my $fw_if = "dp0p192p1";         # unused but existing interface on vRouter
-my $remote_ip = "172.22.19.120"; # IP from which to allow traffic
+my $fw_if     = "dp0p192p1";        # unused but existing interface on vRouter
+my $remote_ip = "172.22.19.120";    # IP from which to allow traffic
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
@@ -53,18 +53,20 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(cfgfile => $configfile,
-                                                         ctrl=>$bvc);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
+my $vRouter = Brocade::BSC::Node::NC::Vrouter::VR5600->new(
+    cfgfile => $configfile,
+    ctrl    => $bvc
+);
 
 print "<<< 'Controller': $bvc->{ipAddr}, '"
-    . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
+  . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
 
 
 $status = $bvc->add_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< '$vRouter->{name}' added to the Controller\n\n";
-sleep(2);
+sleep (2);
 
 
 $status = $bvc->check_node_conn_status($vRouter->{name});
@@ -77,11 +79,13 @@ show_firewalls_cfg($vRouter);
 
 my $fw_name_1 = "ACCEPT-SRC-IPADDR";
 print ">>> Create new firewall instance '$fw_name_1' on '$vRouter->{name}'\n";
-my $fw1 = new Brocade::BSC::Node::NC::Vrouter::Firewall;
+my $fw1 = Brocade::BSC::Node::NC::Vrouter::Firewall->new;
 $fw1->add_group($fw_name_1);
-$fw1->add_rule($fw_name_1, 30,
-               'action' => 'accept',
-               'src_addr' => $remote_ip);
+$fw1->add_rule(
+    $fw_name_1, 30,
+    'action'   => 'accept',
+    'src_addr' => $remote_ip
+);
 print $fw1->as_json() . "\n";
 $status = $vRouter->create_firewall_instance($fw1);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
@@ -89,11 +93,13 @@ print "Firewall instance '$fw_name_1' was successfully created\n\n";
 
 my $fw_name_2 = "DROP-ICMP";
 print ">>> Create new firewall instance '$fw_name_2' on '$vRouter->{name}'\n";
-my $fw2 = new Brocade::BSC::Node::NC::Vrouter::Firewall;
+my $fw2 = Brocade::BSC::Node::NC::Vrouter::Firewall->new;
 $fw2->add_group($fw_name_2);
-$fw2->add_rule($fw_name_2, 40,
-               'action' => 'drop',
-               'typename' => 'ping');
+$fw2->add_rule(
+    $fw_name_2, 40,
+    'action'   => 'drop',
+    'typename' => 'ping'
+);
 print $fw2->as_json() . "\n";
 $status = $vRouter->create_firewall_instance($fw2);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
@@ -104,13 +110,15 @@ show_firewalls_cfg($vRouter);
 
 
 print "<<< Apply firewall '$fw_name_1' to inbound traffic and '$fw_name_2'"
-    . "to outbound traffic on the '$fw_if' dataplane interface\n";
-$status = $vRouter->set_dataplane_interface_firewall(ifName => $fw_if,
-                                                     inFw   => $fw_name_1,
-                                                     outFw  => $fw_name_2);
+  . "to outbound traffic on the '$fw_if' dataplane interface\n";
+$status = $vRouter->set_dataplane_interface_firewall(
+    ifName => $fw_if,
+    inFw   => $fw_name_1,
+    outFw  => $fw_name_2
+);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "Firewall instances were successfully applied to the '$fw_if'"
-    . "dataplane interface\n\n";
+  . "dataplane interface\n\n";
 
 
 show_dpif_cfg($vRouter, $fw_if);
@@ -120,7 +128,7 @@ print "<<< Remove firewall settings from the '$fw_if' dataplane interface\n";
 $status = $vRouter->delete_dataplane_interface_firewall($fw_if);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "Firewall settings successfully removed from "
-    ."'$vRouter->{name}' dataplane interface\n\n";
+  . "'$vRouter->{name}' dataplane interface\n\n";
 
 
 show_dpif_cfg($vRouter, $fw_if);
@@ -144,7 +152,8 @@ show_firewalls_cfg($vRouter);
 print ">>> Remove '$vRouter->{name}' NETCONF node from the Controller\n";
 $status = $bvc->delete_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
-print "'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
+print
+"'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
 
 
 print ("\n");
@@ -159,23 +168,25 @@ sub show_firewalls_cfg {
     print "<<< Show firewalls configuration on the '$vRouter->{name}'\n";
     ($status, $fwcfg) = $vRouter->get_firewalls_cfg();
     if ($status->no_data) {
-	print "No firewall configuration found.\n";
-	return;
+        print "No firewall configuration found.\n";
+        return;
     }
     $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
     print "'$vRouter->{name}' firewalls config:\n";
     print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg))
-        . "\n";
+      . "\n";
+    return;
 }
 
 sub show_dpif_cfg {
     my ($vRouter, $ifname) = @_;
 
     print "<<< Show '$ifname' dataplane interface configuration "
-        . "on the '$vRouter->{name}'\n";
+      . "on the '$vRouter->{name}'\n";
     ($status, $ifcfg) = $vRouter->get_dataplane_interface_cfg($fw_if);
     $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
     print "Interfaces '$ifname' config:\n";
     print JSON->new->canonical->pretty->encode(JSON::decode_json($ifcfg))
-        . "\n";
+      . "\n";
+    return;
 }

@@ -45,11 +45,12 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 
-print ("<<< Show list of all NETCONF operations supported by the Controller\n");
+print "<<< Show list of all NETCONF operations supported "
+  . "by the Controller\n";
 my ($status, $result) = $bvc->get_netconf_operations('controller-config');
 
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";

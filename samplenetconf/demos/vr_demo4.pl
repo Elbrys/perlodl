@@ -39,8 +39,8 @@ use Brocade::BSC::Node::NC::Vrouter::VR5600;
 use Brocade::BSC::Node::NC::Vrouter::Firewall;
 
 my $configfile = "";
-my $status = undef;
-my $fwcfg = undef;
+my $status     = undef;
+my $fwcfg      = undef;
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
@@ -48,18 +48,20 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(cfgfile => $configfile,
-                                                          ctrl=>$bvc);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
+my $vRouter = Brocade::BSC::Node::NC::Vrouter::VR5600->new(
+    cfgfile => $configfile,
+    ctrl    => $bvc
+);
 
 print "<<< 'Controller': $bvc->{ipAddr}, '"
-    . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
+  . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
 
 
 $status = $bvc->add_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< '$vRouter->{name}' added to the Controller\n\n";
-sleep(2);
+sleep (2);
 
 
 $status = $bvc->check_node_conn_status($vRouter->{name});
@@ -71,24 +73,28 @@ show_firewalls_cfg($vRouter);
 
 
 my $fw_group = "FW-ACCEPT-SRC-172_22_17_108";
-print "<<< Create new firewall instance '$fw_group' on ' $vRouter->{name}'\n\n";
-my $firewall = new Brocade::BSC::Node::NC::Vrouter::Firewall;
+print
+  "<<< Create new firewall instance '$fw_group' on ' $vRouter->{name}'\n\n";
+my $firewall = Brocade::BSC::Node::NC::Vrouter::Firewall->new;
 $firewall->add_group($fw_group);
-$firewall->add_rule($fw_group, 33,
-                    'action' => 'accept',
-                    'src_addr' => '172.22.17.108');
+$firewall->add_rule(
+    $fw_group, 33,
+    'action'   => 'accept',
+    'src_addr' => '172.22.17.108'
+);
 $status = $vRouter->create_firewall_instance($firewall);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "Firewall instance '$fw_group' was successfully created\n\n";
 
 
 print "<<< Show content of the firewall instance "
-    . "'$fw_group' on '$vRouter->{name}'\n";
+  . "'$fw_group' on '$vRouter->{name}'\n";
 ($status, $fwcfg) = $vRouter->get_firewall_instance_cfg($fw_group);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
 print "Firewall instance '" . $fw_group . "':\n";
-print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg)) . "\n\n";
+print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg))
+  . "\n\n";
 
 
 show_firewalls_cfg($vRouter);
@@ -107,7 +113,8 @@ show_firewalls_cfg($vRouter);
 print ">>> Remove '$vRouter->{name}' NETCONF node from the Controller\n";
 $status = $bvc->delete_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
-print "'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
+print
+"'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
 
 
 print ("\n");
@@ -124,6 +131,8 @@ sub show_firewalls_cfg {
     $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
     print "'$vRouter->{name}' firewalls config:\n";
-    print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg)) . "\n";
+    print JSON->new->canonical->pretty->encode(JSON::decode_json($fwcfg))
+      . "\n";
+    return;
 }
 

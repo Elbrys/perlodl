@@ -38,7 +38,7 @@ use Brocade::BSC;
 use Brocade::BSC::Node::NC::Vrouter::VR5600;
 
 my $configfile = "";
-my $status = undef;
+my $status     = undef;
 my @iflist;
 my $ifcfg = undef;
 
@@ -48,18 +48,20 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(cfgfile => $configfile,
-                                                         ctrl=>$bvc);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
+my $vRouter = Brocade::BSC::Node::NC::Vrouter::VR5600->new(
+    cfgfile => $configfile,
+    ctrl    => $bvc
+);
 
 print "<<< 'Controller': $bvc->{ipAddr}, '"
-    . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
+  . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
 
 
 $status = $bvc->add_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< '$vRouter->{name}' added to the Controller\n\n";
-sleep(2);
+sleep (2);
 
 
 $status = $bvc->check_node_conn_status($vRouter->{name});
@@ -76,7 +78,7 @@ print JSON->new->pretty->encode(\@iflist) . "\n\n";
 
 my $sample_if = 'dp0p192p1';
 print "<<< Show '$sample_if' dataplane interface configuration on the "
-    . "'$vRouter->{name}'\n";
+  . "'$vRouter->{name}'\n";
 ($status, $ifcfg) = $vRouter->get_dataplane_interface_cfg($sample_if);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
@@ -85,7 +87,7 @@ print JSON->new->canonical->pretty->encode(JSON::decode_json($ifcfg));
 
 
 print "<<< Show configuration of dataplane interfaces on the "
-    . "'$vRouter->{name}'\n";
+  . "'$vRouter->{name}'\n";
 ($status, $ifcfg) = $vRouter->get_dataplane_interfaces_cfg();
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
@@ -96,7 +98,8 @@ print JSON->new->canonical->pretty->encode($ifcfg);
 print ">>> Remove '$vRouter->{name}' NETCONF node from the Controller\n";
 $status = $bvc->delete_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
-print "'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
+print
+"'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
 
 
 print ("\n");

@@ -43,23 +43,23 @@ use Brocade::BSC::Node::OF::Action::Output;
 use Brocade::BSC::Node::OF::Action::PopMplsHeader;
 
 my $configfile = "";
-my $status = undef;
-my $flowinfo = undef;
+my $status     = undef;
+my $flowinfo   = undef;
 
-my $ethtype = $ETH_TYPE_MPLS_UCAST;
+my $ethtype    = $ETH_TYPE_MPLS_UCAST;
 my $input_port = 14;
 my $mpls_label = 44;
 
 my $pop_ether_type = $ETH_TYPE_MPLS_UCAST;
-my $output_port = 13;
+my $output_port    = 13;
 
-my $table_id = 0;
-my $flow_id  = 30;
+my $table_id      = 0;
+my $flow_id       = 30;
 my $flow_priority = 1023;
-my $cookie = 889;
-my $cookie_mask = 255;
-my $hard_timeout = 0;
-my $idle_timeout = 0;
+my $cookie        = 889;
+my $cookie_mask   = 255;
+my $hard_timeout  = 0;
+my $idle_timeout  = 0;
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
@@ -67,19 +67,22 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $ofswitch = new Brocade::BSC::Node::OF::Switch(cfgfile => $configfile,
-                                                    ctrl => $bvc);
-print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
+my $ofswitch = Brocade::BSC::Node::OF::Switch->new(
+    cfgfile => $configfile,
+    ctrl    => $bvc
+);
+print
+"<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
 
-print  "<<< Set OpenFlow flow on the Controller\n";
+print "<<< Set OpenFlow flow on the Controller\n";
 printf "        Match:  Ethernet Type        (0x%04x)\n", $ethtype;
-print  "                Input Port           ($input_port)\n";
-print  "                MPLS Label           ($mpls_label)\n";
-print  "        Action: Set Field            (MPLS label $mpls_label)\n";
-print  "                Output (Physical Port number $output_port)\n\n";
+print "                Input Port           ($input_port)\n";
+print "                MPLS Label           ($mpls_label)\n";
+print "        Action: Set Field            (MPLS label $mpls_label)\n";
+print "                Output (Physical Port number $output_port)\n\n";
 
-my $flowentry = new Brocade::BSC::Node::OF::FlowEntry;
+my $flowentry = Brocade::BSC::Node::OF::FlowEntry->new;
 $flowentry->flow_name(__FILE__);
 $flowentry->table_id($table_id);
 $flowentry->id($flow_id);
@@ -93,16 +96,19 @@ $flowentry->idle_timeout($idle_timeout);
 # #     Action:      'Output' NORMAL
 my $instruction = $flowentry->add_instruction(0);
 
-my $action = new Brocade::BSC::Node::OF::Action::PopMplsHeader(order => 0);
+my $action = Brocade::BSC::Node::OF::Action::PopMplsHeader->new(order => 0);
 $action->eth_type($pop_ether_type);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::Output(order => 1, port => $output_port);
+$action = Brocade::BSC::Node::OF::Action::Output->new(
+    order => 1,
+    port  => $output_port
+);
 $instruction->apply_actions($action);
 
 # # --- Match Fields
 
-my $match = new Brocade::BSC::Node::OF::Match();
+my $match = Brocade::BSC::Node::OF::Match->new();
 $match->eth_type($ethtype);
 $match->in_port($input_port);
 $match->mpls_label($mpls_label);
@@ -122,9 +128,9 @@ print "Flow info:\n";
 print JSON->new->pretty->encode(JSON::decode_json($flowinfo)) . "\n";
 
 print "<<< Delete flow with id of '$flow_id' from the Controller's cache\n";
-print "        and from table '$table_id' on the '$ofswitch->{name}' node\n\n";
-$status = $ofswitch->delete_flow($flowentry->table_id,
-                                 $flowentry->id);
+print
+  "        and from table '$table_id' on the '$ofswitch->{name}' node\n\n";
+$status = $ofswitch->delete_flow($flowentry->table_id, $flowentry->id);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Flow successfully removed from the Controller\n";
 

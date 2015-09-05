@@ -1,3 +1,5 @@
+#!/usr/bin/perl -T
+
 # Copyright (c) 2015,  BROCADE COMMUNICATIONS SYSTEMS, INC
 #
 # All rights reserved.
@@ -28,37 +30,41 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGE.
 
-#!/usr/bin/perl -T
+use strict;
+use warnings;
 
 use Test::More tests => 15;
 
 # check module load 1
-use_ok( 'Brocade::BSC::Node::NC::Vrouter::VR5600' );
+use_ok('Brocade::BSC::Node::NC::Vrouter::VR5600');
 use Brocade::BSC;
 
 # create object with specified values 10
-my $bsc = new Brocade::BSC;
-my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(ctrl => $bsc,
-                                                          name => 'vr5600',
-                                                          ipAddr => '192.168.99.4',
-                                                          adminName => 'vyatta',
-                                                          adminPassword => 'Vy@tt@');
+my $bsc     = Brocade::BSC->new;
+my $vRouter = Brocade::BSC::Node::NC::Vrouter::VR5600->new(
+    ctrl          => $bsc,
+    name          => 'vr5600',
+    ipAddr        => '192.168.99.4',
+    adminName     => 'vyatta',
+    adminPassword => 'Vy@tt@'
+);
 
-ok( defined($vRouter),                            "created VR5600 object");
-ok( $vRouter->isa(Brocade::BSC::Node::NC::Vrouter::VR5600), "...and its a VR5600");
-is( scalar keys %$vRouter, 7,                     "   a HASH with seven keys");
-ok( $vRouter->{ctrl}->isa(Brocade::BSC),          "controller object (specified)");
-is( $vRouter->{name}, 'vr5600',                   "name (specified)");
-is( $vRouter->{ipAddr}, '192.168.99.4',           "ipAddr (specified)");
-is( $vRouter->{portNum}, 830,                     "portNum (default)");
-is( $vRouter->{tcpOnly}, 0,                       "tcpOnly (default)");
-is( $vRouter->{adminName}, 'vyatta',              "adminName (specified)");
-is( $vRouter->{adminPassword}, 'Vy@tt@',          "adminPassword (specified)");
+ok(defined ($vRouter), "created VR5600 object");
+ok($vRouter->isa('Brocade::BSC::Node::NC::Vrouter::VR5600'),
+    "...and its a VR5600");
+is(scalar keys %$vRouter, 7, "   a HASH with seven keys");
+ok($vRouter->{ctrl}->isa('Brocade::BSC'), "controller object (specified)");
+is($vRouter->{name},          'vr5600',       "name (specified)");
+is($vRouter->{ipAddr},        '192.168.99.4', "ipAddr (specified)");
+is($vRouter->{portNum},       830,            "portNum (default)");
+is($vRouter->{tcpOnly},       0,              "tcpOnly (default)");
+is($vRouter->{adminName},     'vyatta',       "adminName (specified)");
+is($vRouter->{adminPassword}, 'Vy@tt@',       "adminPassword (specified)");
 
 # verify methods accessible 4
 # inherited
-can_ok( $vRouter, as_json );
+can_ok($vRouter, 'as_json');
 # self
-can_ok( $vRouter, get_schema );
-can_ok( $vRouter, get_cfg );
-can_ok( $vRouter, get_interfaces_list );
+can_ok($vRouter, 'get_schema');
+can_ok($vRouter, 'get_cfg');
+can_ok($vRouter, 'get_interfaces_list');

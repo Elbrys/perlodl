@@ -41,8 +41,9 @@ my $configfile = "";
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $ncNode = new Brocade::BSC::Node::NC(cfgfile => $configfile, ctrl => $bvc);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
+my $ncNode =
+  Brocade::BSC::Node::NC->new(cfgfile => $configfile, ctrl => $bvc);
 
 my ($status, $nodes_ref) = $bvc->get_all_nodes_in_config();
 $status->ok or die "Error: ${\$status->msg}\n";

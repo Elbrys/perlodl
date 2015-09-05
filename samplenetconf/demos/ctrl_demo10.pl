@@ -37,8 +37,8 @@ use Getopt::Long;
 use Brocade::BSC;
 use Brocade::BSC::Node::NC;
 
-my $status = undef;
-my $result = undef;
+my $status     = undef;
+my $result     = undef;
 my $configfile = "";
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
@@ -48,13 +48,14 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 
 show_netconf_nodes_in_config($bvc);
 
-my $ncNode = new Brocade::BSC::Node::NC(cfgfile => $configfile, ctrl=>$bvc);
+my $ncNode =
+  Brocade::BSC::Node::NC->new(cfgfile => $configfile, ctrl => $bvc);
 print "<<< Creating new '$ncNode->{name}' NETCONF node\n";
 print "'$ncNode->{name}':\n";
 print $ncNode->as_json() . "\n";
@@ -62,9 +63,10 @@ print $ncNode->as_json() . "\n";
 print "<<< Add '$ncNode->{name}' NETCONF node to the Controller\n";
 $status = $bvc->add_netconf_node($ncNode);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
-print "'$ncNode->{name}' NETCONF node was successfully added to the Controller\n\n";
+print
+"'$ncNode->{name}' NETCONF node was successfully added to the Controller\n\n";
 
-sleep(2);    
+sleep (2);
 
 show_netconf_nodes_in_config($bvc);
 
@@ -74,7 +76,8 @@ $status = $bvc->check_node_config_status($ncNode->{name});
 $status->configured or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "'$ncNode->{name}' node is configured\n\n";
 
-print "<<< Show connection status for all NETCONF nodes configured on the Controller\n";
+print
+"<<< Show connection status for all NETCONF nodes configured on the Controller\n";
 ($status, $result) = $bvc->get_netconf_nodes_conn_status();
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
@@ -92,8 +95,9 @@ print ">>> Remove '$ncNode->{name}' NETCONF node from the Controller\n";
 $status = $bvc->delete_netconf_node($ncNode);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
-print "'$ncNode->{name}' NETCONF node was successfully removed from the Controller\n\n";
-sleep(2);
+print
+"'$ncNode->{name}' NETCONF node was successfully removed from the Controller\n\n";
+sleep (2);
 
 show_netconf_nodes_in_config($bvc);
 
@@ -107,7 +111,7 @@ print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
 
 sub show_netconf_nodes_in_config {
     my $bvc = shift;
-    
+
     print "<<< Show NETCONF nodes configured on the Controller\n";
     my ($status, $result) = $bvc->get_netconf_nodes_in_config();
     $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
@@ -117,13 +121,15 @@ sub show_netconf_nodes_in_config {
         print "    '$_'\n";
     }
     print "\n";
+    return;
 }
 
 
 sub show_node_conn_status {
     my ($bvc, $ncNode) = @_;
 
-    print "<<< Show connection status for the '", $ncNode->{name}, "' NETCONF node\n";
+    print "<<< Show connection status for the '", $ncNode->{name},
+      "' NETCONF node\n";
     my $status = $bvc->check_node_conn_status($ncNode->{name});
 
     if ($status->connected || $status->disconnected || $status->not_found) {
@@ -132,4 +138,5 @@ sub show_node_conn_status {
     else {
         die "!!! Demo terminated, reason: ${\$status->msg}\n";
     }
+    return;
 }

@@ -42,25 +42,25 @@ use Brocade::BSC::Node::OF::Match;
 use Brocade::BSC::Node::OF::Action::Output;
 
 my $configfile = "";
-my $status = undef;
-my $flowinfo = undef;
+my $status     = undef;
+my $flowinfo   = undef;
 
-my $ethtype = $ETH_TYPE_IPv6;
-my $ipv6_src = '4231::3210:3210:3210:3210/80';
-my $ipv6_dst = '1234:1234:1234:1234::5678:5678/64';
-my $ipv6_flabel = 33;
-my $ip_dscp = $IP_DSCP_CS5;
-my $ip_proto = $IP_PROTO_TCP;
+my $ethtype      = $ETH_TYPE_IPv6;
+my $ipv6_src     = '4231::3210:3210:3210:3210/80';
+my $ipv6_dst     = '1234:1234:1234:1234::5678:5678/64';
+my $ipv6_flabel  = 33;
+my $ip_dscp      = $IP_DSCP_CS5;
+my $ip_proto     = $IP_PROTO_TCP;
 my $tcp_src_port = 11111;
 my $tcp_dst_port = 22222;
-my $output_port = 'CONTROLLER';
+my $output_port  = 'CONTROLLER';
 
-my $table_id = 0;
-my $flow_id  = 25;
+my $table_id      = 0;
+my $flow_id       = 25;
 my $flow_priority = 1018;
-my $cookie = 23;
-my $hard_timeout = 1200;
-my $idle_timeout = 3400;
+my $cookie        = 23;
+my $hard_timeout  = 1200;
+my $idle_timeout  = 3400;
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
@@ -68,23 +68,26 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $ofswitch = new Brocade::BSC::Node::OF::Switch(cfgfile => $configfile,
-                                                    ctrl => $bvc);
-print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
+my $ofswitch = Brocade::BSC::Node::OF::Switch->new(
+    cfgfile => $configfile,
+    ctrl    => $bvc
+);
+print
+"<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
 
-print  "<<< Set OpenFlow flow on the Controller\n";
+print "<<< Set OpenFlow flow on the Controller\n";
 printf "        Match:  Ethernet Type        (0x%04x)\n", $ethtype;
-print  "                IPv6 Source Address  ($ipv6_src)\n";
-print  "                IPv6 Dest Address    ($ipv6_dst)\n";
-print  "                IPv6 Flow Label      ($ipv6_flabel)\n";
-print  "                IP Protocol          ($ip_proto)\n";
-print  "                IP DSCP              ($ip_dscp)\n";
-print  "                TCP Source Port      ($tcp_src_port)\n";
-print  "                TCP Destination Port ($tcp_dst_port)\n";
-print  "        Action: Output (to $output_port)\n\n";
+print "                IPv6 Source Address  ($ipv6_src)\n";
+print "                IPv6 Dest Address    ($ipv6_dst)\n";
+print "                IPv6 Flow Label      ($ipv6_flabel)\n";
+print "                IP Protocol          ($ip_proto)\n";
+print "                IP DSCP              ($ip_dscp)\n";
+print "                TCP Source Port      ($tcp_src_port)\n";
+print "                TCP Destination Port ($tcp_dst_port)\n";
+print "        Action: Output (to $output_port)\n\n";
 
-my $flowentry = new Brocade::BSC::Node::OF::FlowEntry;
+my $flowentry = Brocade::BSC::Node::OF::FlowEntry->new;
 $flowentry->flow_name(__FILE__);
 $flowentry->table_id($table_id);
 $flowentry->id($flow_id);
@@ -96,13 +99,15 @@ $flowentry->idle_timeout($idle_timeout);
 # # --- Instruction: 'Apply-action'
 # #     Action:      'Output' NORMAL
 my $instruction = $flowentry->add_instruction(0);
-my $action = new Brocade::BSC::Node::OF::Action::Output(order => 0,
-                                                        port => $output_port);
+my $action      = Brocade::BSC::Node::OF::Action::Output->new(
+    order => 0,
+    port  => $output_port
+);
 $instruction->apply_actions($action);
 
 # # --- Match Fields
 
-my $match = new Brocade::BSC::Node::OF::Match();
+my $match = Brocade::BSC::Node::OF::Match->new();
 $match->eth_type($ethtype);
 $match->ipv6_src($ipv6_src);
 $match->ipv6_dst($ipv6_dst);
@@ -127,9 +132,9 @@ print "Flow info:\n";
 print JSON->new->pretty->encode(JSON::decode_json($flowinfo)) . "\n";
 
 print "<<< Delete flow with id of '$flow_id' from the Controller's cache\n";
-print "        and from table '$table_id' on the '$ofswitch->{name}' node\n\n";
-$status = $ofswitch->delete_flow($flowentry->table_id,
-                                 $flowentry->id);
+print
+  "        and from table '$table_id' on the '$ofswitch->{name}' node\n\n";
+$status = $ofswitch->delete_flow($flowentry->table_id, $flowentry->id);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Flow successfully removed from the Controller\n";
 

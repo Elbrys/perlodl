@@ -71,7 +71,7 @@ my $copy = qr/# Copyright \(c\) 201.*,  BROCADE COMMUNICATIONS SYSTEMS, INC
 my $Test = Test::Builder->new;
 
 my @files = _brocade_files();
-$Test->plan( tests => scalar @files );
+$Test->plan(tests => scalar @files);
 
 # slurp files in one gulp
 undef $/;
@@ -82,7 +82,7 @@ foreach my $file (@files) {
         $ok = m/$copy/s;
     }
     close $fh;
-    $Test->ok ($ok, $file);
+    $Test->ok($ok, $file);
 }
 
 # Files to check for the Brocade copyright line: *.pl *.pm b##-*.t s##-*.t
@@ -91,31 +91,40 @@ sub _brocade_files {
     my @files;
     # lib/.../*.pm
     File::Find::find({
-        wanted => sub { my ($vol, $path, $file) = File::Spec->splitpath($_);
-                        -f $_ &&
-                            $file =~ /.*\.pm$/ &&
-                            push @files, $_; },
-        no_chdir => 1,
+            wanted => sub {
+                my ($vol, $path, $file) = File::Spec->splitpath($_);
+                -f $_
+                  && $file =~ /.*\.pm$/
+                  && push @files, $_;
+            },
+            no_chdir => 1,
         },
-        'lib');
+        'lib'
+    );
     # t/b##-*.t t/s##-*.t
     File::Find::find({
-        wanted => sub { my ($vol, $path, $file) = File::Spec->splitpath($_);
-                        -f $_ &&
-                            $file =~ /^[bs][0-9][0-9]-.*\.t$/ &&
-                            push @files, $_; },
-        no_chdir => 1,
+            wanted => sub {
+                my ($vol, $path, $file) = File::Spec->splitpath($_);
+                -f $_
+                  && $file =~ /^[bs][0-9][0-9]-.*\.t$/
+                  && push @files, $_;
+            },
+            no_chdir => 1,
         },
-        't');
+        '.'
+    );
     # ../.../*.pl
     File::Find::find({
-        wanted => sub { my ($vol, $path, $file) = File::Spec->splitpath($_);
-                        -f $_ &&
-                            $file =~ /.*\.pl$/ &&
-                            push @files, $_; },
-        no_chdir => 1,
+            wanted => sub {
+                my ($vol, $path, $file) = File::Spec->splitpath($_);
+                -f $_
+                  && $file =~ /.*\.pl$/
+                  && push @files, $_;
+            },
+            no_chdir => 1,
         },
-        '..');
+        '..'
+    );
 
     return @files;
 }

@@ -38,8 +38,8 @@ use Brocade::BSC;
 use Brocade::BSC::Node::NC::Vrouter::VR5600;
 
 my $configfile = "";
-my $status = undef;
-my $schema = undef;
+my $status     = undef;
+my $schema     = undef;
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
@@ -47,18 +47,20 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(cfgfile => $configfile,
-                                                          ctrl=>$bvc);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
+my $vRouter = Brocade::BSC::Node::NC::Vrouter::VR5600->new(
+    cfgfile => $configfile,
+    ctrl    => $bvc
+);
 
 print "<<< 'Controller': $bvc->{ipAddr}, '"
-    . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
+  . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
 
 $status = $bvc->add_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
 print "<<< '$vRouter->{name}' added to the Controller\n\n";
-sleep(2);
+sleep (2);
 
 
 $status = $bvc->check_node_conn_status($vRouter->{name});
@@ -69,7 +71,7 @@ print "<<< '$vRouter->{name}' is connected to the Controller\n\n";
 my $yangModelName    = "vyatta-security-firewall";
 my $yangModelVersion = "2014-11-07";
 print "<<< Retrieve '$yangModelName"
-    . "' YANG model definition from the '$vRouter->{name}'\n\n";
+  . "' YANG model definition from the '$vRouter->{name}'\n\n";
 
 ($status, $schema) = $vRouter->get_schema($yangModelName, $yangModelVersion);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
@@ -81,13 +83,13 @@ print $schema;
 print ">>> Remove '$vRouter->{name}' NETCONF node from the Controller\n";
 $status = $bvc->delete_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
-print "'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
+print
+"'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
 
 
 print ("\n");
 print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 print (">>> Demo End\n");
 print (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-
 
 

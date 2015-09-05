@@ -45,11 +45,12 @@ print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
 print ("\n<<< Creating Controller instance\n");
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 
-print ("<<< Show operational state of all configuration modules on the Controller\n");
+print "<<< Show operational state of all configuration modules "
+  . "on the Controller\n";
 my ($status, $result) = $bvc->get_all_modules_operational_state();
 
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";

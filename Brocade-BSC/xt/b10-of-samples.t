@@ -40,7 +40,7 @@ require File::Find;
 my $Test = Test::Builder->new;
 
 my $cfgfile = 'xt/of.yml';
-my @demos = _oflow_demos();
+my @demos   = _oflow_demos();
 
 # To run this test, create a file in the xt directory named of.yml
 # containing parameters for your local topology.  Example:
@@ -56,31 +56,34 @@ my @demos = _oflow_demos();
 
 -f $cfgfile or plan skip_all => "create $cfgfile to run oflow demo tests";
 
-$Test->plan( tests => scalar @demos );
+$Test->plan(tests => scalar @demos);
 
-$ENV{PATH} = "/bin:/usr/bin";
+local $ENV{PATH} = "/bin:/usr/bin";
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
-$ENV{PERL5LIB} = "$ENV{PWD}/lib";
+local $ENV{PERL5LIB} = "$ENV{PWD}/lib";
 
 foreach my $demo (@demos) {
     $demo =~ /12/ && $Test->skip('TODO: fix demo12') && next;
     $demo =~ /21/ && $Test->skip('TODO: fix demo21') && next;
     # untaint *cough*
     $demo =~ m[(../sampleopenflow/demos/demo\d+.pl$)]g && ($demo = $1);
-    my $ok = (0 == system( "$demo -c xt/of.yml" ));
-    $Test->ok ($ok, $demo);
+    my $ok = (0 == system ("$demo -c xt/of.yml"));
+    $Test->ok($ok, $demo);
 }
 
 
 sub _oflow_demos {
     my @demos;
     File::Find::find({
-        wanted => sub { -f $_ &&
-                            $_ =~ /.*\.pl$/ &&
-                            push @demos, $_; },
-        no_chdir => 1,
+            wanted => sub {
+                -f $_
+                  && $_ =~ /.*\.pl$/
+                  && push @demos, $_;
+            },
+            no_chdir => 1,
         },
-        '../sampleopenflow/demos');
+        '../sampleopenflow/demos'
+    );
 
     return @demos;
 }

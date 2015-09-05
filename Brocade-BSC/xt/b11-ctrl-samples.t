@@ -40,7 +40,7 @@ require File::Find;
 my $Test = Test::Builder->new;
 
 my $cfgfile = 'xt/bsc.yml';
-my @demos = _ctrl_demos();
+my @demos   = _ctrl_demos();
 
 # To run this test, create a file in the xt directory named ctrl.yml
 # containing parameters for your local topology.  Example:
@@ -53,31 +53,34 @@ my @demos = _ctrl_demos();
 
 -f $cfgfile or plan skip_all => "create $cfgfile to run ctrl_demo tests";
 
-$Test->plan( tests => scalar @demos );
+$Test->plan(tests => scalar @demos);
 
-$ENV{PATH} = "/bin:/usr/bin";
+local $ENV{PATH} = "/bin:/usr/bin";
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
-$ENV{PERL5LIB} = "$ENV{PWD}/lib";
+local $ENV{PERL5LIB} = "$ENV{PWD}/lib";
 
 foreach my $demo (@demos) {
-    $demo =~ /[279]/ && $Test->skip('TODO: fix ctrl_demo2/7/9') && next;
-    $demo =~ /ctrl_demo10/ && $Test->skip('TODO: fix ctrl_demo10') && next;
-    $demo =~ /ctrl_demo11/ && $Test->skip('TODO: fix ctrl_demo11') && next;
+    $demo =~ /[279]/       && $Test->skip('TODO: fix ctrl_demo2/7/9') && next;
+    $demo =~ /ctrl_demo10/ && $Test->skip('TODO: fix ctrl_demo10')    && next;
+    $demo =~ /ctrl_demo11/ && $Test->skip('TODO: fix ctrl_demo11')    && next;
     # untaint *cough*
     $demo =~ m[(../samplenetconf/demos/ctrl_demo\d+.pl$)]g && ($demo = $1);
-    my $ok = (0 == system( "$demo -c $cfgfile" ));
-    $Test->ok ($ok, $demo);
+    my $ok = (0 == system ("$demo -c $cfgfile"));
+    $Test->ok($ok, $demo);
 }
 
 sub _ctrl_demos {
     my @demos;
     File::Find::find({
-        wanted => sub { -f $_ &&
-                            $_ =~ /.*ctrl.*\.pl$/ &&
-                            push @demos, $_; },
-        no_chdir => 1,
+            wanted => sub {
+                -f $_
+                  && $_ =~ /.*ctrl.*\.pl$/
+                  && push @demos, $_;
+            },
+            no_chdir => 1,
         },
-        '../samplenetconf/demos');
+        '../samplenetconf/demos'
+    );
 
     return @demos;
 }

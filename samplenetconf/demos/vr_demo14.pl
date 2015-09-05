@@ -40,10 +40,10 @@ use Brocade::BSC::Node::NC::Vrouter::OvpnIf;
 use Brocade::BSC::Node::NC::Vrouter::StaticRoute;
 
 my $configfile = "";
-my $status = undef;
+my $status     = undef;
 my $ovpn_ifcfg = undef;
-my $ifname = 'vtun0';
-my $route_cfg = undef;
+my $ifname     = 'vtun0';
+my $route_cfg  = undef;
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
@@ -53,18 +53,20 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 print "<<< OpenVPN configuration example: Site-to-Site Mode with TLS\n\n";
 
-my $bsc = new Brocade::BSC(cfgfile => $configfile);
-my $vRouter = new Brocade::BSC::Node::NC::Vrouter::VR5600(cfgfile => $configfile,
-                                                          ctrl=>$bsc);
+my $bsc = Brocade::BSC->new(cfgfile => $configfile);
+my $vRouter = Brocade::BSC::Node::NC::Vrouter::VR5600->new(
+    cfgfile => $configfile,
+    ctrl    => $bsc
+);
 
 print "<<< 'Controller': $bsc->{ipAddr}, '"
-    . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
+  . "$vRouter->{name}': $vRouter->{ipAddr}\n\n";
 
 
 $status = $bsc->add_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 print "<<< '$vRouter->{name}' added to the Controller\n\n";
-sleep(2);
+sleep (2);
 
 
 $status = $bsc->check_node_conn_status($vRouter->{name});
@@ -82,13 +84,14 @@ elsif ($status->no_data) {
     print "No OpenVPN interfaces configuration found.\n\n";
 }
 else {
-    $bsc->delete_netconf_node($vRouter) and
-    die "!!!Demo terminated, reason: ${\$status->msg}\n";
+    $bsc->delete_netconf_node($vRouter)
+      and die "!!!Demo terminated, reason: ${\$status->msg}\n";
 }
 
 
-print ">>> Configure new '$ifname' OpenVPN tunnel interface on the '$vRouter->{name}'\n";
-my $vpnif = new Brocade::BSC::Node::NC::Vrouter::OvpnIf($ifname);
+print
+">>> Configure new '$ifname' OpenVPN tunnel interface on the '$vRouter->{name}'\n";
+my $vpnif = Brocade::BSC::Node::NC::Vrouter::OvpnIf->new($ifname);
 
 
 #=======================================================================
@@ -110,17 +113,18 @@ $vpnif->tls_key_file('/config/auth/V1.key');
 
 
 $status = $vRouter->set_openvpn_interface_cfg($vpnif);
-$status->ok or
-    $bsc->delete_netconf_node($vRouter) and
-    die "!!!Demo terminated, reason: ${\$status->msg}\n";
-print "<<< '$vRouter->{name}' interface configuration was successfully created\n\n";
+$status->ok
+  or $bsc->delete_netconf_node($vRouter)
+  and die "!!!Demo terminated, reason: ${\$status->msg}\n";
+print
+"<<< '$vRouter->{name}' interface configuration was successfully created\n\n";
 
 
 print "<<< Show '$ifname' interface configuration on '$vRouter->{name}'\n";
 ($status, $ovpn_ifcfg) = $vRouter->get_openvpn_interface_cfg($ifname);
-$status->ok or
-    $bsc->delete_netconf_node($vRouter) and
-    die "!!!Demo terminated, reason: ${\$status->msg}\n";
+$status->ok
+  or $bsc->delete_netconf_node($vRouter)
+  and die "!!!Demo terminated, reason: ${\$status->msg}\n";
 print "'$ifname' interface configuration:\n";
 print JSON->new->canonical->pretty->encode(JSON::decode_json($ovpn_ifcfg));
 print "<<< '$ifname' interface configuration was successfully read.\n\n";
@@ -128,69 +132,82 @@ print "<<< '$ifname' interface configuration was successfully read.\n\n";
 
 my $remote_subnet = '192.168.101.0/24';
 print "<<< Create static route to access the remote subnet '$remote_subnet' "
-    . "through the '$ifname' interface.\n";
-my $route = new Brocade::BSC::Node::NC::Vrouter::StaticRoute;
+  . "through the '$ifname' interface.\n";
+my $route = Brocade::BSC::Node::NC::Vrouter::StaticRoute->new;
 $route->interface_route($remote_subnet);
-$route->interface_route_next_hop_interface(subnet => $remote_subnet,
-                                           ifname => $ifname);
+$route->interface_route_next_hop_interface(
+    subnet => $remote_subnet,
+    ifname => $ifname
+);
 
 
 $status = $vRouter->set_protocols_static_route_cfg($route);
-$status->ok or
-    $bsc->delete_netconf_node($vRouter) and
-    die "!!!Demo terminated, reason: ${\$status->msg}\n";
+$status->ok
+  or $bsc->delete_netconf_node($vRouter)
+  and die "!!!Demo terminated, reason: ${\$status->msg}\n";
 print "<<< Static route was successfully created.\n\n";
 
 
-print "<<< Show subnet '$remote_subnet' static route configuration on '$vRouter->{name}'\n";
-($status, $route_cfg) = $vRouter->get_protocols_static_interface_route_cfg($remote_subnet);
-$status->ok or
-    $bsc->delete_netconf_node($vRouter) and
-    die "!!!Demo terminated, reason: ${\$status->msg}\n";
+print
+"<<< Show subnet '$remote_subnet' static route configuration on '$vRouter->{name}'\n";
+($status, $route_cfg) =
+  $vRouter->get_protocols_static_interface_route_cfg($remote_subnet);
+$status->ok
+  or $bsc->delete_netconf_node($vRouter)
+  and die "!!!Demo terminated, reason: ${\$status->msg}\n";
 print "Static route configuration:\n";
 print JSON->new->canonical->pretty->encode(JSON::decode_json($route_cfg));
 print "<<< Static route configuration was successfully read.\n\n";
 
 
-print "<<< Delete '$ifname' interface configuration from the '$vRouter->{name}'\n";
+print
+"<<< Delete '$ifname' interface configuration from the '$vRouter->{name}'\n";
 $status = $vRouter->delete_openvpn_interface_cfg($ifname);
-$status->ok or
-    $bsc->delete_netconf_node($vRouter) and
-    die "!!!Demo terminated, reason: ${\$status->msg}\n";
+$status->ok
+  or $bsc->delete_netconf_node($vRouter)
+  and die "!!!Demo terminated, reason: ${\$status->msg}\n";
 print "<<< '$ifname' interface configuration successfully removed "
-    . "from the '$vRouter->{name}'\n\n";
+  . "from the '$vRouter->{name}'\n\n";
 
 
 print "<<< Show '$ifname' interface configuration on '$vRouter->{name}'\n";
 ($status, $ovpn_ifcfg) = $vRouter->get_openvpn_interface_cfg($ifname);
-$status->no_data or
-    $bsc->delete_netconf_node($vRouter) and
-    die "!!!Demo terminated, reason: "
-        . $status->ok ? "Interface configuration still exists\n" : "${\$status->msg}\n";
+$status->no_data
+  or $bsc->delete_netconf_node($vRouter)
+  and die "!!!Demo terminated, reason: " . $status->ok
+  ? "Interface configuration still exists\n"
+  : "${\$status->msg}\n";
 print "No '$ifname' interface configuration found.\n\n";
 
 
-print "<<< Delete '$remote_subnet' subnet static route configuration from the '$vRouter->{name}'\n";
-$status = $vRouter->delete_protocols_static_interface_route_cfg($remote_subnet);
-$status->ok or
-    $bsc->delete_netconf_node($vRouter) and
-    die "!!!Demo terminated, reason: ${\$status->msg}\n";
-print "<<< Static route configuration successfully removed from '$vRouter->{name}'\n\n";
+print
+"<<< Delete '$remote_subnet' subnet static route configuration from the '$vRouter->{name}'\n";
+$status =
+  $vRouter->delete_protocols_static_interface_route_cfg($remote_subnet);
+$status->ok
+  or $bsc->delete_netconf_node($vRouter)
+  and die "!!!Demo terminated, reason: ${\$status->msg}\n";
+print
+"<<< Static route configuration successfully removed from '$vRouter->{name}'\n\n";
 
 
-print "<<< Show subnet '$remote_subnet' static route configuration on '$vRouter->{name}'\n";
-($status, $route_cfg) = $vRouter->get_protocols_static_interface_route_cfg($remote_subnet);
-$status->no_data or
-    $bsc->delete_netconf_node($vRouter) and
-    die "!!!Demo terminated, reason: "
-        . $status->ok ? "Static route configuration still found\n" : "${\$status->msg}\n";
+print
+"<<< Show subnet '$remote_subnet' static route configuration on '$vRouter->{name}'\n";
+($status, $route_cfg) =
+  $vRouter->get_protocols_static_interface_route_cfg($remote_subnet);
+$status->no_data
+  or $bsc->delete_netconf_node($vRouter)
+  and die "!!!Demo terminated, reason: " . $status->ok
+  ? "Static route configuration still found\n"
+  : "${\$status->msg}\n";
 print "No static route configuration found.\n\n";
 
 
 print ">>> Remove '$vRouter->{name}' NETCONF node from the Controller\n";
 $status = $bsc->delete_netconf_node($vRouter);
 $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
-print "'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
+print
+"'$vRouter->{name}' NETCONF node was successfully removed from the Controller\n\n";
 
 
 print ("\n");

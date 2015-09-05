@@ -38,9 +38,9 @@ use Brocade::BSC;
 use Brocade::BSC::Node::OF::Switch;
 
 my $configfile = "";
-my $status = undef;
-my $portlist = undef;
-my $portinfo = undef;
+my $status     = undef;
+my $portlist   = undef;
+my $portinfo   = undef;
 
 my $sample = "openflow:1";
 
@@ -50,10 +50,13 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
-my $ofswitch = new Brocade::BSC::Node::OF::Switch(ctrl => $bvc, name => $sample);
+my $ofswitch = Brocade::BSC::Node::OF::Switch->new(
+    ctrl => $bvc,
+    name => $sample
+);
 
 
 print "<<< Get detailed information about ports on OpenFlow node '$sample'\n";

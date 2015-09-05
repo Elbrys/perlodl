@@ -40,7 +40,7 @@ my $configfile = "";
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
-my $bvc = new Brocade::BSC($configfile);
+my $bvc = Brocade::BSC->new($configfile);
 
 my ($status, $schemas) = $bvc->get_schemas('controller-config');
 $status->ok or die "Error: ${\$status->msg}\n";

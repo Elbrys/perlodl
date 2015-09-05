@@ -45,8 +45,8 @@ use Brocade::BSC::Node::OF::Action::PushVlanHeader;
 use Brocade::BSC::Node::OF::Action::PopVlanHeader;
 
 my $configfile = "";
-my $status = undef;
-my $flowinfo = undef;
+my $status     = undef;
+my $flowinfo   = undef;
 
 my $qinq_eth_type    = $ETH_TYPE_STAG;
 my $dot1q_eth_type   = $ETH_TYPE_CTAG;
@@ -57,7 +57,7 @@ my $customer_vlan_id = 998;
 my $provider_vlan_id = 100;
 
 my $table_id      = 0;
-my $first_flow_id = my $flow_id  = 31;
+my $first_flow_id = my $flow_id = 31;
 my $flow_priority = 500;
 my $cookie        = 1000;
 my $cookie_mask   = 255;
@@ -68,31 +68,34 @@ print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 print ("<<< Demo Start\n");
 print ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
-my $bvc = new Brocade::BSC(cfgfile => $configfile);
-my $ofswitch = new Brocade::BSC::Node::OF::Switch(cfgfile => $configfile,
-                                                    ctrl => $bvc);
+my $bvc = Brocade::BSC->new(cfgfile => $configfile);
+my $ofswitch = Brocade::BSC::Node::OF::Switch->new(
+    cfgfile => $configfile,
+    ctrl    => $bvc
+);
 
 # ---------------------------------------------------
 # First flow entry
 # ---------------------------------------------------
 
-print "<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
+print
+"<<< 'Controller': $bvc->{ipAddr}, 'OpenFlow' switch: $ofswitch->{name}\n\n";
 
-print  "<<< Set OpenFlow flow on the Controller\n";
+print "<<< Set OpenFlow flow on the Controller\n";
 printf "        Match:  Ethernet Type        (0x%04x)\n", $ETH_TYPE_ARP;
-print  "                VLAN ID              ($customer_vlan_id)\n";
-print  "                Input Port           ($customer_port)\n";
+print "                VLAN ID              ($customer_vlan_id)\n";
+print "                Input Port           ($customer_port)\n";
 printf "        Action: Push VLAN            (Ethernet Type 0x%04x)\n",
-    $qinq_eth_type;
-print  "                Set Field            (VLAN ID $provider_vlan_id)\n";
+  $qinq_eth_type;
+print "                Set Field            (VLAN ID $provider_vlan_id)\n";
 printf "                Push VLAN            (Ethernet Type 0x%04x)\n",
-    $dot1q_eth_type;
-print  "                Set Field            (VLAN ID $customer_vlan_id)\n";
-print  "                Output (Physical Port number $provider_port)\n\n";
+  $dot1q_eth_type;
+print "                Set Field            (VLAN ID $customer_vlan_id)\n";
+print "                Output (Physical Port number $provider_port)\n\n";
 
-my $flowentry = new Brocade::BSC::Node::OF::FlowEntry;
+my $flowentry = Brocade::BSC::Node::OF::FlowEntry->new;
 $flowentry->flow_name("[MLX1-A] Test flow (match:inport=110,arp;actions:"
-    . "push-QINQ-tag,mod_vlan=100,push-DOT1Q-tag,mod_vlan=998,output:111)");
+      . "push-QINQ-tag,mod_vlan=100,push-DOT1Q-tag,mod_vlan=998,output:111)");
 $flowentry->table_id($table_id);
 $flowentry->id($flow_id++);
 $flowentry->priority($flow_priority);
@@ -107,29 +110,37 @@ my $instruction = $flowentry->add_instruction(0);
 
 my $action_order = 0;
 my $action;
-$action = new Brocade::BSC::Node::OF::Action::PushVlanHeader(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::PushVlanHeader->new(
+    order => $action_order++);
 $action->eth_type($qinq_eth_type);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::SetField(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::SetField->new(order => $action_order++);
 $action->vlan_id($provider_vlan_id);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::PushVlanHeader(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::PushVlanHeader->new(
+    order => $action_order++);
 $action->eth_type($dot1q_eth_type);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::SetField(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::SetField->new(order => $action_order++);
 $action->vlan_id($customer_vlan_id);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::Output(order => $action_order++,
-                                                     port => $provider_port);
+$action = Brocade::BSC::Node::OF::Action::Output->new(
+    order => $action_order++,
+    port  => $provider_port
+);
 $instruction->apply_actions($action);
 
 # # --- Match Fields
 
-my $match = new Brocade::BSC::Node::OF::Match();
+my $match = Brocade::BSC::Node::OF::Match->new();
 $match->eth_type($ETH_TYPE_ARP);
 $match->vlan_id($customer_vlan_id);
 $match->in_port($customer_port);
@@ -146,21 +157,21 @@ print "<<< Flow successfully added to the Controller\n\n";
 # Second flow entry
 # ---------------------------------------------------
 
-print  "<<< Set OpenFlow flow on the Controller\n";
+print "<<< Set OpenFlow flow on the Controller\n";
 printf "        Match:  Ethernet Type        (0x%04x)\n", $ip_eth_type;
-print  "                VLAN ID              ($customer_vlan_id)\n";
-print  "                Input Port           ($customer_port)\n";
+print "                VLAN ID              ($customer_vlan_id)\n";
+print "                Input Port           ($customer_port)\n";
 printf "        Action: Push VLAN            (Ethernet Type 0x%04x)\n",
-    $qinq_eth_type;
-print  "                Set Field            (VLAN ID $provider_vlan_id)\n";
+  $qinq_eth_type;
+print "                Set Field            (VLAN ID $provider_vlan_id)\n";
 printf "                Push VLAN            (Ethernet Type 0x%04x)\n",
-    $dot1q_eth_type;
-print  "                Set Field            (VLAN ID $customer_vlan_id)\n";
-print  "                Output (Physical Port number $provider_port)\n\n";
+  $dot1q_eth_type;
+print "                Set Field            (VLAN ID $customer_vlan_id)\n";
+print "                Output (Physical Port number $provider_port)\n\n";
 
-my $flowentry2 = new Brocade::BSC::Node::OF::FlowEntry;
+my $flowentry2 = Brocade::BSC::Node::OF::FlowEntry->new;
 $flowentry2->flow_name("[MLX1-A] Test flow (match:inport=110,ip;actions:"
-    . "push-QINQ-tag,mod_vlan=100,output:111)");
+      . "push-QINQ-tag,mod_vlan=100,output:111)");
 $flowentry2->table_id($table_id);
 $flowentry2->id($flow_id++);
 $flowentry2->priority($flow_priority);
@@ -173,27 +184,35 @@ $instruction = $flowentry2->add_instruction(0);
 
 $action_order = 0;
 
-$action = new Brocade::BSC::Node::OF::Action::PushVlanHeader(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::PushVlanHeader->new(
+    order => $action_order++);
 $action->eth_type($qinq_eth_type);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::SetField(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::SetField->new(order => $action_order++);
 $action->vlan_id($provider_vlan_id);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::PushVlanHeader(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::PushVlanHeader->new(
+    order => $action_order++);
 $action->eth_type($dot1q_eth_type);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::SetField(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::SetField->new(order => $action_order++);
 $action->vlan_id($customer_vlan_id);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::Output(order => $action_order++,
-                                                     port => $provider_port);
+$action = Brocade::BSC::Node::OF::Action::Output->new(
+    order => $action_order++,
+    port  => $provider_port
+);
 $instruction->apply_actions($action);
 
-$match = new Brocade::BSC::Node::OF::Match;
+$match = Brocade::BSC::Node::OF::Match->new;
 $match->eth_type($ip_eth_type);
 $match->vlan_id($customer_vlan_id);
 $match->in_port($customer_port);
@@ -210,16 +229,16 @@ print "<<< Flow successfully added to the Controller\n\n";
 # Third flow entry
 # ---------------------------------------------------
 
-print  "<<< Set OpenFlow flow on the Controller\n";
+print "<<< Set OpenFlow flow on the Controller\n";
 printf "        Match:  Ethernet Type        (0x%04x)\n", $ETH_TYPE_ARP;
-print  "                VLAN ID              ($provider_vlan_id)\n";
-print  "                Input Port           ($provider_port)\n";
-print  "        Action: Pop VLAN\n";
-print  "                Output (Physical Port number $customer_port)\n\n";
+print "                VLAN ID              ($provider_vlan_id)\n";
+print "                Input Port           ($provider_port)\n";
+print "        Action: Pop VLAN\n";
+print "                Output (Physical Port number $customer_port)\n\n";
 
-my $flowentry3 = new Brocade::BSC::Node::OF::FlowEntry;
+my $flowentry3 = Brocade::BSC::Node::OF::FlowEntry->new;
 $flowentry3->flow_name("[MLX1-A] Test flow (match:inport=111,arp,vid=100;"
-    . "actions:pop-vlan-tag,output:110)");
+      . "actions:pop-vlan-tag,output:110)");
 $flowentry3->table_id($table_id);
 $flowentry3->id($flow_id++);
 $flowentry3->priority($flow_priority);
@@ -232,14 +251,18 @@ $instruction = $flowentry3->add_instruction(0);
 
 $action_order = 0;
 
-$action = new Brocade::BSC::Node::OF::Action::PopVlanHeader(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::PopVlanHeader->new(
+    order => $action_order++);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::Output(order => $action_order++,
-                                                     port => $customer_port);
+$action = Brocade::BSC::Node::OF::Action::Output->new(
+    order => $action_order++,
+    port  => $customer_port
+);
 $instruction->apply_actions($action);
 
-$match = new Brocade::BSC::Node::OF::Match;
+$match = Brocade::BSC::Node::OF::Match->new;
 $match->eth_type($ETH_TYPE_ARP);
 $match->vlan_id($provider_vlan_id);
 $match->in_port($provider_port);
@@ -256,16 +279,16 @@ print "<<< Flow successfully added to the Controller\n\n";
 # Fourth flow entry
 # ---------------------------------------------------
 
-print  "<<< Set OpenFlow flow on the Controller\n";
+print "<<< Set OpenFlow flow on the Controller\n";
 printf "        Match:  Ethernet Type        (0x%04x)\n", $ip_eth_type;
-print  "                VLAN ID              ($provider_vlan_id)\n";
-print  "                Input Port           ($provider_port)\n";
-print  "        Action: Pop VLAN\n";
-print  "                Output (Physical Port number $customer_port)\n\n";
+print "                VLAN ID              ($provider_vlan_id)\n";
+print "                Input Port           ($provider_port)\n";
+print "        Action: Pop VLAN\n";
+print "                Output (Physical Port number $customer_port)\n\n";
 
-my $flowentry4 = new Brocade::BSC::Node::OF::FlowEntry;
+my $flowentry4 = Brocade::BSC::Node::OF::FlowEntry->new;
 $flowentry4->flow_name("[MLX1-A] Test flow (match:inport=111,ip,vid=100;"
-    . "actions:pop-vlan-tag,output:110)");
+      . "actions:pop-vlan-tag,output:110)");
 $flowentry4->table_id($table_id);
 $flowentry4->id($flow_id++);
 $flowentry4->priority($flow_priority);
@@ -278,14 +301,18 @@ $instruction = $flowentry4->add_instruction(0);
 
 $action_order = 0;
 
-$action = new Brocade::BSC::Node::OF::Action::PopVlanHeader(order => $action_order++);
+$action =
+  Brocade::BSC::Node::OF::Action::PopVlanHeader->new(
+    order => $action_order++);
 $instruction->apply_actions($action);
 
-$action = new Brocade::BSC::Node::OF::Action::Output(order => $action_order++,
-                                                     port => $customer_port);
+$action = Brocade::BSC::Node::OF::Action::Output->new(
+    order => $action_order++,
+    port  => $customer_port
+);
 $instruction->apply_actions($action);
 
-$match = new Brocade::BSC::Node::OF::Match;
+$match = Brocade::BSC::Node::OF::Match->new;
 $match->eth_type($ip_eth_type);
 $match->vlan_id($provider_vlan_id);
 $match->in_port($provider_port);
@@ -303,8 +330,9 @@ print "<<< Flow successfully added to the Controller\n\n";
 # ---------------------------------------------------
 
 print "<<< Get configured flows from the Controller\n";
-foreach my $flow_num ($first_flow_id .. $flow_id-1) {
-    ($status, $flowinfo) = $ofswitch->get_configured_flow($table_id, $flow_num);
+foreach my $flow_num ($first_flow_id .. $flow_id - 1) {
+    ($status, $flowinfo) =
+      $ofswitch->get_configured_flow($table_id, $flow_num);
     $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
 
     print "<<< Flow '$flow_num' successfully read from the Controller\n";
@@ -319,10 +347,11 @@ foreach my $flow_num ($first_flow_id .. $flow_id-1) {
 print "<<< Delete flows from the Controller's cache and from\n";
 print "    the table '$table_id' on the '$ofswitch->{name}' node\n";
 
-foreach my $flow_num ($first_flow_id .. $flow_id-1) {
+foreach my $flow_num ($first_flow_id .. $flow_id - 1) {
     $status = $ofswitch->delete_flow($table_id, $flow_num);
     $status->ok or die "!!! Demo terminated, reason: ${\$status->msg}\n";
-    print "<<< Flow with id of '$flow_num' successfully removed from the Controller\n";
+    print
+"<<< Flow with id of '$flow_num' successfully removed from the Controller\n";
 }
 
 
