@@ -5,10 +5,11 @@ perl:
   - "5.14"
   - "5.10"
 before_install:
-  - find /home/travis -type d -name Critic
+  - find /home/travis/perl5 -name Critic\*
   - cpanm --quiet --installdeps --notest Test::Perl::Critic
-  - find /home/travis -type d -name Critic
+  - find /home/travis/perl5 -name Critic\*
   - cd Brocade-BSC
 script:
   - perl Makefile.PL && make test && prove -l xt
-  - find /home/travis -type d -name Critic
+  - find /home/travis/perl5 -name Critic\*
+
