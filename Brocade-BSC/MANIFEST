@@ -62,3 +62,4 @@ xt/b00-copyright.t
 xt/b10-of-samples.t
 xt/b11-ctrl-samples.t
 xt/perlcriticrc
+xt/perltidyrc

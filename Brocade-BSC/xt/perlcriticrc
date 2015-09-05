@@ -1,1 +1,9 @@
-# stub
+# perlcritic
+
+# [5: 'gentle', 'stern', 'harsh', 'cruel', 'brutal']
+severity = stern
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[-Modules::ProhibitMultiplePackages]

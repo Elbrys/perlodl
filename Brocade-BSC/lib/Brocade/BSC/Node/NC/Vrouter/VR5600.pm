@@ -39,23 +39,31 @@ controlled via netconf by a I<Brocade::BSC> instance.
 
 =cut
 
+package Brocade::BSC::Node::NC::Vrouter::VR5600;
+
 use strict;
 use warnings;
+
+use base qw(Brocade::BSC::Node::NC);
+use HTTP::Status qw(:constants :is status_message);
+use URI::Escape qw(uri_escape);
+use JSON -convert_blessed_universally;
+use Brocade::BSC;
+use Brocade::BSC::Status qw(:constants);
 
 # Package ==============================================================
 # DataplaneInterfaceFirewall
 #
 #
 # ======================================================================
-package Brocade::BSC::Node::NC::Vrouter::VR5600::DataplaneInterfaceFirewall; ## no critic
+package Brocade::BSC::Node::NC::Vrouter::VR5600::DataplaneInterfaceFirewall;
 
 # Constructor ==========================================================
 # Parameters: interface name
 # Returns   :
 #
 sub new {
-    my $class = shift;
-    my $tagnode = shift;
+    my ($class, $tagnode) = @_;
 
     my $self = {
         tagnode => $tagnode,
@@ -64,7 +72,7 @@ sub new {
             outlist => []
         }
     };
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 # Method ===============================================================
@@ -76,6 +84,7 @@ sub add_in_item {
     my ($self, $item) = @_;
 
     push @{$self->{firewall}->{inlist}}, $item;
+    return @{$self->{firewall}->{inlist}};
 }
 # Method ===============================================================
 #             add_out_item : append firewall rule to outbound rules list
@@ -86,6 +95,7 @@ sub add_out_item {
     my ($self, $item) = @_;
 
     push @{$self->{firewall}->{outlist}}, $item;
+    return @{$self->{firewall}->{outlist}};
 }
 
 # Method ===============================================================
@@ -109,7 +119,7 @@ sub _get_url_extension {
 sub get_payload {
     my $self = shift;
 
-    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
     my $payload = '{"vyatta-interfaces-dataplane:dataplane":'
         . $json->encode($self)
         . '}';
@@ -129,13 +139,6 @@ sub get_payload {
 # ======================================================================
 
 package Brocade::BSC::Node::NC::Vrouter::VR5600;
-
-use base qw(Brocade::BSC::Node::NC);
-use HTTP::Status qw(:constants :is status_message);
-use URI::Escape qw(uri_escape);
-use JSON -convert_blessed_universally;
-use Brocade::BSC;
-use Brocade::BSC::Status qw(:constants);
 
 =head1 METHODS
 
@@ -164,8 +167,7 @@ sub get_schemas {
 
 =cut ===================================================================
 sub get_schema {
-    my $self = shift;
-    my ($yangId, $yangVersion) = @_;
+    my ($self, $yangId, $yangVersion) = @_;
 
     return $self->{ctrl}->get_schema($self->{name}, $yangId, $yangVersion);
 }
@@ -180,7 +182,7 @@ sub get_schema {
 =cut ===================================================================
 sub get_cfg {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $config = undef;
 
     my $url = $self->_nc_config_urlpath;
@@ -205,7 +207,7 @@ sub get_cfg {
 =cut ===================================================================
 sub get_firewalls_cfg {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $config = undef;
 
     my $url = $self->_nc_config_urlpath;
@@ -237,7 +239,7 @@ sub get_firewalls_cfg {
 sub get_firewall_instance_cfg {
     my $self = shift;
     my $instance = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $config = undef;
 
     my $url = $self->_nc_config_urlpath;
@@ -266,7 +268,7 @@ Create empty firewall instance on VR5600
 sub create_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
 
     my $urlpath = $self->_nc_config_urlpath;
     my %headers = ('content-type'=>'application/yang.data+json');
@@ -307,7 +309,7 @@ sub create_firewall_instance {
 sub delete_firewall_instance {
     my $self = shift;
     my $fwInstance = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
 
     my $urlpath = $self->_nc_config_urlpath
         . $fwInstance->_get_url_extension()
@@ -341,13 +343,13 @@ sub delete_firewall_instance {
 =cut ===================================================================
 sub set_dataplane_interface_firewall {
     my ($self, %params) = @_;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
 
     my %headers = ('content-type' => 'application/yang.data+json');
     my $urlpath = $self->_nc_config_urlpath;
 
     $params{ifName} or die "missing req'd parameter \$ifName";
-    my $fw = new Brocade::BSC::Node::NC::Vrouter::VR5600::DataplaneInterfaceFirewall($params{ifName});
+    my $fw = Brocade::BSC::Node::NC::Vrouter::VR5600::DataplaneInterfaceFirewall->new($params{ifName});
 
     $params{inFw}  and $fw->add_in_item($params{inFw});
     $params{outFw} and $fw->add_out_item($params{outFw});
@@ -371,7 +373,7 @@ sub set_dataplane_interface_firewall {
 sub delete_dataplane_interface_firewall {
     my ($self, $ifName) = @_;
 
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
 
     my $urlpath = $self->_nc_config_urlpath
         . "vyatta-interfaces:interfaces/vyatta-interfaces-dataplane:dataplane"
@@ -391,7 +393,7 @@ sub delete_dataplane_interface_firewall {
 =cut ===================================================================
 sub get_interfaces_list {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $ifcfg = undef;
     my @iflist = ();
 
@@ -414,7 +416,7 @@ sub get_interfaces_list {
 =cut ===================================================================
 sub get_interfaces_cfg {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $config = undef;
 
     my $urlpath = $self->_nc_config_urlpath;
@@ -441,7 +443,7 @@ sub get_interfaces_cfg {
 =cut ===================================================================
 sub get_dataplane_interfaces_list {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $dpifcfg = undef;
     my $iflist = undef;
     my @dpiflist;
@@ -495,7 +497,7 @@ sub get_dataplane_interfaces_cfg {
 sub get_dataplane_interface_cfg {
     my $self = shift;
     my $ifname = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $cfg = undef;
 
     my $urlpath = $self->_nc_config_urlpath
@@ -572,7 +574,7 @@ sub get_loopback_interfaces_cfg {
 sub get_loopback_interface_cfg {
     my $self = shift;
     my $ifName = shift;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
     my $config = undef;
 
     my $urlpath = $self->_nc_config_urlpath
@@ -601,7 +603,7 @@ sub get_loopback_interface_cfg {
 =cut ===================================================================
 sub set_vpn_cfg {
     my ($self, $vpn) = @_;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
 
     my $urlpath = $self->_nc_config_urlpath;
     my %headers = ('content-type' => 'application/yang.data+json');
@@ -622,7 +624,7 @@ sub set_vpn_cfg {
 =cut ===================================================================
 sub get_vpn_cfg {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $config = undef;
     
     my $urlpath = $self->_nc_config_urlpath
@@ -653,7 +655,7 @@ sub get_vpn_cfg {
 =cut ===================================================================
 sub delete_vpn_cfg {
     my $self = shift;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
 
     my $urlpath = $self->_nc_config_urlpath
 	. "vyatta-security:security/vyatta-security-vpn-ipsec:vpn";
@@ -673,7 +675,7 @@ sub delete_vpn_cfg {
 =cut ===================================================================
 sub set_openvpn_interface_cfg {
     my ($self, $ovpn_ifcfg) = @_;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
     my %headers = ('content-type' => 'application/yang.data+json');
     my $urlpath = $self->_nc_config_urlpath;
 
@@ -694,7 +696,7 @@ sub set_openvpn_interface_cfg {
 =cut ===================================================================
 sub get_openvpn_interface_cfg {
     my ($self, $ovpn_ifname) = @_;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $config = undef;
     my $urlpath = $self->_nc_config_urlpath
         . "vyatta-interfaces:interfaces/"
@@ -749,7 +751,7 @@ sub get_openvpn_interfaces_cfg {
 =cut ===================================================================
 sub delete_openvpn_interface_cfg {
     my ($self, $ovpn_ifname) = @_;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
     my $urlpath = $self->_nc_config_urlpath
         . "vyatta-interfaces:interfaces/"
         . "vyatta-interfaces-openvpn:openvpn/$ovpn_ifname";
@@ -772,7 +774,7 @@ Configure static route on vRouter
 =cut ===================================================================
 sub set_protocols_static_route_cfg {
     my ($self, $route) = @_;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
     my %headers = ('content-type' => 'application/yang.data+json');
     my $urlpath = $self->_nc_config_urlpath;
 
@@ -794,7 +796,7 @@ sub set_protocols_static_route_cfg {
 =cut ===================================================================
 sub get_protocols_cfg {
     my ($self, $model) = @_;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $config = undef;
     my $urlpath = $self->_nc_config_urlpath
         . "vyatta-protocols:protocols";
@@ -825,7 +827,7 @@ sub get_protocols_cfg {
 =cut ===================================================================
 sub delete_protocols_cfg {
     my ($self, $model) = @_;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
     my $urlpath = $self->_nc_config_urlpath
         . "vyatta-protocols:protocols";
     defined $model and $urlpath .= "/$model";

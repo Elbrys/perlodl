@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::PushPBBHeader object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{push_pbb_action}->{'ethernet-type'} = $params{eth_type};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -53,7 +52,7 @@ sub new {
 #             accessors
 sub eth_type {
     my ($self, $eth_type) = @_;
-    $self->{push_pbb_action}->{'ethernet-type'} =
+    return $self->{push_pbb_action}->{'ethernet-type'} =
         (2 == @_) ? $eth_type : $self->{push_pbb_action}->{'ethernet-type'};
 }
 

@@ -1,0 +1,8 @@
+#
+-i=4                # indent 4, default
+-l=78               # line length
+-nsfs               # no spaces before semicolons in for() loops
+#-fpsc=40        # side comments indented to column 40 or right
+#-ndws               # no delete whitespace
+#                    # (e.g., don't change indentation of side comments)
+-mbl=2              # maximum number of consecutive blank lines

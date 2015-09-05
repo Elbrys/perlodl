@@ -69,7 +69,7 @@ sub new {
         route6           => [],
         table            => [],
     };
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -82,7 +82,7 @@ sub new {
 =cut ===================================================================
 sub as_json {
     my $self = shift;
-    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
     return $json->pretty->encode($self);
 }
 
@@ -174,6 +174,7 @@ sub interface_route {
     my ($self, $subnet) = @_;
     my $route = $self->_find_interface_route(create => 1,
                                              subnet => $subnet);
+    return $route;
 }
 
 
@@ -201,6 +202,7 @@ sub interface_route_next_hop_interface {
                                   ifname => $params{ifname});
     $params{disable} && ($nhif->{disable} = '');
     $params{distance} && ($nhif->{distance} = $params{distance});
+    return $nhif;
 }
 
 

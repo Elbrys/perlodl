@@ -45,7 +45,7 @@ use strict;
 use warnings;
 
 use Exporter;
-our @ISA = qw(Exporter);
+our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(Firewall);
 
 use JSON -convert_blessed_universally;
@@ -56,14 +56,13 @@ use JSON -convert_blessed_universally;
 package Brocade::BSC::Node::NC::Vrouter::Firewall::Rule;
 
 sub new {
-    my $class = shift;
-    my $tagnode = shift;
+    my ($class, $tagnode, %attributes) = @_;
 
     my $self = {
         'tagnode' => $tagnode,
-        @_
+        %attributes,
     };
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 # Method ===============================================================
@@ -72,10 +71,9 @@ sub new {
 # Returns   : 
 #
 sub add_action {
-    my $self = shift;
-    my $action = shift;
+    my ($self, $action) = @_;
 
-    $self->{action} = $action;
+    return $self->{action} = $action;
 }
 
 # Method ===============================================================
@@ -84,7 +82,7 @@ sub add_action {
 # Returns   : 
 #
 sub get_name {
-    my $self = shift;
+    my $self = @_;
 
     return $self->{tagnode};
 }
@@ -95,14 +93,13 @@ sub get_name {
 package Brocade::BSC::Node::NC::Vrouter::Firewall::Group;
 
 sub new {
-    my $class = shift;
-    my $tagnode = shift;
+    my ($class, $tagnode) = @_;
 
     my $self = {
         tagnode => $tagnode,
         rule => []
     };
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 # Method ===============================================================
@@ -111,7 +108,7 @@ sub new {
 # Returns   : 
 #
 sub get_name {
-    my $self = shift;
+    my $self = @_;
     return $self->{tagnode};
 }
 
@@ -134,11 +131,11 @@ package Brocade::BSC::Node::NC::Vrouter::Firewall;
 
 =cut ===================================================================
 sub new {
-    my $class = shift;
+    my $class = @_;
     my $self = {
         name => []
     };
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 # Method ===============================================================
@@ -149,9 +146,9 @@ sub new {
 
 =cut ===================================================================
 sub as_json {
-    my $self = shift;
+    my $self = @_;
 
-    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
     return $json->pretty->encode($self);
 }
 
@@ -161,11 +158,11 @@ sub as_json {
 # Returns   : array including new group
 #           :
 sub _add_group {
-    my $self = shift;
-    my $name = shift;
+    my ($self, $name) = @_;
 
-    my $group = new Brocade::BSC::Node::NC::Vrouter::Firewall::Group($name);
+    my $group = Brocade::BSC::Node::NC::Vrouter::Firewall::Group->new($name);
     push @{$self->{name}}, $group;
+    return @{$self->{name}};
 }
 
 # Method ===============================================================
@@ -174,8 +171,7 @@ sub _add_group {
 # Returns   : 
 #
 sub _get_group {
-    my $self = shift;
-    my $name = shift;
+    my ($self, $name) = @_;
 
     my @groups = $self->{name};
     foreach my $groupref (@{ $self->{name} }) {
@@ -196,13 +192,12 @@ sub _get_group {
 
 =cut ===================================================================
 sub add_rule {
-    my $self       = shift;
-    my $group_name = shift;
-    my $rule_id    = shift;
+    my ($self, $group_name, $rule_id, %attributes) = @_;
 
-    my $rule = new Brocade::BSC::Node::NC::Vrouter::Firewall::Rule($rule_id, @_);
+    my $rule = Brocade::BSC::Node::NC::Vrouter::Firewall::Rule->new($rule_id, %attributes);
     my $group = $self->_get_group($group_name);
     push @{$group->{rule}}, $rule;
+    return @{$group->{rule}};
 }
 
 # Method ===============================================================
@@ -210,11 +205,11 @@ sub add_rule {
 # Parameters: 
 # Returns   : 
 #
-sub ___get_rule {
-    my $self = shift;
-
+#sub ___get_rule {
+#    my $self = shift;
+#
     # XXX
-}
+#}
 
 # Method ===============================================================
 # 
@@ -222,7 +217,7 @@ sub ___get_rule {
 # Returns   : 
 #
 sub _get_rules {
-    my $self = shift;
+    my $self = @_;
 
     return @{ $self->{name} };
 }
@@ -236,9 +231,9 @@ sub _get_rules {
 
 =cut ===================================================================
 sub get_payload {
-    my $self = shift;
+    my $self = @_;
 
-    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
     my $payload = '{"vyatta-security:security":{"vyatta-security-firewall:firewall":'
         . $json->encode($self)
         . '}}';
@@ -253,7 +248,7 @@ sub get_payload {
 # Returns   : 
 #
 sub _get_url_extension {
-    my $self = shift;
+    my $self = @_;
 
     return "vyatta-security:security/vyatta-security-firewall:firewall";
 }

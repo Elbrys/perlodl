@@ -71,7 +71,7 @@ sub _as_oxm {
 #             accessors
 sub eth_type {
     my ($self, $eth_type) = @_;
-    $self->{pop_mpls_action}->{'ethernet-type'} =
+    return $self->{pop_mpls_action}->{'ethernet-type'} =
         (2 == @_) ? $eth_type : $self->{pop_mpls_action}->{'ethernet-type'};
 }
 

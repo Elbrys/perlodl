@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::DecMplsTTL object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{dec_mpls_ttl} = {};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 

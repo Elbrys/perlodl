@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::SetTcpUdpSrc object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{set_tp_src_action}->{port} = $params{port};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -53,7 +52,7 @@ sub new {
 #             accessors
 sub port {
     my ($self, $port) = @_;
-    $self->{set_tp_src_action}->{port} =
+    return $self->{set_tp_src_action}->{port} =
         (2 == @_) ? $port : $self->{set_tp_src_action}->{port};
 }
 

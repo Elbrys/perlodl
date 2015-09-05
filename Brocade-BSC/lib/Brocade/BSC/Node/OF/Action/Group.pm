@@ -40,13 +40,12 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::Group object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{group_action}->{group} = $params{group};
     $self->{group_action}->{'group-id'} = $params{group_id};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -54,12 +53,12 @@ sub new {
 #             accessors
 sub group {
     my ($self, $group) = @_;
-    $self->{group_action}->{group} =
+    return $self->{group_action}->{group} =
         (2 == @_) ? $group : $self->{group_action}->{group};
 }
 sub group_id {
     my ($self, $group_id) = @_;
-    $self->{group_action}->{group_id} =
+    return $self->{group_action}->{group_id} =
         (2 == @_) ? $group_id : $self->{group_action}->{group_id};
 }
 

@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::SetNwDst object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{set_nw_dst_action}->{address} = $params{ip_addr};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -53,7 +52,7 @@ sub new {
 #             accessors
 sub ip_addr {
     my ($self, $ip_addr) = @_;
-    $self->{set_nw_dst_action}->{address} =
+    return $self->{set_nw_dst_action}->{address} =
         (2 == @_) ? $ip_addr : $self->{set_nw_dst_action}->{address};
 }
 

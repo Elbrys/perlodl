@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::PopPBBHeader object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{pop_pbb_action} = {};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 

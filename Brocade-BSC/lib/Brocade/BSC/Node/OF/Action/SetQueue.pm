@@ -40,13 +40,12 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::SetQueue object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{set_queue_action}->{queue} = $params{queue};
     $self->{set_queue_action}->{'queue-id'} = $params{queue_id};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -54,12 +53,12 @@ sub new {
 #             accessors
 sub queue {
     my ($self, $queue) = @_;
-    $self->{set_queue_action}->{queue} =
+    return $self->{set_queue_action}->{queue} =
         (2 == @_) ? $queue : $self->{set_queue_action}->{queue};
 }
 sub queue_id {
     my ($self, $queue_id) = @_;
-    $self->{set_queue_action}->{queue_id} =
+    return $self->{set_queue_action}->{queue_id} =
         (2 == @_) ? $queue_id : $self->{set_queue_action}->{queue_id};
 }
 

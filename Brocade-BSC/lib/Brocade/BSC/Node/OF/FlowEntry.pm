@@ -75,31 +75,31 @@ sub new {
         assert (ref($action_aref) eq "ARRAY");
         foreach my $action (@$action_aref) {
             if (exists $action->{'drop-action'}) {
-                my $new_action = new Brocade::BSC::Node::OF::Action::Drop;
+                my $new_action = Brocade::BSC::Node::OF::Action::Drop->new;
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'output-action'}) {
-                my $new_action = new Brocade::BSC::Node::OF::Action::Output(href => $action->{'output-action'});
+                my $new_action = Brocade::BSC::Node::OF::Action::Output->new(href => $action->{'output-action'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'set-field'}) {
-                my $new_action = new Brocade::BSC::Node::OF::Action::SetField(href => $action->{'set-field'});
+                my $new_action = Brocade::BSC::Node::OF::Action::SetField->new(href => $action->{'set-field'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'push-vlan-action'}) {
-                my $new_action = new Brocade::BSC::Node::OF::Action::PushVlanHeader(href => $action->{'push-vlan-action'});
+                my $new_action = Brocade::BSC::Node::OF::Action::PushVlanHeader->new(href => $action->{'push-vlan-action'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'pop-vlan-action'}) {
-                my $new_action = new Brocade::BSC::Node::OF::Action::PopVlanHeader(href => $action->{'pop-vlan-action'});
+                my $new_action = Brocade::BSC::Node::OF::Action::PopVlanHeader->new(href => $action->{'pop-vlan-action'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'push-mpls-action'}) {
-                my $new_action = new Brocade::BSC::Node::OF::Action::PushMplsHeader(href => $action->{'push-mpls-action'});
+                my $new_action = Brocade::BSC::Node::OF::Action::PushMplsHeader->new(href => $action->{'push-mpls-action'});
                 $self->apply_actions($new_action);
             }
             elsif (exists $action->{'pop-mpls-action'}) {
-                my $new_action = new Brocade::BSC::Node::OF::Action::PopMplsHeader(href => $action->{'pop-mpls-action'});
+                my $new_action = Brocade::BSC::Node::OF::Action::PopMplsHeader->new(href => $action->{'pop-mpls-action'});
                 $self->apply_actions($new_action);
             }
         }
@@ -136,7 +136,7 @@ sub new {
     if ($params{href}) {
         while (my ($key, $value) = each %{$params{href}}) {
             if ($key eq 'instruction') {
-                $self->instruction(new Brocade::BSC::Node::OF::FlowEntry::Instruction(aref => $value))
+                $self->instruction(Brocade::BSC::Node::OF::FlowEntry::Instruction->new(aref => $value))
             }
         }
     }
@@ -152,7 +152,7 @@ sub new {
 sub instruction {
     my ($self, $instruction) = @_;
 
-    defined $self->{instruction} or $self->instruction = new Brocade::BSC::Node::OF::FlowEntry::Instruction;
+    defined $self->{instruction} or $self->instruction = Brocade::BSC::Node::OF::FlowEntry::Instruction->new;
     (2 == @_) and push @{$self->{instruction}}, $instruction;
     return $self->{instruction};
 }
@@ -217,7 +217,7 @@ sub new {
         match => {},
         instructions => undef
     };
-    $self->{instructions} = new Brocade::BSC::Node::OF::FlowEntry::Instructions;
+    $self->{instructions} = Brocade::BSC::Node::OF::FlowEntry::Instructions->new;
     bless ($self, $class);
     # if ($params{json}) {
     #     die "foobar\n";
@@ -226,10 +226,10 @@ sub new {
         while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'match') {
-                $self->add_match(new Brocade::BSC::Node::OF::Match(href => $value));
+                $self->add_match(Brocade::BSC::Node::OF::Match->new(href => $value));
             }
             elsif ($key eq 'instructions') {
-                $self->{instructions} = new Brocade::BSC::Node::OF::FlowEntry::Instructions(href => $value);
+                $self->{instructions} = Brocade::BSC::Node::OF::FlowEntry::Instructions->new(href => $value);
             }
             else {
                 $self->{$key} = $value;
@@ -248,7 +248,7 @@ sub new {
 =cut ===================================================================
 sub as_json {
     my $self = shift;
-    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
     return $json->pretty->encode($self);
 }
 
@@ -279,7 +279,7 @@ sub get_payload {
 # Parameters: none
 # Returns   : FlowEntry as formatted for transmission to controller
 #
-no strict 'refs';  ## no critic
+no strict 'refs';
 sub _as_oxm {
     my $self = shift;
 
@@ -333,7 +333,7 @@ Set or retrieve the FlowEntry table id.
 =cut
 sub table_id {
     my ($self, $table_id) = @_;
-    $self->{table_id} = (2 == @_) ? $table_id : $self->{table_id};
+    return $self->{table_id} = (2 == @_) ? $table_id : $self->{table_id};
 }
 
 =item B<flow_name>
@@ -343,7 +343,7 @@ Set or retrieve the FlowEntry name.
 =cut
 sub flow_name {
     my ($self, $flow_name) = @_;
-    $self->{flow_name} = (2 == @_) ? $flow_name : $self->{flow_name};
+    return $self->{flow_name} = (2 == @_) ? $flow_name : $self->{flow_name};
 }
 
 =item B<id>
@@ -353,7 +353,7 @@ Set or retrieve the FlowEntry ID.
 =cut
 sub id {
     my ($self, $id) = @_;
-    $self->{id} = (2 == @_) ? $id : $self->{id};
+    return $self->{id} = (2 == @_) ? $id : $self->{id};
 }
 
 =item B<install_hw>
@@ -372,7 +372,7 @@ messages beyond the Barrier Request.
 =cut
 sub install_hw {
     my ($self, $install_hw) = @_;
-    $self->{installHw} = (2 == @_) ? $install_hw : $self->{installHw};
+    return $self->{installHw} = (2 == @_) ? $install_hw : $self->{installHw};
 }
 
 =item B<priority>
@@ -382,7 +382,7 @@ Set or retrieve the FlowEntry priority.
 =cut
 sub priority {
     my ($self, $priority) = @_;
-    $self->{priority} = (2 == @_) ? $priority : $self->{priority};
+    return $self->{priority} = (2 == @_) ? $priority : $self->{priority};
 }
 
 =item B<hard_timeout>
@@ -393,7 +393,7 @@ packet (seconds).
 =cut
 sub hard_timeout {
     my ($self, $timeout) = @_;
-    $self->{hard_timeout} = (2 == @_) ? $timeout : $self->{hard_timeout};
+    return $self->{hard_timeout} = (2 == @_) ? $timeout : $self->{hard_timeout};
 }
 
 =item B<idle_timeout>
@@ -404,7 +404,7 @@ packets (seconds).
 =cut
 sub idle_timeout {
     my ($self, $timeout) = @_;
-    $self->{idle_timeout} = (2 == @_) ? $timeout : $self->{idle_timeout};
+    return $self->{idle_timeout} = (2 == @_) ? $timeout : $self->{idle_timeout};
 }
 
 =item B<cookie>
@@ -414,7 +414,7 @@ Set or retrieve the FlowEntry cookie.
 =cut
 sub cookie {
     my ($self, $cookie) = @_;
-    $self->{cookie} = (2 == @_) ? $cookie : $self->{cookie};
+    return $self->{cookie} = (2 == @_) ? $cookie : $self->{cookie};
 }
 
 =item B<cookie_mask>
@@ -424,7 +424,7 @@ Set or retrieve the FlowEntry cookie mask.
 =cut
 sub cookie_mask {
     my ($self, $mask) = @_;
-    $self->{cookie_mask} = (2 == @_) ? $mask : $self->{cookie_mask};
+    return $self->{cookie_mask} = (2 == @_) ? $mask : $self->{cookie_mask};
 }
 
 =item B<strict>
@@ -434,7 +434,7 @@ Set or retrieve the FlowEntry I<strict> flag.
 =cut
 sub strict {
     my ($self, $strict) = @_;
-    $self->{strict} = (2 == @_) ? $strict : $self->{strict};
+    return $self->{strict} = (2 == @_) ? $strict : $self->{strict};
 }
 
 =item B<add_instruction>
@@ -445,7 +445,7 @@ Add a new instruction to the FlowEntry.
 sub add_instruction {
     my ($self, $order) = @_;
 
-    my $instruction = new Brocade::BSC::Node::OF::FlowEntry::Instruction(order => $order);
+    my $instruction = Brocade::BSC::Node::OF::FlowEntry::Instruction->new(order => $order);
     if (not exists ($self->{instructions}->{instruction})) {
         $self->{instructions}->{instruction} = [];
     }
@@ -462,7 +462,7 @@ sub add_match {
     my $self = shift;
     my $match_ref = shift;
 
-    $self->{match} = $match_ref;
+    return $self->{match} = $match_ref;
 }
 
 

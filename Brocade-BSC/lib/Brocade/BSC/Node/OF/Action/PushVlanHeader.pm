@@ -75,27 +75,27 @@ sub _as_oxm {
 #             accessors
 sub eth_type {
     my ($self, $eth_type) = @_;
-    $self->{push_vlan_action}->{ethernet_type} =
+    return $self->{push_vlan_action}->{ethernet_type} =
         (2 == @_) ? $eth_type : $self->{push_vlan_action}->{ethernet_type};
 }
 sub tag {
     my ($self, $tag) = @_;
-    $self->{push_vlan_action}->{tag} =
+    return $self->{push_vlan_action}->{tag} =
         (2 == @_) ? $tag : $self->{push_vlan_action}->{tag};
 }
 sub pcp {
     my ($self, $pcp) = @_;
-    $self->{push_vlan_action}->{pcp} =
+    return $self->{push_vlan_action}->{pcp} =
         (2 == @_) ? $pcp : $self->{push_vlan_action}->{pcp};
 }
 sub cfi {
     my ($self, $cfi) = @_;
-    $self->{push_vlan_action}->{cfi} =
+    return $self->{push_vlan_action}->{cfi} =
         (2 == @_) ? $cfi : $self->{push_vlan_action}->{cfi};
 }
 sub vid {
     my ($self, $vid) = @_;
-    $self->{push_vlan_action}->{vlan_id} =
+    return $self->{push_vlan_action}->{vlan_id} =
         (2 == @_) ? $vid : $self->{push_vlan_action}->{vlan_id};
 }
 

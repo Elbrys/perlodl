@@ -99,8 +99,7 @@ Returns new I<Brocade::BSC> object.
 
 =cut
 sub new {
-    my $class  = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $yamlcfg;
     if ($params{cfgfile} && ( -e $params{cfgfile})) {
@@ -127,7 +126,7 @@ sub new {
     }
     map { $params{$_} && ($self->{$_} = $params{$_}) }
         qw(ipAddr portNum adminName adminPassword timeout);
-    bless ($self, $class);
+    return bless ($self, $class);
 }    
 
 # Method ===============================================================
@@ -139,8 +138,7 @@ sub new {
 # Returns   : HTTP::Response
 #
 sub _http_req {
-    my $self = shift;
-    my ($method, $urlpath, $data, $headerref) = @_;
+    my ($self, $method, $urlpath, $data, $headerref) = @_;
     my %headers = $headerref ? %$headerref : ();
 
     my $url = "http://$$self{ipAddr}:$$self{portNum}$urlpath";
@@ -167,7 +165,7 @@ sub _http_req {
 =cut
 sub as_json {
     my $self = shift;
-    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
     return $json->pretty->encode($self);
 }
 
@@ -182,7 +180,7 @@ sub as_json {
 sub get_nodes_operational_list {
     my $self = shift;
     my @nodeNames = ();
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -219,10 +217,9 @@ sub get_nodes_operational_list {
 
 =cut
 sub get_node_info {
-    my $self = shift;
-    my $node = shift;
+    my ($self, $node) = @_;
     my $node_info = undef;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/$node";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -247,9 +244,8 @@ sub get_node_info {
 
 =cut
 sub check_node_config_status {
-    my $self = shift;
-    my $node = shift;
-    my $status = new Brocade::BSC::Status;
+    my ($self, $node) = @_;
+    my $status = Brocade::BSC::Status->new;
 
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/$node";
     my $resp = $self->_http_req('GET', $urlpath);
@@ -267,9 +263,8 @@ sub check_node_config_status {
 
 =cut
 sub check_node_conn_status {
-    my $self = shift;
-    my $node = shift;
-    my $status = new Brocade::BSC::Status;
+    my ($self, $node) = @_;
+    my $status = Brocade::BSC::Status->new;
     ($status, my $nodeStatus) = $self->get_all_nodes_conn_status();
     if ($status->ok) {
         $status->_code($BSC_NODE_NOT_FOUND);
@@ -295,7 +290,7 @@ sub check_node_conn_status {
 sub get_all_nodes_in_config {
     my $self = shift;
     my @nodeNames = ();
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -341,7 +336,7 @@ sub get_all_nodes_in_config {
 sub get_all_nodes_conn_status {
     my $self = shift;
     my @nodeStatus = ();
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $connected = undef;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";
 
@@ -389,7 +384,7 @@ sub get_netconf_nodes_in_config {
     my @netconf_nodes = undef;
 
     my ($status, $nodelist_ref) = $self->get_all_nodes_in_config();
-    $status->ok and @netconf_nodes = grep !/^openflow:/, @$nodelist_ref;
+    $status->ok and @netconf_nodes = grep { !/^openflow:/ } @$nodelist_ref;
     return ($status, \@netconf_nodes);
 }
 
@@ -423,10 +418,9 @@ sub get_netconf_nodes_conn_status {
 
 =cut
 sub get_schemas {
-    my $self = shift;
-    my $node = shift;
+    my ($self, $node) = @_;
     my $schemas = undef;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/"
         . "$node/yang-ext:mount/ietf-netconf-monitoring:netconf-state/schemas";
 
@@ -458,9 +452,8 @@ sub get_schemas {
 
 =cut
 sub get_schema {
-    my $self = shift;
-    my ($node, $schemaId, $schemaVersion) = @_;
-    my $status = new Brocade::BSC::Status;
+    my ($self, $node, $schemaId, $schemaVersion) = @_;
+    my $status = Brocade::BSC::Status->new;
     my $schema = undef;
 
     my $urlpath = "/restconf/operations/opendaylight-inventory:nodes"
@@ -472,7 +465,7 @@ sub get_schema {
 
     my $resp = $self->_http_req('POST', $urlpath, $payload, \%headers);
     if ($resp->code == HTTP_OK) {
-        my $xmltree_ref = new XML::Parser(Style => 'Tree')->parse($resp->content);
+        my $xmltree_ref = XML::Parser->new(Style => 'Tree')->parse($resp->content);
         assert   ($xmltree_ref->[0]          eq 'get-schema');
         assert   ($xmltree_ref->[1][1]       eq 'output');
         assert   ($xmltree_ref->[1][2][1]    eq 'data');
@@ -496,10 +489,9 @@ sub get_schema {
 
 =cut
 sub get_netconf_operations {
-    my $self = shift;
-    my $node = shift;
+    my ($self, $node) = @_;
     my $operations = undef;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/operations/opendaylight-inventory:nodes/node/$node/yang-ext:mount/";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -529,7 +521,7 @@ sub get_netconf_operations {
 sub get_all_modules_operational_state {
     my $self = shift;
     my $modules = undef;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
     
     my $resp = $self->_http_req('GET', $urlpath);
@@ -562,10 +554,9 @@ sub get_all_modules_operational_state {
 
 =cut
 sub get_module_operational_state {
-    my $self = shift;
-    my ($moduleType, $moduleName) = @_;
+    my ($self, $moduleType, $moduleName) = @_;
     my $module = undef;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules/module/$moduleType/$moduleName";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -594,10 +585,9 @@ sub get_module_operational_state {
 
 =cut
 sub get_sessions_info {
-    my $self = shift;
-    my $node = shift;
+    my ($self, $node) = @_;
     my $sessions = undef;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes/node/$node/yang-ext:mount/ietf-netconf-monitoring:netconf-state/sessions";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -628,7 +618,7 @@ sub get_sessions_info {
 sub get_streams_info {
     my $self = shift;
     my $streams = undef;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/streams";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -659,7 +649,7 @@ sub get_streams_info {
 sub get_service_providers_info {
     my $self = shift;
     my $service = undef;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:services";
 
     my $resp = $self->_http_req('GET', $urlpath);
@@ -688,10 +678,9 @@ sub get_service_providers_info {
 
 =cut
 sub get_service_provider_info {
-    my $self = shift;
-    my $name = shift;
+    my ($self, $name) = @_;
     my $service = undef;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node"
         . "/controller-config/yang-ext:mount/config:services/service/$name";
 
@@ -722,9 +711,8 @@ Add a mount point on controller for specified node.
 
 =cut
 sub add_netconf_node {
-    my $self = shift;
-    my $node = shift;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my ($self, $node) = @_;
+    my $status = Brocade::BSC::Status->new($BSC_OK);
 
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
     my %headers = ('content-type' => 'application/xml',
@@ -776,9 +764,8 @@ END_XML
 
 =cut
 sub delete_netconf_node {
-    my $self = shift;
-    my $node = shift;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my ($self, $node) = @_;
+    my $status = Brocade::BSC::Status->new($BSC_OK);
     my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node"
         . "/controller-config/yang-ext:mount/config:modules/module"
         . "/odl-sal-netconf-connector-cfg:sal-netconf-connector/"
@@ -813,8 +800,7 @@ sub delete_netconf_node {
 # Returns   : base restconf URL for configuration of mounted netconf node
 #
 sub _get_ext_mount_config_urlpath {
-    my $self = shift;
-    my $node = shift;
+    my ($self, $node) = @_;
 
     return "/restconf/config/opendaylight-inventory:nodes/node/"
         . "$node/yang-ext:mount/";
@@ -828,8 +814,7 @@ sub _get_ext_mount_config_urlpath {
 # Returns   : base restconf URL for operational status of mounted netconf node
 #
 sub _get_ext_mount_operational_urlpath {
-    my $self = shift;
-    my $node = shift;
+    my ($self, $node) = @_;
 
     return "/restconf/operational/opendaylight-inventory:nodes/node/"
         . "$node/yang-ext:mount/";
@@ -843,8 +828,7 @@ sub _get_ext_mount_operational_urlpath {
 # Returns   : base restconf URL for node, operational status
 #
 sub _get_node_operational_urlpath {
-    my $self = shift;
-    my $node = shift;
+    my ($self, $node) = @_;
 
     return "/restconf/operational/opendaylight-inventory:nodes/node/$node";
 }
@@ -857,8 +841,7 @@ sub _get_node_operational_urlpath {
 # Returns   : base restconf URL for node, configuration
 #
 sub _get_node_config_urlpath {
-    my $self = shift;
-    my $node = shift;
+    my ($self, $node) = @_;
 
     return "/restconf/config/opendaylight-inventory:nodes/node/$node";
 }
@@ -873,7 +856,7 @@ sub _get_node_config_urlpath {
 =cut
 sub get_openflow_nodes_operational_list {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my @nodelist = ();
 
     my $urlpath = "/restconf/operational/opendaylight-inventory:nodes";

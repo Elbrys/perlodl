@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::SetMplsTTL object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{set_mpls_ttl_action}->{'mpls-ttl'} = $params{mpls_ttl};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -53,7 +52,7 @@ sub new {
 #             accessors
 sub mpls_ttl {
     my ($self, $mpls_ttl) = @_;
-    $self->{set_mpls_ttl_action}->{'mpls-ttl'} =
+    return $self->{set_mpls_ttl_action}->{'mpls-ttl'} =
         (2 == @_) ? $mpls_ttl : $self->{set_mpls_ttl_action}->{'mpls-ttl'};
 }
 

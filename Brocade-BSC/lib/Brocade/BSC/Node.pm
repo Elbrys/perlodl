@@ -78,8 +78,7 @@ values from argument hash, if present, or YAML configuration file.
 Returns new I<Brocade::BSC::Node> object.
 =cut
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $yamlcfg;
     if ($params{cfgfile} && ( -e $params{cfgfile})) {
@@ -95,19 +94,19 @@ sub new {
     }
     $params{name} && ($self->{name} = $params{name});
 
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 # Method ===============================================================
 
 =item B<as_json>
 
-  # Returns   : Returns pretty-printed JSON string representing netconf node.
+  # Returns   : Returns pretty-printed JSON string representing node.
 
 =cut
 sub as_json {
     my $self = shift;
-    my $json = new JSON->canonical->allow_blessed->convert_blessed;
+    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
     return $json->pretty->encode($self);
 }
 
@@ -130,6 +129,7 @@ sub _strip_undef {
             }
         }
     }
+    return; # perlcritic
 }
 
 
@@ -142,11 +142,11 @@ sub _strip_undef {
 sub _stripped_json {
     my $self = shift;
 
-    my $json = new JSON->canonical;
+    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
     my $clone = $self->clone();
 
     Data::Walk::walkdepth(\&_strip_undef, $clone);
-    return $json->allow_blessed->convert_blessed->encode($clone);
+    return $json->encode($clone);
 }
 
 
@@ -162,9 +162,9 @@ sub _stripped_json {
 
 =cut
 sub ctrl_req {
-    my $self = shift;
+    my ($self, @http_args) = @_;
 
-    return $self->{ctrl}->_http_req(@_);
+    return $self->{ctrl}->_http_req(@http_args);
 }
 
 # Method ===============================================================

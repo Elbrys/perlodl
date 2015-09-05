@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::SetNwTTL object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{set_nw_ttl_action}->{'nw-ttl'} = $params{ip_ttl};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -53,7 +52,7 @@ sub new {
 #             accessors
 sub ip_ttl {
     my ($self, $nw_ttl) = @_;
-    $self->{set_nw_ttl_action}->{'nw-ttl'} =
+    return $self->{set_nw_ttl_action}->{'nw-ttl'} =
         (2 == @_) ? $ip_ttl : $self->{set_nw_ttl_action}->{'nw-ttl'};
 }
 

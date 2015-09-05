@@ -79,12 +79,12 @@ sub _as_oxm {
 #             accessors
 sub outport {
     my ($self, $port) = @_;
-    $self->{output_action}->{'output_node_connector'} =
+    return $self->{output_action}->{'output_node_connector'} =
         (2 == @_) ? $port : $self->{output_action}->{'output_node_connector'};
 }
 sub max_len {
     my ($self, $max_len) = @_;
-    $self->{output_action}->{'max_length'} =
+    return $self->{output_action}->{'max_length'} =
         (2 == @_) ? $max_len : $self->{output_action}->{'max_length'};
 }
 

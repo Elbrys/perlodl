@@ -71,6 +71,7 @@ sub new {
     my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
+    return $self;
 }
 
 # Method ===============================================================
@@ -83,7 +84,7 @@ sub new {
 =cut ===================================================================
 sub get_switch_info {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my %node_info = ();
 
     my $urlpath = $self->_oper_urlpath;
@@ -112,7 +113,7 @@ sub get_switch_info {
 =cut ===================================================================
 sub get_features_info {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $feature_info_ref = undef;
 
     my $urlpath = $self->_oper_urlpath;
@@ -141,7 +142,7 @@ sub get_features_info {
 =cut ===================================================================
 sub get_ports_list {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my @port_list = ();
 
     my $urlpath = $self->_oper_urlpath;
@@ -166,7 +167,7 @@ sub get_ports_list {
 # sub get_port_brief_info {
 #     my $self = shift;
 #     my $portnum = shift;
-#     my $status = new Brocade::BSC::Status;
+#     my $status = Brocade::BSC::Status->new;
 
 #     die "XXX";
 # }
@@ -182,7 +183,7 @@ sub get_ports_list {
 =cut ===================================================================
 sub get_ports_brief_info {
     my $self = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my @ports_info = ();
 
     my $urlpath = $self->_oper_urlpath;
@@ -223,7 +224,7 @@ sub get_ports_brief_info {
 sub get_port_detail_info {
     my $self = shift;
     my $portnum = shift;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $port_info_ref;
 
     my $urlpath = $self->_oper_urlpath
@@ -256,7 +257,7 @@ sub get_port_detail_info {
 =cut ===================================================================
 sub add_modify_flow {
     my ($self, $flow_entry) = @_;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
 
     if($flow_entry->isa("Brocade::BSC::Node::OF::FlowEntry")) {
         my %headers = ('content-type' => 'application/yang.data+json');
@@ -286,7 +287,7 @@ sub add_modify_flow {
 =cut ===================================================================
 sub delete_flow {
     my ($self, $table_id, $flow_id) = @_;
-    my $status = new Brocade::BSC::Status($BSC_OK);
+    my $status = Brocade::BSC::Status->new($BSC_OK);
 
     my $urlpath = $self->_config_urlpath
         . "/table/$table_id/flow/$flow_id";
@@ -328,7 +329,7 @@ sub delete_flows {
 =cut ===================================================================
 sub get_configured_flow {
     my ($self, $table_id, $flow_id) = @_;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $flow = undef;
 
     my $urlpath = $self->_config_urlpath
@@ -358,7 +359,7 @@ sub get_configured_flow {
 sub _get_flows {
     my ($self, $table_id, $operational) = @_;
     $operational //= 1;
-    my $status = new Brocade::BSC::Status;
+    my $status = Brocade::BSC::Status->new;
     my $flows = undef;
 
     my $urlpath = $operational
@@ -395,7 +396,7 @@ sub _get_FlowEntries {
     my ($status, $flows) = $self->_get_flows($table_id, $operational);
     if ($status->ok) {
         foreach (@$flows) {
-            my $flowentry = new Brocade::BSC::Node::OF::FlowEntry(href => $_);
+            my $flowentry = Brocade::BSC::Node::OF::FlowEntry->new(href => $_);
             push @FlowEntries, $flowentry;
         }
     }
@@ -446,7 +447,7 @@ sub get_configured_FlowEntry {
     if ($status->ok) {
         # XXX sanity check structure/existence
         my $flow = decode_json($flow_json)->{'flow-node-inventory:flow'}[0];
-        $flowentry = new Brocade::BSC::Node::OF::FlowEntry(href => $flow);
+        $flowentry = Brocade::BSC::Node::OF::FlowEntry->new(href => $flow);
     }
     return ($status, $flowentry);
 }

@@ -55,7 +55,7 @@ sub new {
 
     my $self = {};
     $self->{order} = $params{order} ? $params{order} : 0;
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -71,7 +71,7 @@ sub new {
 =cut
 sub order {
     my ($self, $order) = @_;
-    $self->{order} = (@_ == 2) ? $order : $self->{order};
+    return $self->{order} = (@_ == 2) ? $order : $self->{order};
 }
 
 

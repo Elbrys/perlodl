@@ -50,10 +50,10 @@ sub new {
         while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'protocol_match_fields') {
-                $self->{set_field}->{$key} = new Brocade::BSC::Node::OF::Match::ProtocolMatchFields(href => $value);
+                $self->{set_field}->{$key} = Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new(href => $value);
             }
             elsif ($key eq 'vlan_match') {
-                $self->{set_field}->{$key} = new Brocade::BSC::Node::OF::Match::Vlan(href => $value);
+                $self->{set_field}->{$key} = Brocade::BSC::Node::OF::Match::Vlan->new(href => $value);
             }
         }
     }
@@ -85,7 +85,7 @@ sub vlan_id {
     my $match_exists = defined $self->{set_field}->{'vlan_match'};
 
     if (@_ == 2) {
-        $match_exists or $self->{set_field}->{'vlan_match'} = new Brocade::BSC::Node::OF::Match::Vlan;
+        $match_exists or $self->{set_field}->{'vlan_match'} = Brocade::BSC::Node::OF::Match::Vlan->new;
         $self->{set_field}->{'vlan_match'}->vid($vid);
     }
     $match_exists and $value = $self->{set_field}->{'vlan_match'}->vid();
@@ -95,7 +95,7 @@ sub mpls_label {
     my ($self, $mpls_label) = @_;
     my $value = undef;
     defined $self->{set_field}->{'protocol_match_fields'} or
-        $self->{set_field}->{'protocol_match_fields'} = new Brocade::BSC::Node::OF::Match::ProtocolMatchFields;
+        $self->{set_field}->{'protocol_match_fields'} = Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new;
     (2 == @_) and
         $self->{set_field}->{'protocol_match_fields'}->mpls_label($mpls_label);
     return $self->{set_field}->{'protocol_match_fields'}->mpls_label();

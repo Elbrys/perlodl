@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::SetVlanPCP object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{set_vlan_pcp_action}->{'vlan-pcp'} = $params{vlan_pcp};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -53,7 +52,7 @@ sub new {
 #             accessors
 sub vlan_pcp {
     my ($self, $vlan_pcp) = @_;
-    $self->{set_vlan_pcp_action}->{'vlan-pcp'} =
+    return $self->{set_vlan_pcp_action}->{'vlan-pcp'} =
         (2 == @_) ? $vlan_pcp : $self->{set_vlan_pcp_action}->{'vlan-pcp'};
 }
 

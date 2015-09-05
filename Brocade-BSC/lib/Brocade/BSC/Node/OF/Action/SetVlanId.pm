@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::SetVlanId object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{set_vlan_id_action}->{'vlan-id'} = $params{vid};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 
@@ -53,7 +52,7 @@ sub new {
 #             accessors
 sub vid {
     my ($self, $vid) = @_;
-    $self->{set_vlan_id_action}->{'vlan-id'} =
+    return $self->{set_vlan_id_action}->{'vlan-id'} =
         (2 == @_) ? $vid : $self->{set_vlan_id_action}->{'vlan-id'};
 }
 

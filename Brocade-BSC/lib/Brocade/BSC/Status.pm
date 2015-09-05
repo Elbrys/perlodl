@@ -114,14 +114,14 @@ Creates a new I<Brocade::BSC::Status> object.
 # Parameters: may be called with $BSC_XXX constant to initialize code
 #
 sub new {
-    my $class = shift;
+    my ($class, $code) = @_;
     my $self = {
         code      => $BSC_UNKNOWN,
         http_code => 0,
         http_msg  => undef
     };
-    @_ and $self->{code} = $_[0];
-    bless ($self, $class);
+    defined $code and $self->{code} = $code;
+    return bless ($self, $class);
 }
 
 # Method ===============================================================
@@ -198,13 +198,13 @@ sub configured {
 #
 sub _code {
     my ($self, $code) = @_;
-    $self->{code} = (2 == @_) ? $code : $self->{code};
+    return $self->{code} = (2 == @_) ? $code : $self->{code};
 }
 
 # Method ===============================================================
 #             _http_err
 # Parameters: HTTP::Response object
-# Returns   : ignore; updates BVCStatus object with values from http response
+# Returns   : HTTP::Response error code
 #
 sub _http_err {
     my ($self, $http_resp) = @_;
@@ -212,6 +212,7 @@ sub _http_err {
     $self->{code}      = $BSC_HTTP_ERROR;
     $self->{http_code} = $http_resp->code;
     $self->{http_msg}  = $http_resp->message;
+    return $self->{http_code};
 }
 
 # Method ===============================================================
@@ -228,9 +229,10 @@ sub msg {
     if ($self->{http_code} and defined $self->{http_msg}) {
         $http_err = " $self->{http_code} - '$self->{http_msg}'";
     }
-    ($self->{code} >= $BSC_FIRST and $self->{code} <= $BSC_LAST)
-        and return $errmsg[$self->{code}] . $http_err
-        or  return "Undefined status code $self->{code}";
+    my $msg = ($self->{code} >= $BSC_FIRST and $self->{code} <= $BSC_LAST) ?
+        $errmsg[$self->{code}] . $http_err                                 :
+        "Undefined status code $self->{code}";
+    return $msg;
 }
 
 

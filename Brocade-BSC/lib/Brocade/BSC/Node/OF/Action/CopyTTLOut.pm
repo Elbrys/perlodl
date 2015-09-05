@@ -40,12 +40,11 @@ use warnings;
 # Returns   : Brocade::BSC::Node::OF::Action::CopyTTLOut object
 # 
 sub new {
-    my $class = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     my $self = $class->SUPER::new(%params);
     $self->{copy_ttl_out} = {};
-    bless ($self, $class);
+    return bless ($self, $class);
 }
 
 

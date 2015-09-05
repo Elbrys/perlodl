@@ -131,7 +131,7 @@ sub vid {
 }
 sub pcp {
     my ($self, $pcp) = @_;
-    $self->{vlan_pcp} = (2 == @_) ? $pcp : $self->{vlan_pcp};
+    return $self->{vlan_pcp} = (2 == @_) ? $pcp : $self->{vlan_pcp};
 }
 
 
@@ -162,11 +162,11 @@ sub new {
 #             accessors
 sub type {
     my ($self, $icmp_type) = @_;
-    $self->{icmpv4_type} = (2 == @_) ? $icmp_type : $self->{icmpv4_type};
+    return $self->{icmpv4_type} = (2 == @_) ? $icmp_type : $self->{icmpv4_type};
 }
 sub code {
     my ($self, $icmp_code) = @_;
-    $self->{icmpv4_code} = (2 == @_) ? $icmp_code : $self->{icmpv4_code};
+    return $self->{icmpv4_code} = (2 == @_) ? $icmp_code : $self->{icmpv4_code};
 }
 
 
@@ -197,11 +197,11 @@ sub new {
 #             accessors
 sub type {
     my ($self, $icmp6_type) = @_;
-    $self->{icmpv6_type} = (2 == @_) ? $icmp6_type : $self->{icmpv6_type};
+    return $self->{icmpv6_type} = (2 == @_) ? $icmp6_type : $self->{icmpv6_type};
 }
 sub code {
     my ($self, $icmp6_code) = @_;
-    $self->{icmpv6_code} = (2 == @_) ? $icmp6_code : $self->{icmpv6_code};
+    return $self->{icmpv6_code} = (2 == @_) ? $icmp6_code : $self->{icmpv6_code};
 }
 
 
@@ -233,15 +233,15 @@ sub new {
 #             accessors
 sub dscp {
     my ($self, $dscp) = @_;
-    $self->{ip_dscp} = (2 == @_) ? $dscp : $self->{ip_dscp};
+    return $self->{ip_dscp} = (2 == @_) ? $dscp : $self->{ip_dscp};
 }
 sub ecn {
     my ($self, $ecn) = @_;
-    $self->{ip_ecn} = (2 == @_) ? $ecn : $self->{ip_ecn};
+    return $self->{ip_ecn} = (2 == @_) ? $ecn : $self->{ip_ecn};
 }
 sub proto {
     my ($self, $proto) = @_;
-    $self->{ip_protocol} = (2 == @_) ? $proto : $self->{ip_protocol};
+    return $self->{ip_protocol} = (2 == @_) ? $proto : $self->{ip_protocol};
 }
 
 
@@ -272,11 +272,11 @@ sub new {
 #             accessors
 sub flabel {
     my ($self, $flabel) = @_;
-    $self->{ipv6_flabel} = (2 == @_) ? $flabel : $self->{ipv6_flabel};
+    return $self->{ipv6_flabel} = (2 == @_) ? $flabel : $self->{ipv6_flabel};
 }
 sub flabel_mask {
     my ($self, $mask) = @_;
-    $self->{flabel_mask} = (2 == @_) ? $mask : $self->{flabel_mask};
+    return $self->{flabel_mask} = (2 == @_) ? $mask : $self->{flabel_mask};
 }
 
 
@@ -307,11 +307,11 @@ sub new {
 #             accessors
 sub exthdr {
     my ($self, $exthdr) = @_;
-    $self->{ipv6_exthdr} = (2 == @_) ? $exthdr : $self->{ipv6_exthdr};
+    return $self->{ipv6_exthdr} = (2 == @_) ? $exthdr : $self->{ipv6_exthdr};
 }
 sub exthdr_mask {
     my ($self, $mask) = @_;
-    $self->{exthdr_mask} = (2 == @_) ? $mask : $self->{exthdr_mask};
+    return $self->{exthdr_mask} = (2 == @_) ? $mask : $self->{exthdr_mask};
 }
 
 
@@ -342,11 +342,11 @@ sub new {
 #             accessors
 sub isid {
     my ($self, $isid) = @_;
-    $self->{pbb_isid} = (2 == @_) ? $isid : $self->{pbb_isid};
+    return $self->{pbb_isid} = (2 == @_) ? $isid : $self->{pbb_isid};
 }
 sub mask {
     my ($self, $mask) = @_;
-    $self->{pbb_mask} = (2 == @_) ? $mask : $self->{pbb_mask};
+    return $self->{pbb_mask} = (2 == @_) ? $mask : $self->{pbb_mask};
 }
 
 
@@ -379,15 +379,15 @@ sub new {
 #             accessors
 sub mpls_label {
     my ($self, $mpls_label) = @_;
-    $self->{mpls_label} = (2 == @_) ? $mpls_label : $self->{mpls_label};
+    return $self->{mpls_label} = (2 == @_) ? $mpls_label : $self->{mpls_label};
 }
 sub mpls_tc {
     my ($self, $mpls_tc) = @_;
-    $self->{mpls_tc} = (2 == @_) ? $mpls_tc : $self->{mpls_tc};
+    return $self->{mpls_tc} = (2 == @_) ? $mpls_tc : $self->{mpls_tc};
 }
 sub mpls_bos {
     my ($self, $mpls_bos) = @_;
-    $self->{mpls_bos} = (2 == @_) ? $mpls_bos : $self->{mpls_bos};
+    return $self->{mpls_bos} = (2 == @_) ? $mpls_bos : $self->{mpls_bos};
 }
 
 
@@ -418,11 +418,11 @@ sub new {
 #             accessors
 sub metadata {
     my ($self, $metadata) = @_;
-    $self->{metadata} = (2 == @_) ? $metadata : $self->{metadata};
+    return $self->{metadata} = (2 == @_) ? $metadata : $self->{metadata};
 }
 sub metadata_mask {
     my ($self, $mask) = @_;
-    $self->{metadata_mask} = (2 == @_) ? $mask : $self->{metadata_mask};
+    return $self->{metadata_mask} = (2 == @_) ? $mask : $self->{metadata_mask};
 }
 
 
@@ -489,22 +489,22 @@ sub new {
         while (my ($key, $value) = each %{$params{href}}) {
             $key =~ s/-/_/g;
             if ($key eq 'ethernet_match') {
-                $self->{$key} = new Brocade::BSC::Node::OF::Match::Ethernet(href => $value);
+                $self->{$key} = Brocade::BSC::Node::OF::Match::Ethernet->new(href => $value);
             }
             elsif ($key eq 'ip_match') {
-                $self->{$key} = new Brocade::BSC::Node::OF::Match::Ip(href => $value);
+                $self->{$key} = Brocade::BSC::Node::OF::Match::Ip->new(href => $value);
             }
             elsif ($key eq 'protocol_match_fields') {
-                $self->{$key} = new Brocade::BSC::Node::OF::Match::ProtocolMatchFields(href => $value);
+                $self->{$key} = Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new(href => $value);
             }
             elsif ($key eq 'icmpv4_match') {
-                $self->{$key} = new Brocade::BSC::Node::OF::Match::Icmp(href => $value);
+                $self->{$key} = Brocade::BSC::Node::OF::Match::Icmp->new(href => $value);
             }
             elsif ($key eq 'icmpv6_match') {
-                $self->{$key} = new Brocade::BSC::Node::OF::Match::IcmpV6(href => $value);
+                $self->{$key} = Brocade::BSC::Node::OF::Match::IcmpV6->new(href => $value);
             }
             elsif ($key eq 'vlan_match') {
-                $self->{$key} = new Brocade::BSC::Node::OF::Match::Vlan(href => $value);
+                $self->{$key} = Brocade::BSC::Node::OF::Match::Vlan->new(href => $value);
             }
             else {
                 $self->{$key} = $value;
@@ -520,7 +520,7 @@ sub new {
 # Parameters: none
 # Returns   : FlowEntry formatted as Node::OF eXtensible Match
 #
-no strict 'refs';   ## no critic
+no strict 'refs';
 sub _as_oxm {
     my $self = shift;
 
@@ -589,7 +589,7 @@ sub eth_type {
     my $match_exists = defined $self->{ethernet_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{ethernet_match} = new Brocade::BSC::Node::OF::Match::Ethernet;
+        $match_exists or $self->{ethernet_match} = Brocade::BSC::Node::OF::Match::Ethernet->new;
         $self->{ethernet_match}->type($eth_type);
     }
     $match_exists and $value = $self->{ethernet_match}->type();
@@ -607,7 +607,7 @@ sub eth_src {
     my $match_exists = defined $self->{ethernet_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{ethernet_match} = new Brocade::BSC::Node::OF::Match::Ethernet;
+        $match_exists or $self->{ethernet_match} = Brocade::BSC::Node::OF::Match::Ethernet->new;
         $self->{ethernet_match}->src($eth_src);
     }
     $match_exists and $value = $self->{ethernet_match}->src();
@@ -625,7 +625,7 @@ sub eth_dst {
     my $match_exists = defined $self->{ethernet_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{ethernet_match} = new Brocade::BSC::Node::OF::Match::Ethernet;
+        $match_exists or $self->{ethernet_match} = Brocade::BSC::Node::OF::Match::Ethernet->new;
         $self->{ethernet_match}->dst($eth_dst);
     }
     $match_exists and $value = $self->{ethernet_match}->dst();
@@ -643,7 +643,7 @@ sub vlan_id {
     my $match_exists = defined $self->{vlan_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{vlan_match} = new Brocade::BSC::Node::OF::Match::Vlan;
+        $match_exists or $self->{vlan_match} = Brocade::BSC::Node::OF::Match::Vlan->new;
         $self->{vlan_match}->vid($vid);
     }
     $match_exists and $value = $self->{vlan_match}->vid();
@@ -661,7 +661,7 @@ sub vlan_pcp {
     my $match_exists = defined $self->{vlan_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{vlan_match} = new Brocade::BSC::Node::OF::Match::Vlan;
+        $match_exists or $self->{vlan_match} = Brocade::BSC::Node::OF::Match::Vlan->new;
         $self->{vlan_match}->pcp($pcp);
     }
     $match_exists and $value = $self->{vlan_match}->pcp();
@@ -675,7 +675,7 @@ Set or retrieve the FlowEntry IPv4 source address match field.
 =cut
 sub ipv4_src {
     my ($self, $ipv4_src) = @_;
-    $self->{ipv4_source} = (@_ == 2) ? $ipv4_src : $self->{ipv4_source};
+    return $self->{ipv4_source} = (@_ == 2) ? $ipv4_src : $self->{ipv4_source};
 }
 
 =item B<ipv4_dst>
@@ -685,7 +685,7 @@ Set or retrieve the FlowEntry IPv4 destination address match field.
 =cut
 sub ipv4_dst {
     my ($self, $ipv4_dst) = @_;
-    $self->{ipv4_destination}
+    return $self->{ipv4_destination}
         = (@_ == 2) ? $ipv4_dst : $self->{ipv4_destination};
 }
 
@@ -696,7 +696,7 @@ Set or retrieve the FlowEntry IPv6 source address match field.
 =cut
 sub ipv6_src {
     my ($self, $ipv6_src) = @_;
-    $self->{ipv6_source} = (@_ == 2) ? $ipv6_src : $self->{ipv6_source};
+    return $self->{ipv6_source} = (@_ == 2) ? $ipv6_src : $self->{ipv6_source};
 }
 
 =item B<ipv6_dst>
@@ -706,7 +706,7 @@ Set or retrieve the FlowEntry IPv6 destination address match field.
 =cut
 sub ipv6_dst {
     my ($self, $ipv6_dst) = @_;
-    $self->{ipv6_destination}
+    return $self->{ipv6_destination}
         = (@_ == 2) ? $ipv6_dst : $self->{ipv6_destination};
 }
 
@@ -721,7 +721,7 @@ sub ipv6_flabel {
     my $match_exists = defined $self->{ipv6_label};
 
     if (@_ == 2) {
-        $match_exists or $self->{ipv6_label} = new Brocade::BSC::Node::OF::Match::IPv6Label;
+        $match_exists or $self->{ipv6_label} = Brocade::BSC::Node::OF::Match::IPv6Label->new;
         $self->{ipv6_label}->flabel($ipv6_label);
     }
     $match_exists and $value = $self->{ipv6_label}->flabel();
@@ -739,7 +739,7 @@ sub ipv6_ext_header {
     my $match_exists = defined $self->{ipv6_ext_header};
 
     if (@_ == 2) {
-        $match_exists or $self->{ipv6_ext_header} = new Brocade::BSC::Node::OF::Match::IPv6ExtHdr;
+        $match_exists or $self->{ipv6_ext_header} = Brocade::BSC::Node::OF::Match::IPv6ExtHdr->new;
         $self->{ipv6_ext_header}->exthdr($ipv6_ext_header);
     }
     $match_exists and $value = $self->{ipv6_ext_header}->exthdr();
@@ -757,7 +757,7 @@ sub ip_dscp {
     my $match_exists = defined $self->{ip_match};
 
     if (@_== 2) {
-        $match_exists or $self->{ip_match} = new Brocade::BSC::Node::OF::Match::Ip;
+        $match_exists or $self->{ip_match} = Brocade::BSC::Node::OF::Match::Ip->new;
         $self->{ip_match}->dscp($dscp);
     }
     $match_exists and $value = $self->{ip_match}->dscp();
@@ -775,7 +775,7 @@ sub ip_ecn {
     my $match_exists = defined $self->{ip_match};
 
     if (@_== 2) {
-        $match_exists or $self->{ip_match} = new Brocade::BSC::Node::OF::Match::Ip;
+        $match_exists or $self->{ip_match} = Brocade::BSC::Node::OF::Match::Ip->new;
         $self->{ip_match}->ecn($ecn);
     }
     $match_exists and $value = $self->{ip_match}->ecn();
@@ -793,7 +793,7 @@ sub ip_proto {
     my $match_exists = defined $self->{ip_match};
 
     if (@_== 2) {
-        $match_exists or $self->{ip_match} = new Brocade::BSC::Node::OF::Match::Ip;
+        $match_exists or $self->{ip_match} = Brocade::BSC::Node::OF::Match::Ip->new;
         $self->{ip_match}->proto($proto);
     }
     $match_exists and $value = $self->{ip_match}->proto();
@@ -810,7 +810,7 @@ Set or retrieve the FlowEntry UDP source port match field.
 =cut
 sub udp_src_port {
     my ($self, $udp_src_port) = @_;
-    $self->{udp_source_port}
+    return $self->{udp_source_port}
         = (@_ == 2) ? $udp_src_port : $self->{udp_source_port};
 }
 
@@ -821,7 +821,7 @@ Set or retrieve the FlowEntry UDP destination port match field.
 =cut
 sub udp_dst_port {
     my ($self, $udp_dst_port) = @_;
-    $self->{udp_destination_port}
+    return $self->{udp_destination_port}
         = (@_ == 2) ? $udp_dst_port : $self->{udp_destination_port};
 }
 
@@ -832,7 +832,7 @@ Set or retrieve the FlowEntry TCP source port match field.
 =cut
 sub tcp_src_port {
     my ($self, $tcp_src_port) = @_;
-    $self->{tcp_source_port}
+    return $self->{tcp_source_port}
         = (@_ == 2) ? $tcp_src_port : $self->{tcp_source_port};
 }
 
@@ -843,7 +843,7 @@ Set or retrieve the FlowEntry TCP destination port match field.
 =cut
 sub tcp_dst_port {
     my ($self, $tcp_dst_port) = @_;
-    $self->{tcp_destination_port}
+    return $self->{tcp_destination_port}
         = (@_ == 2) ? $tcp_dst_port : $self->{tcp_destination_port};
 }
 
@@ -854,7 +854,7 @@ Set or retrieve the FlowEntry SCTP source port match field.
 =cut
 sub sctp_src_port {
     my ($self, $sctp_src_port) = @_;
-    $self->{sctp_source_port}
+    return $self->{sctp_source_port}
         = (@_ == 2) ? $sctp_src_port : $self->{sctp_source_port};
 }
 
@@ -865,7 +865,7 @@ Set or retrieve the FlowEntry SCTP destination port match field.
 =cut
 sub sctp_dst_port {
     my ($self, $sctp_dst_port) = @_;
-    $self->{sctp_destination_port}
+    return $self->{sctp_destination_port}
         = (@_ == 2) ? $sctp_dst_port : $self->{sctp_destination_port};
 }
 
@@ -880,7 +880,7 @@ sub icmpv4_type {
     my $match_exists = defined $self->{icmpv4_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv4_match} = new Brocade::BSC::Node::OF::Match::Icmp;
+        $match_exists or $self->{icmpv4_match} = Brocade::BSC::Node::OF::Match::Icmp->new;
         $self->{icmpv4_match}->type($icmpv4_type);
     }
     $match_exists and $value = $self->{icmpv4_match}->type();
@@ -898,7 +898,7 @@ sub icmpv4_code {
     my $match_exists = defined $self->{icmpv4_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv4_match} = new Brocade::BSC::Node::OF::Match::Icmp;
+        $match_exists or $self->{icmpv4_match} = Brocade::BSC::Node::OF::Match::Icmp->new;
         $self->{icmpv4_match}->code($icmpv4_code);
     }
     $match_exists and $value = $self->{icmpv4_match}->code();
@@ -916,7 +916,7 @@ sub icmpv6_type {
     my $match_exists = defined $self->{icmpv6_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv6_match} = new Brocade::BSC::Node::OF::Match::IcmpV6;
+        $match_exists or $self->{icmpv6_match} = Brocade::BSC::Node::OF::Match::IcmpV6->new;
         $self->{icmpv6_match}->type($icmpv6_type);
     }
     $match_exists and $value = $self->{icmpv6_match}->type();
@@ -934,7 +934,7 @@ sub icmpv6_code {
     my $match_exists = defined $self->{icmpv6_match};
 
     if (@_ == 2) {
-        $match_exists or $self->{icmpv6_match} = new Brocade::BSC::Node::OF::Match::IcmpV6;
+        $match_exists or $self->{icmpv6_match} = Brocade::BSC::Node::OF::Match::IcmpV6->new;
         $self->{icmpv6_match}->code($icmpv6_code);
     }
     $match_exists and $value = $self->{icmpv6_match}->code();
@@ -948,7 +948,7 @@ Set or retrieve the FlowEntry port match field.
 =cut
 sub in_port {
     my ($self, $in_port) = @_;
-    $self->{in_port} = (@_ == 2) ? $in_port : $self->{in_port};
+    return $self->{in_port} = (@_ == 2) ? $in_port : $self->{in_port};
 }
 
 =item B<in_phy_port>
@@ -958,7 +958,7 @@ Set or retrieve the FlowEntry physical port match field.
 =cut
 sub in_phy_port {
     my ($self, $in_phy_port) = @_;
-    $self->{in_phy_port} = (@_ == 2) ? $in_phy_port : $self->{in_phy_port};
+    return $self->{in_phy_port} = (@_ == 2) ? $in_phy_port : $self->{in_phy_port};
 }
 
 =item B<arp_opcode>
@@ -968,7 +968,7 @@ Set or retrieve the FlowEntry ARP code match field.
 =cut
 sub arp_opcode {
     my ($self, $arp_opcode) = @_;
-    $self->{arp_op} = (@_ == 2) ? $arp_opcode : $self->{arp_op};
+    return $self->{arp_op} = (@_ == 2) ? $arp_opcode : $self->{arp_op};
 }
 
 =item B<arp_src_transport_address>
@@ -978,7 +978,7 @@ Set or retrieve the FlowEntry ARP source transport address match field.
 =cut
 sub arp_src_transport_address {
     my ($self, $arp_src_transport_address) = @_;
-    $self->{arp_source_transport_address}
+    return $self->{arp_source_transport_address}
         = (@_ == 2) ? $arp_src_transport_address
                     : $self->{arp_source_transport_address};
 }
@@ -990,7 +990,7 @@ Set or retrieve the FlowEntry ARP target transport address match field.
 =cut
 sub arp_tgt_transport_address {
     my ($self, $arp_tgt_transport_address) = @_;
-    $self->{arp_target_transport_address}
+    return $self->{arp_target_transport_address}
         = (@_ == 2) ? $arp_tgt_transport_address
                     : $self->{arp_target_transport_address};
 }
@@ -1039,7 +1039,7 @@ sub mpls_label {
 
     if (@_ == 2) {
         $match_exists or
-            $self->{protocol_match_fields} = new Brocade::BSC::Node::OF::Match::ProtocolMatchFields;
+            $self->{protocol_match_fields} = Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new;
         $self->{protocol_match_fields}->mpls_label($mpls_label);
     }
     $match_exists and $value = $self->{protocol_match_fields}->mpls_label();
@@ -1058,7 +1058,7 @@ sub mpls_tc {
 
     if (@_ == 2) {
         $match_exists or
-            $self->{protocol_match_fields} = new Brocade::BSC::Node::OF::Match::ProtocolMatchFields;
+            $self->{protocol_match_fields} = Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new;
         $self->{protocol_match_fields}->mpls_tc($mpls_tc);
     }
     $match_exists and $value = $self->{protocol_match_fields}->mpls_tc();
@@ -1077,7 +1077,7 @@ sub mpls_bos {
 
     if (@_ == 2) {
         $match_exists or
-            $self->{protocol_match_fields} = new Brocade::BSC::Node::OF::Match::ProtocolMatchFields;
+            $self->{protocol_match_fields} = Brocade::BSC::Node::OF::Match::ProtocolMatchFields->new;
         $self->{protocol_match_fields}->mpls_bos($mpls_bos);
     }
     $match_exists and $value = $self->{protocol_match_fields}->mpls_bos();
@@ -1109,7 +1109,7 @@ sub metadata {
     my $match_exists = defined $self->{metadata};
 
     if (@_ == 2) {
-        $match_exists or $self->{metadata} = new Brocade::BSC::Node::OF::Match::Metadata;
+        $match_exists or $self->{metadata} = Brocade::BSC::Node::OF::Match::Metadata->new;
         $self->{metadata}->metadata($metadata);
     }
     $match_exists and $self->{metadata}->metadata();
@@ -1127,7 +1127,7 @@ sub metadata_mask {
     my $match_exists = defined $self->{metadata};
 
     if (@_ == 2) {
-        $match_exists or $self->{metadata} = new Brocade::BSC::Node::OF::Match::Metadata;
+        $match_exists or $self->{metadata} = Brocade::BSC::Node::OF::Match::Metadata->new;
         $self->{metadata}->metadata_mask($mask);
     }
     $match_exists and $self->{metadata}->metadata_mask();
