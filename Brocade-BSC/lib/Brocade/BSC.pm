@@ -64,8 +64,6 @@ use JSON -convert_blessed_universally;
 use XML::Parser;
 use Carp::Assert;
 
-require Test::Perl::Critic;
-
 =head1 METHODS
 
 =cut
