@@ -5,6 +5,8 @@ perl:
   - "5.14"
   - "5.10"
 before_install:
+  - cpanm --installdeps Test::Perl::Critic
   - cd Brocade-BSC
 script:
   - perl Makefile.PL && make test && prove -l xt
+  - find /home/travis/perl5 -name Critic\*
