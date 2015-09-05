@@ -11,3 +11,4 @@ before_install:
   - cd Brocade-BSC
 script:
   - perl Makefile.PL && make test && prove -l xt
+  - find /home/travis -type d -name Critic
