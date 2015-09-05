@@ -11,4 +11,7 @@ allow = refs
 severity = stern
 perltidyrc = xt/perltidyrc
 
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
 [-Modules::ProhibitMultiplePackages]
