@@ -49,8 +49,8 @@ my $ethtype         = $ETH_TYPE_ARP;
 my $eth_src         = "00:ab:fe:01:03:31";
 my $eth_dst         = "ff:ff:ff:ff:ff:ff";
 my $arp_opcode      = $ARP_REQUEST;
-my $arp_src_ipv4    = "192.168.4.1";
-my $arp_tgt_ipv4    = "10.21.22.23";
+my $arp_src_ipv4    = "192.168.4.1/32";
+my $arp_tgt_ipv4    = "10.21.22.23/32";
 my $arp_src_hw_addr = "12:34:56:78:98:ab";
 my $arp_tgt_hw_addr = "fe:dc:ba:98:76:54";
 

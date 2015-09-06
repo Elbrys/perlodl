@@ -400,7 +400,10 @@ messages beyond the Barrier Request.
 
 sub install_hw {
     my ($self, $install_hw) = @_;
-    return $self->{installHw} = (2 == @_) ? $install_hw : $self->{installHw};
+    if (2 == @_) {
+        $self->{installHw} = $install_hw ? JSON::true : JSON::false;
+    }
+    return $self->{installHw};
 }
 
 =item B<priority>
@@ -470,7 +473,10 @@ Set or retrieve the FlowEntry I<strict> flag.
 
 sub strict {
     my ($self, $strict) = @_;
-    return $self->{strict} = (2 == @_) ? $strict : $self->{strict};
+    if (2 == @_) {
+        $self->{strict} = $strict ? JSON::true : JSON::false;
+    }
+    return $self->{strict};
 }
 
 =item B<add_instruction>

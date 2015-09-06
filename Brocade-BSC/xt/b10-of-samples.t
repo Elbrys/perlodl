@@ -63,8 +63,6 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
 local $ENV{PERL5LIB} = "$ENV{PWD}/lib";
 
 foreach my $demo (@demos) {
-    $demo =~ /12/ && $Test->skip('TODO: fix demo12') && next;
-    $demo =~ /21/ && $Test->skip('TODO: fix demo21') && next;
     # untaint *cough*
     $demo =~ m[(../samples/openflow/demos/demo\d+.pl$)]g && ($demo = $1);
     my $ok = (0 == system ("$demo -c xt/of.yml"));
