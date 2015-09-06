@@ -16,11 +16,6 @@ if ($EVAL_ERROR) {
     $Test->plan(skip_all => $msg);
 }
 
-if ($^V lt 'v5.20.0') {
-    $Test->plan(
-        skip_all => 'perlcritic only run on most recent perl in matrix');
-}
-
 my @files = _perl_files();
 $Test->plan(tests => scalar @files);
 

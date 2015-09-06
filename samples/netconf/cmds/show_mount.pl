@@ -58,7 +58,7 @@ print "<<< NETCONF nodes connection status on controller:\n\n";
 ($status, $nodes_ref) = $bsc->get_netconf_nodes_conn_status();
 $status->ok or die "Error: ${\$status->msg}\n";
 
-foreach my $node(@$nodes_ref) {
+foreach my $node (@$nodes_ref) {
     my $connstatus = $node->{connected} ? "connected" : "not connected";
     print "    '$node->{id}' is $connstatus\n";
 }
