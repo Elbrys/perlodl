@@ -50,6 +50,13 @@ my @demos   = _ctrl_demos();
 ### ctrlPortNum: "8181"
 ### ctrlUname: 'admin'
 ### ctrlPswd:  'admin'
+###
+### # Node specification
+### nodeName: "lwp-vr-5600"
+### nodeIpAddr: "172.22.17.71"
+### nodePortNum: 830
+### nodeUname: "vyatta"
+### nodePswd: "vyatta"
 
 -f $cfgfile or plan skip_all => "create $cfgfile to run ctrl_demo tests";
 
@@ -60,9 +67,7 @@ delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
 local $ENV{PERL5LIB} = "$ENV{PWD}/lib";
 
 foreach my $demo (@demos) {
-    $demo =~ /[279]/       && $Test->skip('TODO: fix ctrl_demo2/7/9') && next;
-    $demo =~ /ctrl_demo10/ && $Test->skip('TODO: fix ctrl_demo10')    && next;
-    $demo =~ /ctrl_demo11/ && $Test->skip('TODO: fix ctrl_demo11')    && next;
+    $demo =~ /ctrl_demo10/ && $Test->skip('TODO: fix ctrl_demo10') && next;
     # untaint *cough*
     $demo =~ m[(../samples/netconf/demos/ctrl_demo\d+.pl$)]g && ($demo = $1);
     my $ok = (0 == system ("$demo -c $cfgfile"));

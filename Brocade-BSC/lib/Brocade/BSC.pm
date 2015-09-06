@@ -492,11 +492,10 @@ sub get_schema {
     if ($resp->code == HTTP_OK) {
         my $xmltree_ref =
           XML::Parser->new(Style => 'Tree')->parse($resp->content);
-        assert($xmltree_ref->[0] eq 'get-schema');
-        assert($xmltree_ref->[1][1] eq 'output');
-        assert($xmltree_ref->[1][2][1] eq 'data');
-        assert($xmltree_ref->[1][2][2][1] == 0);
-        $schema = $xmltree_ref->[1][2][2][2];
+        assert($xmltree_ref->[0] eq 'output');
+        assert($xmltree_ref->[1][1] eq 'data');
+        assert($xmltree_ref->[1][2][1] == 0);
+        $schema = $xmltree_ref->[1][2][2];
         $status->_code($BSC_OK);
     }
     else {
@@ -753,43 +752,48 @@ sub add_netconf_node {
     my ($self, $node) = @_;
     my $status = Brocade::BSC::Status->new($BSC_OK);
 
-    my $urlpath =
-"/restconf/config/opendaylight-inventory:nodes/node/controller-config/yang-ext:mount/config:modules";
+    my $urlpath = "/restconf/config/opendaylight-inventory:nodes/node/"
+      . "controller-config/yang-ext:mount/config:modules";
     my %headers = (
         'content-type' => 'application/xml',
         'accept'       => 'application/xml'
     );
+    my $ns         = "urn:opendaylight:params:xml:ns:yang:controller";
+    my $nc         = "md:sal:connector:netconf";
+    my $tcpOnly    = $node->{tcpOnly} ? 'true' : 'false';
     my $xmlPayload = <<END_XML;
-        <module xmlns="urn:opendaylight:params:xml:ns:yang:controller:config">
-          <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">prefix:sal-netconf-connector</type>
+        <module xmlns="$ns:config">
+          <type xmlns:prefix="$ns:$nc">prefix:sal-netconf-connector</type>
           <name>$node->{name}</name>
-          <address xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{ipAddr}</address>
-          <port xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{portNum}</port>
-          <username xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{adminName}</username>
-          <password xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{adminPassword}</password>
-          <tcp-only xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">$node->{tcpOnly}</tcp-only>
-          <event-executor xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:netty">prefix:netty-event-executor</type>
+          <address xmlns="$ns:$nc">$node->{ipAddr}</address>
+          <port xmlns="$ns:$nc">$node->{portNum}</port>
+          <username xmlns="$ns:$nc">$node->{adminName}</username>
+          <password xmlns="$ns:$nc">$node->{adminPassword}</password>
+          <tcp-only xmlns="$ns:$nc">$tcpOnly</tcp-only>
+          <event-executor xmlns="$ns:$nc">
+            <type xmlns:prefix="$ns:netty">prefix:netty-event-executor</type>
             <name>global-event-executor</name>
           </event-executor>
-          <binding-registry xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:binding">prefix:binding-broker-osgi-registry</type>
+          <binding-registry xmlns="$ns:$nc">
+            <type xmlns:prefix="$ns:md:sal:binding">prefix:binding-broker-osgi-registry</type>
             <name>binding-osgi-broker</name>
           </binding-registry>
-          <dom-registry xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom">prefix:dom-broker-osgi-registry</type>
+          <dom-registry xmlns="$ns:$nc">
+            <type xmlns:prefix="$ns:md:sal:dom">prefix:dom-broker-osgi-registry</type>
             <name>dom-broker</name>
           </dom-registry>
-          <client-dispatcher xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:config:netconf">prefix:netconf-client-dispatcher</type>
+          <client-dispatcher xmlns="$ns:$nc">
+            <type xmlns:prefix="$ns:config:netconf">prefix:netconf-client-dispatcher</type>
             <name>global-netconf-dispatcher</name>
           </client-dispatcher>
-          <processing-executor xmlns="urn:opendaylight:params:xml:ns:yang:controller:md:sal:connector:netconf">
-            <type xmlns:prefix="urn:opendaylight:params:xml:ns:yang:controller:threadpool">prefix:threadpool</type>
+          <processing-executor xmlns="$ns:$nc">
+            <type xmlns:prefix="$ns:threadpool">prefix:threadpool</type>
             <name>global-netconf-processing-executor</name>
           </processing-executor>
         </module>
 END_XML
+
+    print $xmlPayload . "\n\n\n\n";
 
     my $resp = $self->_http_req('POST', $urlpath, $xmlPayload, \%headers);
     $resp->is_success or $status->_http_err($resp);

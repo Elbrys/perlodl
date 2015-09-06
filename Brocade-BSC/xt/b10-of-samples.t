@@ -65,7 +65,7 @@ local $ENV{PERL5LIB} = "$ENV{PWD}/lib";
 foreach my $demo (@demos) {
     # untaint *cough*
     $demo =~ m[(../samples/openflow/demos/demo\d+.pl$)]g && ($demo = $1);
-    my $ok = (0 == system ("$demo -c xt/of.yml"));
+    my $ok = (0 == system ("$demo -c $cfgfile"));
     $Test->ok($ok, $demo);
 }
 

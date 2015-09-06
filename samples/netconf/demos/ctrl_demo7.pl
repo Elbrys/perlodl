@@ -49,9 +49,9 @@ my $bvc = Brocade::BSC->new(cfgfile => $configfile);
 print "'Controller':\n";
 print $bvc->as_json() . "\n";
 
-print (
-"<<< Show operational state of a particular configuration module on the Controller\n"
-);
+print "<<< Show operational state of a particular configuration "
+  . "module on the Controller\n";
+
 my $moduleType = "opendaylight-rest-connector:rest-connector-impl";
 my $moduleName = "rest-connector-default-impl";
 print "    (module type: $moduleType,\n     module name: $moduleName)\n";
