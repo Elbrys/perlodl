@@ -1,0 +1,18 @@
+# Coding conventions ###################################################
+#
+
+Code in the repository should conform to standards defined by the files
+  Brocade-BSC/xt/perlcriticrc
+  Brocade-BSC/xt/perltidyrc
+
+Perl::Critic and Perl::Tidy are run as part of the author/extra test suite.
+
+Test::Perl::Critic should be installed on development/test machines, so that
+the coding convention tests are not skipped.
+
+To tidy code prior to commit, run perltidy with the repository perltidyrc:
+
+$ perltidy -b -p /path/to/xt/perltidyrc foo.pm
+[diff foo.pm.bak against foo.pm]
+$ rm foo.pm.bak
+

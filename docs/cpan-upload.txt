@@ -23,16 +23,3 @@ $ make dist
 
 $ cpan-upload Brocade-BSC-${VERSION}.tar.gz
 
-
-
-
-
-# Ensure Brocade copyright is present in all perl files ################
-#
-
-+ cd to Brocade-BSC
-$ prove -l xt
-
---or--
-
-$ perl -T xt/b00-copyright.t

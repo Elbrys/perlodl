@@ -1,0 +1,11 @@
+# Ensure Brocade copyright is present in all perl files ################
+#
+
+cd to the Brocade-BSC directory and
+
+$ perl -T xt/b00-copyright.t
+
+or just run the full test suite
+
+$ prove -l t xt
+
