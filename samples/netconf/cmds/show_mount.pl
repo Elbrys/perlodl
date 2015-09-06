@@ -41,15 +41,25 @@ my $configfile = "";
 
 GetOptions("config=s" => \$configfile) or die ("Command line args");
 
-my $bvc = Brocade::BSC->new(cfgfile => $configfile);
+my $bsc = Brocade::BSC->new(cfgfile => $configfile);
 my $ncNode =
-  Brocade::BSC::Node::NC->new(cfgfile => $configfile, ctrl => $bvc);
+  Brocade::BSC::Node::NC->new(cfgfile => $configfile, ctrl => $bsc);
 
-my ($status, $nodes_ref) = $bvc->get_all_nodes_in_config();
+print "<<< NETCONF nodes configured on the controller:\n\n";
+my ($status, $nodes_ref) = $bsc->get_netconf_nodes_in_config();
 $status->ok or die "Error: ${\$status->msg}\n";
 
-print "Nodes configured:\n";
-foreach (@$nodes_ref) {
-    print "    '$_'\n";
+foreach my $node (@$nodes_ref) {
+    print "    '$node'\n";
+}
+print "\n";
+
+print "<<< NETCONF nodes connection status on controller:\n\n";
+($status, $nodes_ref) = $bsc->get_netconf_nodes_conn_status();
+$status->ok or die "Error: ${\$status->msg}\n";
+
+foreach my $node(@$nodes_ref) {
+    my $connstatus = $node->{connected} ? "connected" : "not connected";
+    print "    '$node->{id}' is $connstatus\n";
 }
 print "\n";

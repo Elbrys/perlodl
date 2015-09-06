@@ -77,21 +77,6 @@ sub new {
 
 # Method ===============================================================
 
-=item B<as_json>
-
-  # Returns   : OpenVPN interface configuration as formatted JSON string.
-
-=cut ===================================================================
-
-sub as_json {
-    my $self = @_;
-    my $json = JSON->new->canonical->allow_blessed->convert_blessed;
-    return $json->pretty->encode($self);
-}
-
-
-# Method ===============================================================
-
 =item B<get_payload>
 
   # Returns   : OpenVpn interface configuration as JSON for

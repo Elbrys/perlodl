@@ -793,8 +793,6 @@ sub add_netconf_node {
         </module>
 END_XML
 
-    print $xmlPayload . "\n\n\n\n";
-
     my $resp = $self->_http_req('POST', $urlpath, $xmlPayload, \%headers);
     $resp->is_success or $status->_http_err($resp);
     return $status;
