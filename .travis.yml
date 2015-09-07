@@ -1,13 +1,15 @@
 language: perl
 perl:
+  - "5.22"
+  - "5.21"
   - "5.20"
   - "5.18"
   - "5.14"
   - "5.10"
 before_install:
-# only install Test::Perl::Critic on latest version on matrix; doesn't need
+# only install Test::Perl::Critic on one version on matrix; doesn't need
 #   to run against all versions
-  - if [ $(perl -e 'print $^V' | cut -d'.' -f2) -ge 20 ] ; then cpanm --quiet --notest Test::Perl::Critic ; fi
+  - if [ $(perl -e 'print $^V' | cut -d'.' -f2) -eq 20 ] ; then cpanm --quiet --notest Test::Perl::Critic ; fi
   - cd Brocade-BSC
 script:
   - perl Makefile.PL && make test && prove -l xt
