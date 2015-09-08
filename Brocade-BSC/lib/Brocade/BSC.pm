@@ -492,11 +492,20 @@ sub get_schema {
     if ($resp->code == HTTP_OK) {
         my $xmltree_ref =
           XML::Parser->new(Style => 'Tree')->parse($resp->content);
-        assert($xmltree_ref->[0] eq 'output');
-        assert($xmltree_ref->[1][1] eq 'data');
-        assert($xmltree_ref->[1][2][1] == 0);
-        $schema = $xmltree_ref->[1][2][2];
-        $status->_code($BSC_OK);
+        if ($xmltree_ref->[0] eq 'get-schema') {    # BVC 1.x
+            assert($xmltree_ref->[1][1] eq 'output');
+            assert($xmltree_ref->[1][2][1] eq 'data');
+            assert($xmltree_ref->[1][2][2][1] == 0);
+            $schema = $xmltree_ref->[1][2][2][2];
+            $status->_code($BSC_OK);
+        }
+        elsif ($xmltree_ref->[0] eq 'output') {     # BSC 2.x
+            assert($xmltree_ref->[1][1] eq 'data');
+            assert($xmltree_ref->[1][2][1] == 0);
+            $schema = $xmltree_ref->[1][2][2];
+            $status->_code($BSC_OK);
+        }
+        # else: $status remains BSC_UNKNOWN
     }
     else {
         $status->_http_err($resp);
